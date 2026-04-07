@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: #e2e8f0;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 40px 20px;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 20px;
+  color: #60a5fa;
+}
+
+nav a {
+  color: #cbd5f5;
+  text-decoration: none;
+  margin-left: 20px;
+}
+
+/* HERO */
+.hero {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.hero h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  color: #94a3b8;
+}
+
+/* CARD STYLE */
+.card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #6366f1;
+}
+
+/* PROJECT GRID */
+.projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* BUTTON */
+.btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* SECTION */
+.section {
+  margin-bottom: 60px;
+}
+
+.section h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  color: #64748b;
+  margin-top: 60px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- NAV -->
+<nav>
+  <div class="logo">CuriosityEngine</div>
+  <div>
+    <a href="#projects">Projects</a>
+    <a href="#about">About</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>AI Developer Portfolio</h1>
+  <p>Building intelligent systems & real-world AI applications</p>
+</div>
+
+<!-- PROJECTS -->
+<div class="section" id="projects">
+  <h2>AI Projects</h2>
+
+  <div class="projects">
+
+    <div class="card">
+      <h3>AI Paste Tool</h3>
+      <p>Smart pastebin with AI summarization, tagging, and secure sharing.</p>
+      <a href="#" class="btn">View Project</a>
+    </div>
+
+    <div class="card">
+      <h3>Personality Reverse Engine</h3>
+      <p>AI system that predicts a person's past patterns from current traits.</p>
+      <a href="#" class="btn">View Project</a>
+    </div>
+
+    <div class="card">
+      <h3>Medical Insight AI</h3>
+      <p>Healthcare AI assistant that explains medical data in simple language.</p>
+      <a href="#" class="btn">View Project</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section" id="about">
+  <h2>About Me</h2>
+  <div class="card">
+    <p>
+      I am an AI-focused developer with a background in IT and healthcare systems.
+      My goal is to build intelligent applications that solve real-world problems
+      using data, automation, and machine learning.
+    </p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Made with ❤️ | Prince
+</footer>
+
+</div>
+
+</body>
+</html>
