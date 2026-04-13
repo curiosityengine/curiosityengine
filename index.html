@@ -9,13 +9,11 @@
 body {
   margin: 0;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: sans-serif;
   background: linear-gradient(to bottom, #4facfe, #00f2fe);
 }
 
-canvas {
-  display: block;
-}
+canvas { display: block; }
 
 #ui {
   position: absolute;
@@ -24,7 +22,7 @@ canvas {
   text-align: center;
   color: white;
   font-size: 40px;
-  font-weight: 600;
+  font-weight: bold;
 }
 
 #gameOver {
@@ -33,23 +31,11 @@ canvas {
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(0,0,0,0.7);
-  padding: 30px;
-  border-radius: 16px;
+  padding: 25px;
+  border-radius: 12px;
   text-align: center;
   color: white;
   display: none;
-  backdrop-filter: blur(10px);
-}
-
-button {
-  margin-top: 15px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #4facfe;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
 }
 </style>
 </head>
@@ -61,191 +47,154 @@ button {
 <div id="gameOver">
   <h2>Game Over</h2>
   <p id="finalScore"></p>
-  <button onclick="restart()">Play Again</button>
+  <button onclick="restart()">Restart</button>
 </div>
 
 <canvas id="gameCanvas"></canvas>
 
 <script>
-let lastTime = 0;
-let pipeTimer = 0;
-
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let bird = {
-  x: 80,
-  y: canvas.height / 2,
-  radius: 12,
-  velocity: 0
-};
+let bird, pipes, score, running;
 
-let gravity = 0.4;
-let lift = -8;
+// physics tuned for Telegram
+const gravity = 0.5;
+const lift = -9;
 
-let pipes = [];
-let score = 0;
-let gameRunning = true;
+function init() {
+  bird = {
+    x: 80,
+    y: canvas.height / 2,
+    v: 0
+  };
 
-// Create pipes
+  pipes = [];
+  score = 0;
+  running = true;
+
+  document.getElementById("ui").innerText = "0";
+  document.getElementById("gameOver").style.display = "none";
+}
+
 function createPipe() {
-  let gap = 160;
-  let top = Math.random() * (canvas.height - gap - 100);
+  const gap = 150;
+  const top = Math.random() * (canvas.height - gap - 100);
 
   pipes.push({
     x: canvas.width,
-    width: 60,
+    w: 60,
     top: top,
     bottom: top + gap,
     passed: false
   });
 }
 
-// Draw bird with face
+// reliable timing (NOT delta-based)
+setInterval(createPipe, 1500);
+
 function drawBird() {
-  // body
   ctx.beginPath();
   ctx.arc(bird.x, bird.y, 14, 0, Math.PI * 2);
   ctx.fillStyle = "#ffd166";
   ctx.fill();
 
-  // eye
   ctx.beginPath();
   ctx.arc(bird.x + 5, bird.y - 5, 4, 0, Math.PI * 2);
   ctx.fillStyle = "#fff";
   ctx.fill();
 
-  // pupil
   ctx.beginPath();
   ctx.arc(bird.x + 6, bird.y - 5, 2, 0, Math.PI * 2);
   ctx.fillStyle = "#000";
   ctx.fill();
 
-  // beak
   ctx.beginPath();
   ctx.moveTo(bird.x + 14, bird.y);
   ctx.lineTo(bird.x + 22, bird.y - 4);
   ctx.lineTo(bird.x + 22, bird.y + 4);
-  ctx.closePath();
   ctx.fillStyle = "#ff7b00";
   ctx.fill();
 }
 
-// Draw pipes
-function drawPipes() {
-  ctx.fillStyle = "#2ecc71";
+function update() {
+  if (!running) return;
+
+  bird.v += gravity;
+  bird.v = Math.min(bird.v, 10);
+  bird.y += bird.v;
 
   pipes.forEach(pipe => {
-    ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
-    ctx.fillRect(pipe.x, pipe.bottom, pipe.width, canvas.height);
-  });
-}
+    pipe.x -= 3;
 
-// Update game
-function update(delta) {
-  if (!gameRunning) return;
-
-  // Bird physics
-  bird.velocity += gravity * delta;
-  bird.velocity = Math.min(bird.velocity, 10);
-  bird.y += bird.velocity * delta;
-
-  // Pipe spawn (delta-based)
-  pipeTimer += delta;
-  if (pipeTimer > 90) {
-    createPipe();
-    pipeTimer = 0;
-  }
-
-  pipes.forEach(pipe => {
-    pipe.x -= 3 * delta;
-
-    // Collision
+    // collision
     if (
-      bird.x + bird.radius > pipe.x &&
-      bird.x - bird.radius < pipe.x + pipe.width &&
-      (bird.y - bird.radius < pipe.top ||
-       bird.y + bird.radius > pipe.bottom)
+      bird.x + 12 > pipe.x &&
+      bird.x - 12 < pipe.x + pipe.w &&
+      (bird.y - 12 < pipe.top || bird.y + 12 > pipe.bottom)
     ) {
       gameOver();
     }
 
-    // Scoring
-    if (!pipe.passed && pipe.x + pipe.width < bird.x) {
+    // score
+    if (!pipe.passed && pipe.x + pipe.w < bird.x) {
       pipe.passed = true;
       score++;
       document.getElementById("ui").innerText = score;
     }
   });
 
-  // Ground / sky collision
   if (bird.y > canvas.height || bird.y < 0) {
     gameOver();
   }
 }
 
-// Draw
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Bird tilt
+  // tilt
   ctx.save();
   ctx.translate(bird.x, bird.y);
-  ctx.rotate(bird.velocity * 0.05);
+  ctx.rotate(bird.v * 0.05);
   ctx.translate(-bird.x, -bird.y);
 
   drawBird();
 
   ctx.restore();
 
-  drawPipes();
+  ctx.fillStyle = "#2ecc71";
+  pipes.forEach(pipe => {
+    ctx.fillRect(pipe.x, 0, pipe.w, pipe.top);
+    ctx.fillRect(pipe.x, pipe.bottom, pipe.w, canvas.height);
+  });
 }
 
-// Game loop
-function loop(timestamp) {
-  if (!lastTime) lastTime = timestamp;
-  const delta = (timestamp - lastTime) / 16.67;
-  lastTime = timestamp;
-
-  update(delta);
+function loop() {
+  update();
   draw();
-
   requestAnimationFrame(loop);
 }
 
-loop();
-
-// Game Over
 function gameOver() {
-  gameRunning = false;
+  running = false;
   document.getElementById("gameOver").style.display = "block";
   document.getElementById("finalScore").innerText = "Score: " + score;
 }
 
-// Restart
 function restart() {
-  bird.y = canvas.height / 2;
-  bird.velocity = 0;
-  pipes = [];
-  score = 0;
-  gameRunning = true;
-  pipeTimer = 0;
-
-  document.getElementById("ui").innerText = 0;
-  document.getElementById("gameOver").style.display = "none";
+  init();
 }
 
-// Controls
-window.addEventListener("click", () => {
-  bird.velocity = lift;
-});
+// controls
+window.addEventListener("click", () => bird.v = lift);
+window.addEventListener("touchstart", () => bird.v = lift);
 
-window.addEventListener("touchstart", () => {
-  bird.velocity = lift;
-});
+// start
+init();
+loop();
 </script>
 
 </body>
