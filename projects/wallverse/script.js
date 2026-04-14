@@ -8,7 +8,7 @@ function displayImages(data) {
 
   data.forEach(img => {
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "wall-card";
 
     card.innerHTML = `
       <img src="${img.url}" alt="${img.title}" onclick="openImage('${img.url}')">
