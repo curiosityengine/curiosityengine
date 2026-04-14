@@ -1,50 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ToolVerse | AI Tools Directory</title>
+  <meta charset="UTF-8">
+  <title>ToolVerse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../style.css">
+  <!-- GLOBAL CSS -->
+  <link rel="stylesheet" href="../../style.css">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-<div class="back-home">
-  <a href="../../index.html">← Back to Home</a>
-</div>
-<!-- NAVBAR -->
-<div class="navbar">
-  <div class="logo">Tool<span>Verse</span></div>
-  <div class="nav-links">
-    <a href="#">Explore</a>
-    <a href="#">Categories</a>
-    <a href="#">Submit</a>
-  </div>
+
+<!-- BACK TO HOME -->
+<div style="max-width:1100px; margin:0 auto; padding:20px;">
+  <a href="../../index.html" style="color: var(--text-secondary); text-decoration:none;">
+    ← Back to Home
+  </a>
 </div>
 
-<!-- HERO -->
-<div class="hero">
-  <h1>Discover the Best AI Tools</h1>
-  <p>Explore tools for writing, coding, design, and more</p>
-
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search tools...">
-    <button onclick="searchTools()">Search</button>
-  </div>
-</div>
-
-<!-- CATEGORY -->
-<div class="categories">
-  <div class="category active" onclick="filterCategory('all')">All</div>
-  <div class="category" onclick="filterCategory('writing')">Writing</div>
-  <div class="category" onclick="filterCategory('image')">Image</div>
-  <div class="category" onclick="filterCategory('coding')">Coding</div>
-  <div class="category" onclick="filterCategory('productivity')">Productivity</div>
-</div>
-
-<!-- TOOLS GRID -->
 <div class="container">
+
+  <!-- TOP CARD -->
+  <div class="card">
+
+    <h2>🤖 ToolVerse</h2>
+    <p class="subtitle">Discover the best AI tools</p>
+
+    <!-- SEARCH -->
+    <input 
+  type="text" 
+  id="searchInput" 
+  class="input"
+  placeholder="Search tools..."
+  oninput="searchTools()"
+>
+
+    <!-- FILTER BUTTONS -->
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="filterCategory('all')">All</button>
+      <button class="btn" onclick="filterCategory('writing')">Writing</button>
+      <button class="btn" onclick="filterCategory('image')">Image</button>
+      <button class="btn" onclick="filterCategory('coding')">Coding</button>
+      <button class="btn" onclick="filterCategory('productivity')">Productivity</button>
+    </div>
+
+  </div>
+
+  <!-- TOOLS GRID -->
   <div class="grid" id="toolsGrid">
 
     <div class="card" data-category="writing">
@@ -72,6 +77,7 @@
     </div>
 
   </div>
+
 </div>
 
 <!-- FOOTER -->
@@ -79,12 +85,12 @@
   © 2026 ToolVerse | Built by Prince
 </footer>
 
+<!-- SCRIPT -->
 <script>
 
-/* SEARCH */
 function searchTools() {
   let input = document.getElementById("searchInput").value.toLowerCase();
-  let cards = document.querySelectorAll(".card");
+  let cards = document.querySelectorAll("#toolsGrid .card");
 
   cards.forEach(card => {
     let text = card.innerText.toLowerCase();
@@ -92,9 +98,8 @@ function searchTools() {
   });
 }
 
-/* FILTER */
 function filterCategory(category) {
-  let cards = document.querySelectorAll(".card");
+  let cards = document.querySelectorAll("#toolsGrid .card");
 
   cards.forEach(card => {
     if (category === "all" || card.dataset.category === category) {
@@ -103,9 +108,6 @@ function filterCategory(category) {
       card.style.display = "none";
     }
   });
-
-  document.querySelectorAll(".category").forEach(c => c.classList.remove("active"));
-  event.target.classList.add("active");
 }
 
 </script>
