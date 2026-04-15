@@ -1,22 +1,22 @@
 const wallpapers = [
   {
-    url: "https://picsum.photos/400/300?1",
-    title: "Mountain sunrise",
-    category: "nature"
+    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    category: "nature",
+    tags: ["ocean", "sea", "sunset", "water"]
   },
   {
-    url: "https://picsum.photos/400/300?2",
-    title: "City night lights",
-    category: "city"
+    url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    category: "nature",
+    tags: ["forest", "trees", "green"]
   },
   {
-    url: "https://picsum.photos/400/300?3",
-    title: "Anime sky",
-    category: "anime"
+    url: "https://images.unsplash.com/photo-1494526585095-c41746248156",
+    category: "city",
+    tags: ["traffic", "night", "lights"]
   },
   {
-    url: "https://picsum.photos/400/300?4",
-    title: "Village morning",
-    category: "nature"
+    url: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308",
+    category: "anime",
+    tags: ["illustration", "art"]
   }
 ];
