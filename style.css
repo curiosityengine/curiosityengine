@@ -227,3 +227,11 @@ footer {
   text-align: center;
   margin-bottom: 30px;
 }
+
+.wall-card img {
+  transition: transform 0.3s ease;
+}
+
+.wall-card:hover img {
+  transform: scale(1.05);
+}
