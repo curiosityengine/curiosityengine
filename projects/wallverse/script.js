@@ -1,71 +1,78 @@
-let currentIndex = 0;
-const batchSize = 6;
+let currentPage = 1;
+let currentQuery = "nature";
+let isLoading = false;
+let allWallpapers = [];
 
-let filteredData = [];
-
-// WAIT FOR DOM
 document.addEventListener("DOMContentLoaded", () => {
-
-  filteredData = [...wallpapers];
-
   const gallery = document.getElementById("gallery");
   const searchInput = document.getElementById("search");
 
-  function loadMore() {
-    const nextItems = filteredData.slice(currentIndex, currentIndex + batchSize);
+  // ── Load and append wallpapers ──────────────────────────
+  async function loadMore() {
+    if (isLoading) return;
+    isLoading = true;
 
-    nextItems.forEach(item => {
+    const results = await searchWallpapers(currentQuery, currentPage);
+    allWallpapers = [...allWallpapers, ...results];
+
+    results.forEach(item => {
       const div = document.createElement("div");
       div.className = "wall-card";
+      div.style.backgroundColor = item.color; // placeholder color while loading
 
       const img = document.createElement("img");
-      img.src = item.url;
+      img.src = item.thumb;                   // thumb for fast grid load
       img.loading = "lazy";
+      img.alt = item.tags[0] || item.category;
+
+      // Click to view full resolution
+      img.addEventListener("click", () => {
+        window.open(item.url, "_blank");
+      });
 
       div.appendChild(img);
       gallery.appendChild(div);
     });
 
-    currentIndex += batchSize;
+    currentPage++;
+    isLoading = false;
   }
 
-  function resetGallery() {
+  // ── Reset gallery for new search/filter ─────────────────
+  function resetGallery(query) {
     gallery.innerHTML = "";
-    currentIndex = 0;
+    currentPage = 1;
+    currentQuery = query;
+    allWallpapers = [];
     loadMore();
   }
 
-  // INITIAL LOAD
+  // ── Initial load ─────────────────────────────────────────
   loadMore();
 
-  // SEARCH
+  // ── Search ───────────────────────────────────────────────
+  let debounceTimer;
   searchInput.addEventListener("input", () => {
-    const query = searchInput.value.toLowerCase();
-
-    filteredData = wallpapers.filter(item =>
-      item.category.includes(query) ||
-      item.tags.some(tag => tag.includes(query))
-    );
-
-    resetGallery();
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const query = searchInput.value.trim() || "nature";
+      resetGallery(query);
+    }, 500); // wait 500ms after user stops typing
   });
 
-  // CATEGORY FILTER
+  // ── Category filter ──────────────────────────────────────
   window.filterCategory = function(category) {
-    if (category === "all") {
-      filteredData = [...wallpapers];
-    } else {
-      filteredData = wallpapers.filter(item => item.category === category);
-    }
-
-    resetGallery();
+    searchInput.value = "";
+    resetGallery(category === "all" ? "nature" : category);
   };
 
-  // INFINITE SCROLL
+  // ── Infinite scroll ──────────────────────────────────────
   window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 300
+      && !isLoading
+    ) {
       loadMore();
     }
   });
-
 });
