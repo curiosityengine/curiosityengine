@@ -1,51 +1,64 @@
-const gallery = document.getElementById("gallery");
-const searchInput = document.getElementById("search");
+let currentIndex = 0;
+const batchSize = 6;
 
-let currentCategory = "all";
+let filteredData = [...wallpapers];
 
-function displayImages(data) {
-  gallery.innerHTML = "";
+function loadMore() {
+  const gallery = document.getElementById("gallery");
 
-  data.forEach(img => {
-    const card = document.createElement("div");
-    card.className = "wall-card";
+  const nextItems = filteredData.slice(currentIndex, currentIndex + batchSize);
 
-    card.innerHTML = `
-      <img src="${img.url}" alt="${img.title}" onclick="openImage('${img.url}')">
-    `;
+  nextItems.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "wall-card";
 
-    gallery.appendChild(card);
+    const img = document.createElement("img");
+    img.src = item.url;
+    img.loading = "lazy"; // 🔥 lazy loading
+
+    div.appendChild(img);
+    gallery.appendChild(div);
   });
-}
 
-function filterCategory(category) {
-  currentCategory = category;
-  applyFilters();
-}
-
-function applyFilters() {
-  let filtered = wallpapers;
-
-  if (currentCategory !== "all") {
-    filtered = filtered.filter(w => w.category === currentCategory);
-  }
-
-  const searchValue = searchInput.value.toLowerCase();
-
-  if (searchValue) {
-    filtered = filtered.filter(w =>
-      w.title.toLowerCase().includes(searchValue)
-    );
-  }
-
-  displayImages(filtered);
-}
-
-searchInput.addEventListener("input", applyFilters);
-
-function openImage(url) {
-  window.open(url, "_blank");
+  currentIndex += batchSize;
 }
 
 // Initial load
-displayImages(wallpapers);
+loadMore();
+
+
+// Infinite scroll trigger
+window.addEventListener("scroll", () => {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+    loadMore();
+  }
+});
+
+const searchInput = document.getElementById("search");
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+
+  filteredData = wallpapers.filter(item =>
+    item.category.includes(query) ||
+    item.tags.some(tag => tag.includes(query))
+  );
+
+  resetGallery();
+});
+
+function filterCategory(category) {
+  if (category === "all") {
+    filteredData = [...wallpapers];
+  } else {
+    filteredData = wallpapers.filter(item => item.category === category);
+  }
+
+  resetGallery();
+}
+
+function resetGallery() {
+  document.getElementById("gallery").innerHTML = "";
+  currentIndex = 0;
+  loadMore();
+}
