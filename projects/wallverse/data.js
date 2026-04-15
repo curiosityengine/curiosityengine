@@ -1,7 +1,7 @@
-// api.js
+// data.js
 const ACCESS_KEY = "jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM";
 
-export async function searchWallpapers(query = "nature", page = 1) {
+async function searchWallpapers(query = "nature", page = 1) {
   const res = await fetch(
     `https://api.unsplash.com/search/photos?query=${query}&page=${page}&per_page=30&orientation=landscape`,
     { headers: { Authorization: `Client-ID ${ACCESS_KEY}` } }
