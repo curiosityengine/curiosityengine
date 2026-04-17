@@ -1,6 +1,7 @@
 const UNSPLASH_KEY = "jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM";
 const PIXABAY_KEY  = "55480324-56c6d823dfc3fc9c5805c16b0";
 const PEXELS_KEY   = "SOUjV6HIxdiZpJQkA2cey65IKj68rTH8ZJzfF6QulaA8KfXNwMtHTloo";
+const WALLHAVEN_KEY = "yxQAVZjLLwHJKS5yyYcLhIcOQrrNFw7i";
 
 // ── Unsplash ──────────────────────────────────────────
 async function fetchUnsplash(query, page) {
@@ -51,6 +52,23 @@ async function fetchPixabay(query, page) {
   }
 }
 
+// ── Wallhaven ────────────────────────────────────────────
+async function fetchWallhaven(query, page) {
+  const res = await fetch(
+    `https://wallhaven.cc/api/v1/search?q=${query}&page=${page}&ratios=16x9&apikey=${WALLHAVEN_KEY}`
+  );
+
+  const data = await res.json();
+
+  return data.data.map(photo => ({
+    id: "wallhaven_" + photo.id,
+    url: photo.path,
+    thumb: photo.thumbs.large,
+    color: photo.colors?.[0] || "#111",
+    source: "Wallhaven"
+  }));
+}
+
 // ── Pexels ────────────────────────────────────────────
 async function fetchPexels(query, page) {
   try {
@@ -74,6 +92,21 @@ async function fetchPexels(query, page) {
     console.error("Pexels failed:", err);
     return [];
   }
+}
+
+// ===== PICSUM =====
+async function fetchPicsum(query, page) {
+  const res = await fetch(
+    `https://picsum.photos/v2/list?page=${page}&limit=15`
+  );
+  const data = await res.json();
+  return data.map(photo => ({
+    id: "picsum_" + photo.id,
+    url: `https://picsum.photos/id/${photo.id}/1920/1080`,
+    thumb: `https://picsum.photos/id/${photo.id}/400/300`,
+    color: "#111",
+    source: "Picsum"
+  }));
 }
 
 // ── Main function (called by script.js) ──────────────
