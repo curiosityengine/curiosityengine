@@ -20,9 +20,19 @@ function openModal(item) {
   downloadBtn.onclick = async () => {
     try {
       downloadBtn.innerText = "⏳ Downloading...";
-      const response = await fetch(item.thumb); // thumb is smaller, downloads faster
+      downloadBtn.disabled = true;
+
+      // Unsplash requires hitting their /download endpoint first (tracks stats)
+      // Then we fetch the actual image as a blob to force a local download
+      const downloadUrl = `https://images.unsplash.com/${item.id}?w=1920&q=80&fm=jpg&fit=crop`;
+
+      const response = await fetch(downloadUrl, { mode: "cors" });
+
+      if (!response.ok) throw new Error("Fetch failed");
+
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
+
       const a = document.createElement("a");
       a.href = blobUrl;
       a.download = `wallverse-${item.id}.jpg`;
@@ -30,10 +40,19 @@ function openModal(item) {
       a.click();
       a.remove();
       URL.revokeObjectURL(blobUrl);
-      downloadBtn.innerText = "⬇️ Download";
+
+      downloadBtn.innerText = "✅ Downloaded!";
+      setTimeout(() => {
+        downloadBtn.innerText = "⬇️ Download";
+        downloadBtn.disabled = false;
+      }, 2000);
+
     } catch (err) {
       console.error("Download failed:", err);
+      // Fallback: open in new tab so user can save manually
+      window.open(item.url, "_blank");
       downloadBtn.innerText = "⬇️ Download";
+      downloadBtn.disabled = false;
     }
   };
 }
