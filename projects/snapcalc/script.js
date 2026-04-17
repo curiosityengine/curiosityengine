@@ -45,36 +45,83 @@ function preprocess(input) {
 
   let str = input;
 
-  // lakh crore → trillion
-  if (str.includes("lakh crore")) {
-    str = str.replace(/(\d+)/, (_, n) => `${n}e12`);
+  // -------------------------
+  // NUMBER SYSTEM NORMALIZATION
+  // -------------------------
+
+  // million → 1e6
+  if (str.includes("million")) {
+    str = str.replace(/(\d+(\.\d+)?)\s*million/g, (_, n) => `${n}e6`);
   }
 
-  // crore → 1e7
-  else if (str.includes("crore")) {
-    str = str.replace(/(\d+)/, (_, n) => `${n}e7`);
+  // billion → 1e9
+  if (str.includes("billion")) {
+    str = str.replace(/(\d+(\.\d+)?)\s*billion/g, (_, n) => `${n}e9`);
+  }
+
+  // trillion → 1e12
+  if (str.includes("trillion")) {
+    str = str.replace(/(\d+(\.\d+)?)\s*trillion/g, (_, n) => `${n}e12`);
   }
 
   // lakh → 1e5
-  else if (str.includes("lakh")) {
-    str = str.replace(/(\d+)/, (_, n) => `${n}e5`);
+  if (str.includes("lakh")) {
+    str = str.replace(/(\d+(\.\d+)?)\s*lakh/g, (_, n) => `${n}e5`);
   }
 
-  // kattha → sqft (manual handling later)
+  // crore → 1e7
+  if (str.includes("crore")) {
+    str = str.replace(/(\d+(\.\d+)?)\s*crore/g, (_, n) => `${n}e7`);
+  }
+
+  // lakh crore → 1e12
+  if (str.includes("lakh crore")) {
+    str = str.replace(/(\d+(\.\d+)?)\s*lakh crore/g, (_, n) => `${n}e12`);
+  }
+
+  // -------------------------
+  // SPECIAL CASE: convert TO lakh
+  // -------------------------
+  if (str.includes("to lakh")) {
+    str = str.replace("to lakh", "/1e5");
+  }
+
+  // convert TO crore
+  if (str.includes("to crore")) {
+    str = str.replace("to crore", "/1e7");
+  }
+
+  // convert TO million
+  if (str.includes("to million")) {
+    str = str.replace("to million", "/1e6");
+  }
+
+  // convert TO billion
+  if (str.includes("to billion")) {
+    str = str.replace("to billion", "/1e9");
+  }
+
+  // -------------------------
+  // AREA FIX (kattha)
+  // -------------------------
   if (str.includes("kattha")) {
     str = str.replace("kattha", "1361 sqft");
   }
 
-  // Hinglish split
+  // -------------------------
+  // HINGLISH SPLIT
+  // -------------------------
   if (str.includes("baato")) {
     let nums = str.match(/(\d+).*?(\d+)/);
     if (nums) return `${nums[1]} / ${nums[2]}`;
   }
 
-  // remove extra words
+  // -------------------------
+  // CLEAN WORDS
+  // -------------------------
   str = str.replace(/(kitna|hota|hai|me|in|ko|batao)/g, "");
 
-  return str;
+  return str.trim();
 }
 
 // ----------------------------
