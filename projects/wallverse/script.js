@@ -63,15 +63,15 @@ function openModal(item) {
       a.remove();
       URL.revokeObjectURL(blobUrl);
 
-      downloadBtn.innerText = "✅ Downloaded!";
+      downloadBtn.innerText = "Downloaded!";
       setTimeout(() => {
-        downloadBtn.innerText = "⬇️ Download";
+        downloadBtn.innerText = "Download";
         downloadBtn.disabled = false;
       }, 2000);
 
     } catch (err) {
       console.error("Download error:", err);
-      downloadBtn.innerText = "❌ Failed";
+      downloadBtn.innerText = "Failed";
       downloadBtn.disabled = false;
     }
   };
