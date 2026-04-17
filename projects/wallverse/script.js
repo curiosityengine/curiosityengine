@@ -14,7 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const results = await searchWallpapers(currentQuery, currentPage);
     allWallpapers = [...allWallpapers, ...results];
-
+    img.addEventListener("click", () => {
+  openModal(item);
+});
     results.forEach(item => {
       const div = document.createElement("div");
       div.className = "wall-card";
