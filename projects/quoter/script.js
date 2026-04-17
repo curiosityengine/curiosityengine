@@ -66,7 +66,7 @@ function wrapText(text, x, y, maxWidth, lineHeight) {
 
 function downloadImage() {
   const link = document.createElement("a");
-  link.download = "quoteverse.png";
+  link.download = "quoter.png";
   link.href = canvas.toDataURL();
   link.click();
 }
