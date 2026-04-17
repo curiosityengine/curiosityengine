@@ -1,51 +1,24 @@
+// script.js — WallVerse app logic
 let currentPage = 1;
 let currentQuery = "nature";
 let isLoading = false;
 
-const ACCESS_KEY = "jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM"; // 🔥 put your key here
-
 document.addEventListener("DOMContentLoaded", () => {
   const gallery = document.getElementById("gallery");
   const searchInput = document.getElementById("search");
-
+  const loader = document.getElementById("loader");
   const modal = document.getElementById("modal");
   const modalImg = document.getElementById("modalImg");
   const downloadBtn = document.getElementById("downloadBtn");
   const closeModal = document.getElementById("closeModal");
 
-  // ===== FETCH FROM UNSPLASH =====
-  async function fetchWallpapers(query, page) {
-    try {
-      const res = await fetch(
-        `https://api.unsplash.com/search/photos?query=${query}&page=${page}&per_page=20&orientation=landscape`,
-        {
-          headers: {
-            Authorization: `Client-ID ${ACCESS_KEY}`
-          }
-        }
-      );
-
-      const data = await res.json();
-
-      return data.results.map(photo => ({
-        url: photo.urls.full,
-        thumb: photo.urls.small,
-        color: photo.color || "#111"
-      }));
-    } catch (err) {
-      console.error("API Error:", err);
-      return [];
-    }
-  }
-
   // ===== MODAL =====
   function openModal(item) {
     modal.classList.remove("hidden");
     modalImg.src = item.url;
-
     downloadBtn.onclick = () => {
       const a = document.createElement("a");
-      a.href = item.url;
+      a.href = item.url + "&force=true";
       a.download = "wallverse.jpg";
       document.body.appendChild(a);
       a.click();
@@ -53,46 +26,54 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  if (closeModal) {
-    closeModal.addEventListener("click", () => {
-      modal.classList.add("hidden");
-    });
-  }
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    modalImg.src = "";
+  });
 
-  // ===== LOAD =====
+  // Close modal on backdrop click
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+      modalImg.src = "";
+    }
+  });
+
+  // ===== LOAD WALLPAPERS =====
   async function loadMore() {
     if (isLoading) return;
     isLoading = true;
+    loader.style.display = "block";
 
-    const results = await fetchWallpapers(currentQuery, currentPage);
+    const results = await searchWallpapers(currentQuery, currentPage);
 
     results.forEach(item => {
       const div = document.createElement("div");
       div.className = "wall-card";
-      div.style.position = "relative";
       div.style.backgroundColor = item.color;
 
       const img = document.createElement("img");
       img.src = item.thumb;
       img.loading = "lazy";
-
+      img.alt = item.tags?.[0] || item.category;
       img.addEventListener("click", () => openModal(item));
 
-      // ❤️ Favorite
+      // ❤️ Favorite button
       const favBtn = document.createElement("button");
       favBtn.innerText = "❤️";
-      favBtn.style.position = "absolute";
-      favBtn.style.top = "10px";
-      favBtn.style.right = "10px";
-      favBtn.style.background = "transparent";
-      favBtn.style.border = "none";
-      favBtn.style.cursor = "pointer";
-
+      favBtn.className = "fav-btn";
+      favBtn.title = "Save to favorites";
       favBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         let saved = JSON.parse(localStorage.getItem("favorites")) || [];
-        saved.push(item);
-        localStorage.setItem("favorites", JSON.stringify(saved));
+        const alreadySaved = saved.find(w => w.id === item.id);
+        if (!alreadySaved) {
+          saved.push(item);
+          localStorage.setItem("favorites", JSON.stringify(saved));
+          favBtn.innerText = "💜";
+        } else {
+          favBtn.innerText = "💜";
+        }
       });
 
       div.appendChild(img);
@@ -102,9 +83,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentPage++;
     isLoading = false;
+    loader.style.display = "none";
   }
 
-  // ===== RESET =====
+  // ===== RESET GALLERY =====
   function resetGallery(query) {
     gallery.innerHTML = "";
     currentPage = 1;
@@ -112,10 +94,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMore();
   }
 
-  // ===== INIT =====
+  // ===== INITIAL LOAD =====
   loadMore();
 
-  // ===== SEARCH =====
+  // ===== SEARCH (debounced) =====
   let debounceTimer;
   searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimer);
@@ -125,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500);
   });
 
-  // ===== CATEGORY =====
+  // ===== CATEGORY FILTER =====
   window.filterCategory = function(category) {
     searchInput.value = "";
     resetGallery(category === "all" ? "nature" : category);
