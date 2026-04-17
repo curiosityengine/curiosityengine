@@ -185,10 +185,17 @@ a {
   background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
   opacity: 0;
   transition: 0.3s;
+  pointer-events: none; /* ← THIS is the fix, lets clicks pass through */
+  z-index: 1;
 }
 
 .wall-card:hover::after {
   opacity: 1;
+}
+
+/* Also make sure fav button is above the overlay */
+.fav-btn {
+  z-index: 2; /* ← above the ::after overlay */
 }
 
 /* ===== TOOLVERSE GRID ===== */
