@@ -2,7 +2,7 @@ let currentPage = 1;
 let currentQuery = "nature";
 let isLoading = false;
 
-const ACCESS_KEY = "YOUR_UNSPLASH_ACCESS_KEY"; // 🔥 put your key here
+const ACCESS_KEY = "jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM"; // 🔥 put your key here
 
 document.addEventListener("DOMContentLoaded", () => {
   const gallery = document.getElementById("gallery");
