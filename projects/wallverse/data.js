@@ -111,11 +111,13 @@ async function fetchPicsum(query, page) {
 
 // ── Main function (called by script.js) ──────────────
 async function searchWallpapers(query = "nature", page = 1) {
-  // All 3 APIs fire at the same time
-  const [unsplash, pixabay, pexels] = await Promise.all([
+  // All 5 APIs fire at the same time
+  const [unsplash, pixabay, pexels, wallhaven, picsum] = await Promise.all([
     fetchUnsplash(query, page),
     fetchPixabay(query, page),
-    fetchPexels(query, page)
+    fetchPexels(query, page),
+    fetchPicsum(query, page),
+    fetchWallhaven(query, page)
   ]);
 
   // Merge and shuffle so results are mixed, not grouped by source
