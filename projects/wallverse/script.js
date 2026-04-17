@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.src = item.thumb;
       img.loading = "lazy";
       img.alt = item.tags?.[0] || item.category;
-      img.addEventListener("click", () => openModal(item));
+      div.addEventListener("click", () => openModal(item));
 
       // ❤️ Favorite button
       const favBtn = document.createElement("button");
