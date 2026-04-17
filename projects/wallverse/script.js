@@ -19,7 +19,7 @@ function openModal(item) {
 
   downloadBtn.onclick = async () => {
     try {
-      downloadBtn.innerText = "⏳ Downloading...";
+      downloadBtn.innerText = "Downloading...";
       downloadBtn.disabled = true;
 
       // Step 1: Hit Unsplash download endpoint (required by their guidelines)
@@ -44,9 +44,9 @@ function openModal(item) {
       a.remove();
       URL.revokeObjectURL(blobUrl);
 
-      downloadBtn.innerText = "✅ Downloaded!";
+      downloadBtn.innerText = "Downloaded!";
       setTimeout(() => {
-        downloadBtn.innerText = "⬇️ Download";
+        downloadBtn.innerText = "Download";
         downloadBtn.disabled = false;
       }, 2000);
 
