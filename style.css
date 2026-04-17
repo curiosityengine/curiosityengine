@@ -336,3 +336,15 @@ footer {
 .fav-btn:hover {
   transform: scale(1.2);
 }
+
+textarea.input {
+  min-height: 100px;
+  resize: none;
+}
+
+canvas {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  background: #111;
+}
