@@ -19,22 +19,22 @@ function openModal(item) {
 
   downloadBtn.onclick = async () => {
     try {
-      downloadBtn.innerText = "Downloading...";
+      downloadBtn.innerText = "⏳ Downloading...";
       downloadBtn.disabled = true;
 
-      // Step 1: Hit Unsplash download endpoint (required by their guidelines)
-      // This returns a real CDN url that has proper CORS headers
-      const trackRes = await fetch(item.download_url, {
-        headers: { Authorization: `Client-ID ${ACCESS_KEY}` }
-      });
-      const trackData = await trackRes.json();
-      const imageUrl = trackData.url; // actual CDN download link
+      let imageUrl = item.url;
 
-      // Step 2: Fetch image as blob
+      // Only Unsplash needs the special download endpoint
+      if (item.source === "Unsplash" && item.download_url) {
+        const trackRes = await fetch(item.download_url, {
+          headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` }
+        });
+        const trackData = await trackRes.json();
+        imageUrl = trackData.url;
+      }
+
       const imgRes = await fetch(imageUrl);
       const blob = await imgRes.blob();
-
-      // Step 3: Trigger download
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
@@ -44,9 +44,9 @@ function openModal(item) {
       a.remove();
       URL.revokeObjectURL(blobUrl);
 
-      downloadBtn.innerText = "Downloaded!";
+      downloadBtn.innerText = "✅ Downloaded!";
       setTimeout(() => {
-        downloadBtn.innerText = "Download";
+        downloadBtn.innerText = "⬇️ Download";
         downloadBtn.disabled = false;
       }, 2000);
 
