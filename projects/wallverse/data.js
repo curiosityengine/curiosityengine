@@ -54,19 +54,24 @@ async function fetchPixabay(query, page) {
 
 // ── Wallhaven ────────────────────────────────────────────
 async function fetchWallhaven(query, page) {
-  const res = await fetch(
-    `https://wallhaven.cc/api/v1/search?q=${query}&page=${page}&ratios=16x9&apikey=${WALLHAVEN_KEY}`
-  );
+  try {
+    const res = await fetch(
+      `https://wallhaven.cc/api/v1/search?q=${query}&page=${page}&ratios=16x9&apikey=${WALLHAVEN_KEY}`
+    );
 
-  const data = await res.json();
+    const data = await res.json();
 
-  return data.data.map(photo => ({
-    id: "wallhaven_" + photo.id,
-    url: photo.path,
-    thumb: photo.thumbs.large,
-    color: photo.colors?.[0] || "#111",
-    source: "Wallhaven"
-  }));
+    return data.data.map(photo => ({
+      id: "wallhaven_" + photo.id,
+      url: photo.path,
+      thumb: photo.thumbs.large,
+      color: photo.colors?.[0] || "#111",
+      source: "Wallhaven"
+    }));
+  } catch (err) {
+    console.error("Wallhaven failed:", err);
+    return [];
+  }
 }
 
 // ── Pexels ────────────────────────────────────────────
