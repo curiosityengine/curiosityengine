@@ -13,18 +13,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModal = document.getElementById("closeModal");
 
   // ===== MODAL =====
-  function openModal(item) {
-    modal.classList.remove("hidden");
-    modalImg.src = item.url;
-    downloadBtn.onclick = () => {
+function openModal(item) {
+  modal.classList.remove("hidden");
+  modalImg.src = item.url;
+
+  downloadBtn.onclick = async () => {
+    try {
+      downloadBtn.innerText = "⏳ Downloading...";
+      const response = await fetch(item.thumb); // thumb is smaller, downloads faster
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = item.url + "&force=true";
-      a.download = "wallverse.jpg";
+      a.href = blobUrl;
+      a.download = `wallverse-${item.id}.jpg`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-    };
-  }
+      URL.revokeObjectURL(blobUrl);
+      downloadBtn.innerText = "⬇️ Download";
+    } catch (err) {
+      console.error("Download failed:", err);
+      downloadBtn.innerText = "⬇️ Download";
+    }
+  };
+}
 
   closeModal.addEventListener("click", () => {
     modal.classList.add("hidden");
