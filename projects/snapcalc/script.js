@@ -51,7 +51,7 @@ function handleLocal(input) {
   if ((input.includes("lakh crore")) && (input.includes("dollar") || input.includes("usd"))) {
     if (n) {
       let inr = n * 1e12; // lakh crore → INR
-      let usd = inr / 83; // INR → USD
+      let usd = inr / 90; // INR → USD
       return usd / 1e9;   // USD → billion
     }
   }
@@ -69,7 +69,7 @@ function handleLocal(input) {
   if (input.includes("crore") && (input.includes("usd") || input.includes("dollar"))) {
     if (n) {
       let inr = n * 1e7;
-      return inr / 83;
+      return inr / 90;
     }
   }
 
@@ -79,7 +79,7 @@ function handleLocal(input) {
   if (input.includes("lakh") && (input.includes("usd") || input.includes("dollar"))) {
     if (n) {
       let inr = n * 1e5;
-      return inr / 83;
+      return inr / 90;
     }
   }
 
