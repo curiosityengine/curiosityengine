@@ -1,20 +1,91 @@
-// data.js — Unsplash API helper
-const ACCESS_KEY = "jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM";
+const UNSPLASH_KEY = "jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM";
+const PIXABAY_KEY  = "55480324-56c6d823dfc3fc9c5805c16b0";
+const PEXELS_KEY   = "SOUjV6HIxdiZpJQkA2cey65IKj68rTH8ZJzfF6QulaA8KfXNwMtHTloo";
 
+// ── Unsplash ──────────────────────────────────────────
+async function fetchUnsplash(query, page) {
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${query}&page=${page}&per_page=15&orientation=landscape`,
+      { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` } }
+    );
+    const data = await res.json();
+    return data.results.map(photo => ({
+      id: "unsplash_" + photo.id,
+      url: photo.urls.full,
+      thumb: photo.urls.small,
+      download_url: photo.links.download_location,
+      category: query,
+      tags: photo.tags?.map(t => t.title) || [],
+      author: photo.user.name,
+      color: photo.color || "#111",
+      source: "Unsplash"
+    }));
+  } catch (err) {
+    console.error("Unsplash failed:", err);
+    return []; // if one API fails, others still load
+  }
+}
+
+// ── Pixabay ───────────────────────────────────────────
+async function fetchPixabay(query, page) {
+  try {
+    const res = await fetch(
+      `https://pixabay.com/api/?key=${PIXABAY_KEY}&q=${query}&page=${page}&per_page=15&image_type=photo&orientation=horizontal&safesearch=true`
+    );
+    const data = await res.json();
+    return data.hits.map(photo => ({
+      id: "pixabay_" + photo.id,
+      url: photo.largeImageURL,
+      thumb: photo.previewURL,
+      download_url: null, // Pixabay allows direct download
+      category: query,
+      tags: photo.tags?.split(", ") || [],
+      author: photo.user,
+      color: "#111",
+      source: "Pixabay"
+    }));
+  } catch (err) {
+    console.error("Pixabay failed:", err);
+    return [];
+  }
+}
+
+// ── Pexels ────────────────────────────────────────────
+async function fetchPexels(query, page) {
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${query}&page=${page}&per_page=15&orientation=landscape`,
+      { headers: { Authorization: PEXELS_KEY } }
+    );
+    const data = await res.json();
+    return data.photos.map(photo => ({
+      id: "pexels_" + photo.id,
+      url: photo.src.original,
+      thumb: photo.src.medium,
+      download_url: null, // Pexels allows direct download
+      category: query,
+      tags: [query],
+      author: photo.photographer,
+      color: photo.avg_color || "#111",
+      source: "Pexels"
+    }));
+  } catch (err) {
+    console.error("Pexels failed:", err);
+    return [];
+  }
+}
+
+// ── Main function (called by script.js) ──────────────
 async function searchWallpapers(query = "nature", page = 1) {
-  const res = await fetch(
-    `https://api.unsplash.com/search/photos?query=${query}&page=${page}&per_page=20&orientation=landscape`,
-    { headers: { Authorization: `Client-ID ${ACCESS_KEY}` } }
-  );
-  const data = await res.json();
-  return data.results.map(photo => ({
-    id: photo.id,
-    url: photo.urls.full,
-    thumb: photo.urls.small,
-    download_url: photo.links.download_location,
-    category: query,
-    tags: photo.tags?.map(t => t.title) || [],
-    author: photo.user.name,
-    color: photo.color || "#111"
-  }));
+  // All 3 APIs fire at the same time
+  const [unsplash, pixabay, pexels] = await Promise.all([
+    fetchUnsplash(query, page),
+    fetchPixabay(query, page),
+    fetchPexels(query, page)
+  ]);
+
+  // Merge and shuffle so results are mixed, not grouped by source
+  const combined = [...unsplash, ...pixabay, ...pexels];
+  return combined.sort(() => Math.random() - 0.5);
 }
