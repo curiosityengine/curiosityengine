@@ -197,7 +197,7 @@
 
     grid.innerHTML = filtered.map((t, i) => `
       <div class="tv-card" style="animation-delay:${i * 0.03}s"
-           onclick='openModal(${JSON.stringify(t)})'>
+           onclick="openModal(${t.id})">
         <div class="tv-card-top">
           <img class="tv-card-logo" src="${t.logo}" alt="${t.name}"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
