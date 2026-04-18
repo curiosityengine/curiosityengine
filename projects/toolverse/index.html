@@ -28,10 +28,6 @@
 <!-- HERO -->
 <section class="tv-hero">
   <h1>Find the right<br><em>AI tool</em> for the job</h1>
-  <div class="tv-hero-search">
-    <i class="fas fa-search"></i>
-    <input type="text" id="heroSearch" placeholder="Try ChatGPT, Midjourney, Cursor..." oninput="handleSearch(this.value)">
-  </div>
 </section>
 
 <!-- USE-CASE STRIP -->
@@ -116,7 +112,6 @@
   // ── Search ────────────────────────────────
   function handleSearch(val) {
     searchQuery = val.toLowerCase().trim();
-    document.getElementById("heroSearch").value = val;
     document.getElementById("navSearch").value  = val;
     // Clear filters when searching
     if (searchQuery) {
@@ -138,7 +133,6 @@
         activeCategory = btn.dataset.cat;
         activeUsecase  = null;
         searchQuery    = "";
-        document.getElementById("heroSearch").value = "";
         document.getElementById("navSearch").value  = "";
         document.querySelectorAll(".tv-usecase-btn").forEach(b => b.classList.remove("active"));
         renderGrid();
@@ -160,7 +154,6 @@
           activeUsecase  = uc;
           activeCategory = "all";
           searchQuery    = "";
-          document.getElementById("heroSearch").value = "";
           document.getElementById("navSearch").value  = "";
           document.querySelectorAll(".tv-cat-btn").forEach(b => b.classList.remove("active"));
           document.querySelector('[data-cat="all"]').classList.add("active");
