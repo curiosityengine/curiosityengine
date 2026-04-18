@@ -1,102 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prince AI</title>
-    
-    <!-- Using your project's font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Prince — AI enthusiast building useful apps for the public. Explore projects like SnapCalc, Quoter, WallVerse and more.">
+  <title>Prince AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="index.html" class="navbar-brand">
-  <span style="color:white;">Prince</span>
-  <span style="color:#6c63ff;">AI</span>
-</a>
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-    </nav>
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      Prince<span class="brand-accent">AI</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
 
-    <header class="hero" id="home">
-        <h1>Building the Future with AI</h1>
-        <p>A Full-stack Developer specializing in intelligent applications and modern web experiences.</p>
-        <a href="#projects" class="btn">View My Work</a>
-    </header>
+  <header class="hero" id="home">
+    <div class="hero-tag">AI Enthusiast & Builder</div>
+    <h1>Building apps that<br>actually <em>help people</em></h1>
+    <p>I build AI-powered hobby projects for the general public — useful, fast, and free. Each one is an experiment in making technology feel human.</p>
+    <a href="#projects" class="btn">View My Projects</a>
+  </header>
 
-    <div class="container" id="projects">
-        <h2 class="section-title">Featured Projects</h2>
-        <div class="project-grid">
-            
-            <!-- Pastebin Project (Matches your theme) -->
-            <div class="project-card">
-                <i class="fas fa-paste"></i>
-                <h3>Cloud Pastebin</h3>
-                <p>A high-performance text sharing application with QR code integration and glassmorphic UI.</p>
-                <a href="project-pastebin.html" class="btn" style="padding: 8px 20px; font-size: 0.85rem;">View Project</a>
-            </div>
+  <section class="container" id="projects">
+    <h2 class="section-title">Featured Projects</h2>
+    <div class="project-grid">
 
-            <!-- AI Project -->
-            <div class="project-card">
-                <i class="fas fa-robot"></i>
-                <h3>ToolVerse</h3>
-                <p>A curated directory of AI tools with smart search and category filtering to help users discover the right tools faster.</p>
-                <a href="projects/toolverse/index.html" class="btn" style="padding: 8px 20px; font-size: 0.85rem;">View Project</a>
-            </div>
+      <div class="project-card">
+        <div class="project-icon"><i class="fas fa-bolt"></i></div>
+        <h3>SnapCalc</h3>
+        <p>An AI-powered instant calculator. Type anything in plain English or Hinglish — get the answer in milliseconds. No steps, no fluff.</p>
+        <a href="projects/snapcalc/index.html" class="btn btn-sm" target="_blank" rel="noopener noreferrer">View Project</a>
+      </div>
 
-            <!-- Web Project -->
-          <div class="project-card">
-  <i class="fas fa-image"></i>
-  <h3>WallVerse</h3>
-  <p>A clean and fast wallpaper discovery app where users can browse, search, and explore beautiful wallpapers across categories.</p>
-  
-  <a href="projects/wallverse/index.html" 
-     class="btn" 
-     style="padding: 8px 20px; font-size: 0.85rem;">
-     View Project
-  </a>
-</div>
-           <!-- Quoter -->
-          <div class="project-card">
-  <i class="fas fa-image"></i>
-  <h3>Quoter</h3>
-  <p>A clean and fast wallpaper discovery app where users can browse, search, and explore beautiful wallpapers across categories.</p>
-  
-  <a href="projects/quoter/index.html" 
-     class="btn" 
-     style="padding: 8px 20px; font-size: 0.85rem;">
-     View Project
-  </a>
-</div> 
+      <div class="project-card">
+        <div class="project-icon"><i class="fas fa-quote-left"></i></div>
+        <h3>Quoter</h3>
+        <p>Type a quote or describe an idea — AI writes a quote and generates a beautiful shareable image. Supports Hindi, English, and Shayri.</p>
+        <a href="projects/quoter/index.html" class="btn btn-sm" target="_blank" rel="noopener noreferrer">View Project</a>
+      </div>
 
-                       <!-- SnapCalc -->
-          <div class="project-card">
-  <i class="fas fa-image"></i>
-  <h3>SnapCalc</h3>
-  <p>A clean and fast wallpaper discovery app where users can browse, search, and explore beautiful wallpapers across categories.</p>
-  
-  <a href="projects/snapcalc/index.html" 
-     class="btn" 
-     style="padding: 8px 20px; font-size: 0.85rem;">
-     View Project
-  </a>
-</div> 
-        </div>
+      <div class="project-card">
+        <div class="project-icon"><i class="fas fa-image"></i></div>
+        <h3>WallVerse</h3>
+        <p>A clean and fast wallpaper discovery app. Browse, search, and explore beautiful wallpapers across categories — all in one place.</p>
+        <a href="projects/wallverse/index.html" class="btn btn-sm" target="_blank" rel="noopener noreferrer">View Project</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><i class="fas fa-robot"></i></div>
+        <h3>ToolVerse</h3>
+        <p>A curated directory of AI tools with smart search and category filtering — helping users discover the right tool faster.</p>
+        <a href="projects/toolverse/index.html" class="btn btn-sm" target="_blank" rel="noopener noreferrer">View Project</a>
+      </div>
+
+      <div class="project-card">
+        <div class="project-icon"><i class="fas fa-paste"></i></div>
+        <h3>Cloud Pastebin</h3>
+        <p>A high-performance text sharing app with QR code integration and a glassmorphic UI. Share code and text instantly.</p>
+        <a href="project-pastebin.html" class="btn btn-sm" target="_blank" rel="noopener noreferrer">View Project</a>
+      </div>
+
     </div>
-    <footer id="contact">
-        <p>© 2026 ToolVerse | Built by Prince</p>
-        <div style="margin-top: 15px; font-size: 1.5rem; gap: 20px; display: flex; justify-content: center;">
-            <a href="#" style="color: var(--text-secondary)"><i class="fab fa-github"></i></a>
-            <a href="#" style="color: var(--text-secondary)"><i class="fab fa-linkedin"></i></a>
-        </div>
-    </footer>
+  </section>
+
+  <footer>
+    <p>© 2026 Prince — Building in public, one app at a time.</p>
+    <div class="footer-links">
+      <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+      <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+    </div>
+  </footer>
 
 </body>
 </html>
