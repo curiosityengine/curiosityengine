@@ -226,11 +226,10 @@
   }
 
   // ── Modal ─────────────────────────────────
-  function openModal(tool) {
-    if (!tool) return;
-    const related = TOOLS
-      .filter(t => t.category === tool.category && t.id !== tool.id)
-      .slice(0, 3);
+  function openModal(id) {
+  const tool = TOOLS.find(t => t.id === id);
+  if (!tool) return;
+  const related = TOOLS.filter(t => t.category === tool.category && t.id !== tool.id)
 
     document.getElementById("modalContent").innerHTML = `
       <img class="tv-modal-logo" src="${tool.logo}" alt="${tool.name}"
@@ -253,7 +252,7 @@
         <div class="tv-modal-label">Related Tools</div>
         <div class="tv-related-grid">
           ${related.map(r => `
-            <div class="tv-related-item" onclick='openModal(${JSON.stringify(r)})'>
+            <div class="tv-related-item" onclick="openModal(${r.id})">
               <img class="tv-related-logo" src="${r.logo}" alt="${r.name}"
                 onerror="this.src=''">
               <div>
