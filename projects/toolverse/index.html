@@ -227,7 +227,7 @@
 
   // ── Modal ─────────────────────────────────
   function openModal(id) {
-  const tool = TOOLS.find(t => t.id === id);
+  const tool = TOOLS.find(t => t.id === Number(id));
   if (!tool) return;
   const related = TOOLS.filter(t => t.category === tool.category && t.id !== tool.id)
 
