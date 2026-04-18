@@ -2,7 +2,7 @@ const TOOLS = [
   {
     id: 1,
     name: "ChatGPT",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/512px-ChatGPT_logo.svg.png",
+    logo: "https://www.google.com/s2/favicons?domain=openai.com&sz=128",
     description: "The world's most popular AI chatbot for writing, coding, research, and conversation.",
     fullDescription: "ChatGPT by OpenAI is a large language model that can help you write, debug code, answer questions, summarise documents, and much more. It supports GPT-4o with vision, voice, and browsing capabilities.",
     category: "writing",
@@ -16,7 +16,7 @@ const TOOLS = [
   {
     id: 2,
     name: "Midjourney",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png",
+    logo: "https://www.google.com/s2/favicons?domain=midjourney.com&sz=128",
     description: "Generate stunning, photorealistic AI images from text prompts.",
     fullDescription: "Midjourney is a generative AI image tool that creates highly detailed and artistic images from natural language descriptions. Widely used by designers, artists, and marketers.",
     category: "image",
@@ -30,7 +30,7 @@ const TOOLS = [
   {
     id: 3,
     name: "GitHub Copilot",
-    logo: "https://github.githubassets.com/images/modules/site/copilot/copilot-logo.png",
+    logo: "https://www.google.com/s2/favicons?domain=github.com&sz=128",
     description: "AI-powered coding assistant that suggests code as you type.",
     fullDescription: "GitHub Copilot is trained on billions of lines of code and integrates directly into VS Code, JetBrains, and other editors. It autocompletes functions, writes tests, and explains code.",
     category: "coding",
@@ -44,7 +44,7 @@ const TOOLS = [
   {
     id: 4,
     name: "Notion AI",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png",
+    logo: "https://www.google.com/s2/favicons?domain=notion.so&sz=128",
     description: "Smart notes and productivity with built-in AI writing assistant.",
     fullDescription: "Notion AI is embedded directly in Notion's workspace. It can write, edit, summarise, translate, and brainstorm — all within your notes and documents without switching tools.",
     category: "productivity",
@@ -58,7 +58,7 @@ const TOOLS = [
   {
     id: 5,
     name: "Runway",
-    logo: "https://asset.brandfetch.io/idJBRFMewJ/idZRrWFGqC.png",
+    logo: "https://www.google.com/s2/favicons?domain=runwayml.com&sz=128",
     description: "AI video generation and editing for creators and filmmakers.",
     fullDescription: "Runway offers text-to-video, image-to-video, video editing with AI, and green screen tools. Used by Hollywood studios and independent creators alike.",
     category: "video",
@@ -72,7 +72,7 @@ const TOOLS = [
   {
     id: 6,
     name: "Copy.ai",
-    logo: "https://asset.brandfetch.io/idpT3K7V4b/idWJJnnFKp.png",
+    logo: "https://www.google.com/s2/favicons?domain=copy.ai&sz=128",
     description: "AI copywriting tool for ads, emails, blogs, and social media.",
     fullDescription: "Copy.ai helps marketers and writers generate high-converting copy in seconds. It supports 90+ languages and has templates for every marketing use case.",
     category: "marketing",
@@ -86,7 +86,7 @@ const TOOLS = [
   {
     id: 7,
     name: "Cursor",
-    logo: "https://asset.brandfetch.io/idBfaXPBGj/idBT-MZGdg.png",
+    logo: "https://www.google.com/s2/favicons?domain=cursor.com&sz=128",
     description: "AI-first code editor built on VS Code with deep codebase understanding.",
     fullDescription: "Cursor is a fork of VS Code with AI deeply integrated. It can understand your entire codebase, answer questions about it, and make multi-file edits in one go.",
     category: "coding",
@@ -100,7 +100,7 @@ const TOOLS = [
   {
     id: 8,
     name: "ElevenLabs",
-    logo: "https://asset.brandfetch.io/idCE5mLyUE/idtHJ2RJVY.png",
+    logo: "https://www.google.com/s2/favicons?domain=elevenlabs.io&sz=128",
     description: "Ultra-realistic AI voice generation and voice cloning.",
     fullDescription: "ElevenLabs creates the most natural-sounding AI voices available. It supports voice cloning, multilingual dubbing, and real-time voice synthesis for apps and content.",
     category: "productivity",
@@ -114,7 +114,7 @@ const TOOLS = [
   {
     id: 9,
     name: "Perplexity AI",
-    logo: "https://asset.brandfetch.io/idDMPe5pjz/idCj1aJBep.png",
+    logo: "https://www.google.com/s2/favicons?domain=perplexity.ai&sz=128",
     description: "AI search engine that gives cited, accurate answers instantly.",
     fullDescription: "Perplexity is an AI-powered search engine that searches the web and synthesises results into a clear answer with citations. Great for research and fact-checking.",
     category: "productivity",
@@ -128,7 +128,7 @@ const TOOLS = [
   {
     id: 10,
     name: "DALL-E 3",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/512px-ChatGPT_logo.svg.png",
+    logo: "https://www.google.com/s2/favicons?domain=openai.com&sz=128",
     description: "OpenAI's image generation model with precise prompt following.",
     fullDescription: "DALL-E 3 is integrated into ChatGPT and the OpenAI API. It follows prompts more accurately than previous models and excels at text-in-image generation.",
     category: "image",
@@ -142,7 +142,7 @@ const TOOLS = [
   {
     id: 11,
     name: "Jasper",
-    logo: "https://asset.brandfetch.io/idVPMahVKm/idLJfFqSoX.png",
+    logo: "https://www.google.com/s2/favicons?domain=jasper.ai&sz=128",
     description: "Enterprise AI writing platform for marketing teams.",
     fullDescription: "Jasper is an AI writing assistant built for marketing teams. It learns your brand voice, integrates with your tools, and helps create consistent content at scale.",
     category: "marketing",
@@ -156,7 +156,7 @@ const TOOLS = [
   {
     id: 12,
     name: "Synthesia",
-    logo: "https://asset.brandfetch.io/idv3VVsKYn/idIX0qfE5H.png",
+    logo: "https://www.google.com/s2/favicons?domain=synthesia.io&sz=128",
     description: "Create AI videos with realistic avatars — no camera needed.",
     fullDescription: "Synthesia lets you create professional videos with AI avatars from a text script. Used for training, marketing, and internal communications by 50,000+ companies.",
     category: "video",
