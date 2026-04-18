@@ -2,115 +2,340 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ToolVerse</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- GLOBAL CSS -->
-  <link rel="stylesheet" href="../../style.css">
-
-  <!-- FONT -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="ToolVerse — Discover the best AI tools for writing, coding, image generation, video, and more.">
+  <title>ToolVerse — AI Tools Directory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="toolverse.css">
 </head>
-
 <body>
 
-<!-- BACK TO HOME -->
-<div style="max-width:1100px; margin:0 auto; padding:20px;">
-  <a href="../../index.html" style="color: var(--text-secondary); text-decoration:none;">
-    ← Back to Home
-  </a>
+<!-- ── NAVBAR ── -->
+<nav class="tv-nav">
+  <a href="../../index.html" class="tv-logo">Tool<span>Verse</span></a>
+  <ul class="tv-nav-links">
+    <li><a href="#explore">Explore</a></li>
+    <li><a href="#categories">Categories</a></li>
+  </ul>
+  <div class="tv-nav-search">
+    <i class="fas fa-search"></i>
+    <input type="text" id="navSearch" placeholder="Search tools..." oninput="handleSearch(this.value)">
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="tv-hero">
+  <div class="tv-hero-badge"><i class="fas fa-fire"></i> 12 AI Tools Curated</div>
+  <h1>Discover the Best<br><em>AI Tools</em> for Everything</h1>
+  <div class="tv-hero-search">
+    <i class="fas fa-search"></i>
+    <input type="text" id="heroSearch" placeholder="Find tools like ChatGPT, Midjourney, Cursor..." oninput="handleSearch(this.value)">
+  </div>
+  <div class="tv-popular">
+    <span class="tv-popular-label">Popular:</span>
+  </div>
+</section>
+
+<!-- ── USE-CASE FILTER ── -->
+<div class="tv-usecase">
+  <div class="tv-usecase-label">I want to</div>
+  <div class="tv-usecase-btns">
+    <button class="tv-usecase-btn" data-usecase="write">✍️ Write content</button>
+    <button class="tv-usecase-btn" data-usecase="code">💻 Build / Code</button>
+    <button class="tv-usecase-btn" data-usecase="design">🎨 Design</button>
+    <button class="tv-usecase-btn" data-usecase="create">🎬 Create videos</button>
+    <button class="tv-usecase-btn" data-usecase="market">📣 Market my business</button>
+    <button class="tv-usecase-btn" data-usecase="research">🔍 Do research</button>
+    <button class="tv-usecase-btn" data-usecase="organise">📋 Stay organised</button>
+  </div>
 </div>
 
-<div class="container">
-
-  <!-- TOP CARD -->
-  <div class="card">
-
-    <h2>ToolVerse</h2>
-    <p class="subtitle">Discover the best AI tools</p>
-
-    <!-- SEARCH -->
-    <input 
-  type="text" 
-  id="searchInput" 
-  class="input"
-  placeholder="Search tools..."
-  oninput="searchTools()"
->
-
-    <!-- FILTER BUTTONS -->
-    <div style="margin-top:15px;">
-      <button class="btn" onclick="filterCategory('all')">All</button>
-      <button class="btn" onclick="filterCategory('writing')">Writing</button>
-      <button class="btn" onclick="filterCategory('image')">Image</button>
-      <button class="btn" onclick="filterCategory('coding')">Coding</button>
-      <button class="btn" onclick="filterCategory('productivity')">Productivity</button>
+<!-- ── AI RECOMMENDATION ── -->
+<div class="tv-recommend">
+  <div class="tv-recommend-inner">
+    <div class="tv-recommend-title">
+      <i class="fas fa-wand-magic-sparkles"></i> AI Recommendation
     </div>
-
+    <div class="tv-recommend-row">
+      <input class="tv-recommend-input" id="recommendInput"
+        placeholder="e.g. I need to edit product photos for my Shopify store..." />
+      <button class="tv-recommend-btn" id="recommendBtn" onclick="getRecommendations()">
+        Suggest Tools →
+      </button>
+    </div>
+    <div class="tv-recommend-results" id="recommendResults"></div>
   </div>
-
-  <!-- TOOLS GRID -->
-  <div class="grid" id="toolsGrid">
-
-    <div class="card" data-category="writing">
-      <h3>ChatGPT</h3>
-      <p>AI chatbot for writing and coding help</p>
-      <a href="https://chat.openai.com" target="_blank">Visit →</a>
-    </div>
-
-    <div class="card" data-category="image">
-      <h3>Midjourney</h3>
-      <p>Generate stunning AI images</p>
-      <a href="https://www.midjourney.com/" target="_blank">Visit →</a>
-    </div>
-
-    <div class="card" data-category="coding">
-      <h3>GitHub Copilot</h3>
-      <p>AI-powered coding assistant</p>
-      <a href="https://github.com/copilot" target="_blank">Visit →</a>
-    </div>
-
-    <div class="card" data-category="productivity">
-      <h3>Notion AI</h3>
-      <p>Smart notes and productivity tool</p>
-      <a href="https://www.notion.com/product/ai" target="_blank">Visit →</a>
-    </div>
-
-  </div>
-
 </div>
 
-<!-- FOOTER -->
-<footer>
-  © 2026 ToolVerse | Built by Prince
+<!-- ── CATEGORY BAR ── -->
+<div class="tv-catbar-wrap" id="categories">
+  <div class="tv-catbar">
+    <button class="tv-cat-btn active" data-cat="all">All</button>
+    <button class="tv-cat-btn" data-cat="writing">Writing</button>
+    <button class="tv-cat-btn" data-cat="image">Image</button>
+    <button class="tv-cat-btn" data-cat="video">Video</button>
+    <button class="tv-cat-btn" data-cat="coding">Coding</button>
+    <button class="tv-cat-btn" data-cat="marketing">Marketing</button>
+    <button class="tv-cat-btn" data-cat="productivity">Productivity</button>
+  </div>
+</div>
+
+<!-- ── TOOLS GRID ── -->
+<main class="tv-main" id="explore">
+  <div class="tv-grid-header">
+    <span class="tv-grid-title">All Tools</span>
+    <span class="tv-count" id="toolCount"></span>
+  </div>
+  <div class="tv-grid" id="toolsGrid"></div>
+</main>
+
+<!-- ── MODAL ── -->
+<div class="tv-modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<aside class="tv-modal" id="toolModal">
+  <button class="tv-modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+  <div id="modalContent"></div>
+</aside>
+
+<!-- ── FOOTER ── -->
+<footer class="tv-footer">
+  © 2026 ToolVerse · Built by Prince
 </footer>
 
-<!-- SCRIPT -->
+<script src="tools.js"></script>
 <script>
+  const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
 
-function searchTools() {
-  let input = document.getElementById("searchInput").value.toLowerCase();
-  let cards = document.querySelectorAll("#toolsGrid .card");
+  let activeCategory = "all";
+  let activeUsecase  = null;
+  let searchQuery    = "";
 
-  cards.forEach(card => {
-    let text = card.innerText.toLowerCase();
-    card.style.display = text.includes(input) ? "block" : "none";
-  });
-}
+  // ── Init ──────────────────────────────────
+  function init() {
+    renderPopularTags();
+    renderGrid();
+    setupUsecaseBtns();
+    setupCatBtns();
+  }
 
-function filterCategory(category) {
-  let cards = document.querySelectorAll("#toolsGrid .card");
+  // ── Popular tags ──────────────────────────
+  function renderPopularTags() {
+    const popular = TOOLS.filter(t => t.popular);
+    const wrap = document.querySelector(".tv-popular");
+    popular.forEach(t => {
+      const tag = document.createElement("button");
+      tag.className = "tv-popular-tag";
+      tag.textContent = t.name;
+      tag.onclick = () => openModal(t);
+      wrap.appendChild(tag);
+    });
+  }
 
-  cards.forEach(card => {
-    if (category === "all" || card.dataset.category === category) {
-      card.style.display = "block";
+  // ── Category buttons ──────────────────────
+  function setupCatBtns() {
+    document.querySelectorAll(".tv-cat-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tv-cat-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCategory = btn.dataset.cat;
+        activeUsecase  = null;
+        document.querySelectorAll(".tv-usecase-btn").forEach(b => b.classList.remove("active"));
+        renderGrid();
+      });
+    });
+  }
+
+  // ── Use-case buttons ──────────────────────
+  function setupUsecaseBtns() {
+    document.querySelectorAll(".tv-usecase-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const uc = btn.dataset.usecase;
+        if (activeUsecase === uc) {
+          activeUsecase = null;
+          btn.classList.remove("active");
+        } else {
+          document.querySelectorAll(".tv-usecase-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeUsecase = uc;
+          // Reset category
+          activeCategory = "all";
+          document.querySelectorAll(".tv-cat-btn").forEach(b => b.classList.remove("active"));
+          document.querySelector('[data-cat="all"]').classList.add("active");
+        }
+        renderGrid();
+      });
+    });
+  }
+
+  // ── Search ────────────────────────────────
+  function handleSearch(val) {
+    searchQuery = val.toLowerCase().trim();
+    // Sync both search inputs
+    document.getElementById("heroSearch").value = val;
+    document.getElementById("navSearch").value  = val;
+    renderGrid();
+  }
+
+  // ── Filter + render grid ──────────────────
+  function renderGrid() {
+    let filtered = TOOLS;
+
+    if (searchQuery) {
+      filtered = filtered.filter(t =>
+        t.name.toLowerCase().includes(searchQuery) ||
+        t.description.toLowerCase().includes(searchQuery) ||
+        t.category.toLowerCase().includes(searchQuery)
+      );
     } else {
-      card.style.display = "none";
+      if (activeUsecase) {
+        filtered = filtered.filter(t => t.usecases.includes(activeUsecase));
+      } else if (activeCategory !== "all") {
+        filtered = filtered.filter(t => t.category === activeCategory);
+      }
     }
+
+    const grid = document.getElementById("toolsGrid");
+    const count = document.getElementById("toolCount");
+    count.textContent = `${filtered.length} tool${filtered.length !== 1 ? "s" : ""}`;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="tv-no-results"><i class="fas fa-face-meh" style="font-size:2rem;margin-bottom:1rem;display:block"></i>No tools found. Try a different search.</div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map((t, i) => `
+      <div class="tv-card" style="animation-delay:${i * 0.04}s" onclick="openModal(TOOLS.find(x=>x.id===${t.id}))">
+        <div class="tv-card-top">
+          <img class="tv-card-logo" src="${t.logo}" alt="${t.name}"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="tv-card-logo-fallback" style="display:none">${t.name[0]}</div>
+          <div>
+            <div class="tv-card-name">${t.name}</div>
+            <div class="tv-card-cat">${t.category}</div>
+          </div>
+        </div>
+        <div class="tv-card-desc">${t.description}</div>
+        <div class="tv-card-meta">
+          <div class="tv-card-rating"><i class="fas fa-star"></i> ${t.rating}</div>
+          <span class="tv-card-pricing ${pricingClass(t.pricing)}">${t.pricing}</span>
+        </div>
+        <div class="tv-card-footer">
+          <span class="tv-visit-btn">Visit →</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function pricingClass(p) {
+    if (p === "Free") return "pricing-free";
+    if (p === "Paid") return "pricing-paid";
+    return "pricing-freemium";
+  }
+
+  // ── Modal ─────────────────────────────────
+  function openModal(tool) {
+    if (!tool) return;
+    const related = TOOLS
+      .filter(t => t.category === tool.category && t.id !== tool.id)
+      .slice(0, 3);
+
+    document.getElementById("modalContent").innerHTML = `
+      <img class="tv-modal-logo" src="${tool.logo}" alt="${tool.name}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="tv-modal-logo-fallback" style="display:none">${tool.name[0]}</div>
+      <div class="tv-modal-name">${tool.name}</div>
+      <div class="tv-modal-cat">${tool.category}</div>
+      <div class="tv-modal-meta">
+        <div class="tv-card-rating"><i class="fas fa-star"></i> ${tool.rating}</div>
+        <span class="tv-card-pricing ${pricingClass(tool.pricing)}">${tool.pricing}</span>
+      </div>
+      <div class="tv-modal-desc">${tool.fullDescription}</div>
+      <div class="tv-modal-section-title">Features</div>
+      <ul class="tv-modal-features">
+        ${tool.features.map(f => `<li>${f}</li>`).join("")}
+      </ul>
+      <a href="${tool.url}" target="_blank" rel="noopener noreferrer" class="tv-modal-visit">
+        Visit ${tool.name} →
+      </a>
+      ${related.length ? `
+        <div class="tv-modal-section-title">Related Tools</div>
+        <div class="tv-related-grid">
+          ${related.map(r => `
+            <div class="tv-related-item" onclick="openModal(TOOLS.find(x=>x.id===${r.id}))">
+              <img class="tv-related-logo" src="${r.logo}" alt="${r.name}"
+                onerror="this.src=''">
+              <div>
+                <div class="tv-related-name">${r.name}</div>
+                <div class="tv-related-desc">${r.description}</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      ` : ""}
+    `;
+
+    document.getElementById("modalOverlay").classList.add("open");
+    document.getElementById("toolModal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").classList.remove("open");
+    document.getElementById("toolModal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  // Close on Escape
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+  // ── AI Recommendation ─────────────────────
+  async function getRecommendations() {
+    const interest = document.getElementById("recommendInput").value.trim();
+    if (!interest) return;
+
+    const btn = document.getElementById("recommendBtn");
+    btn.disabled = true;
+    btn.textContent = "Thinking...";
+    document.getElementById("recommendResults").innerHTML = "";
+
+    try {
+      const toolNames = TOOLS.map(t => t.name).join(", ");
+      const res = await fetch(`${WORKER_URL}/api/recommend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interest, tools: toolNames }),
+      });
+      const data = await res.json();
+      const names = data.recommendations ?? [];
+
+      const resultsEl = document.getElementById("recommendResults");
+      if (names.length === 0) {
+        resultsEl.innerHTML = `<span style="font-size:0.78rem;color:var(--tv-muted)">No specific matches found. Try rephrasing.</span>`;
+      } else {
+        resultsEl.innerHTML = names.map(name => {
+          const tool = TOOLS.find(t => t.name.toLowerCase() === name.toLowerCase());
+          return tool
+            ? `<button class="tv-recommend-chip" onclick="openModal(TOOLS.find(t=>t.id===${tool.id}))">${tool.name}</button>`
+            : `<span class="tv-recommend-chip">${name}</span>`;
+        }).join("");
+      }
+    } catch {
+      document.getElementById("recommendResults").innerHTML =
+        `<span style="font-size:0.78rem;color:var(--tv-muted)">Could not get recommendations. Try again.</span>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Suggest Tools →";
+    }
+  }
+
+  // Enter key for recommendation
+  document.getElementById("recommendInput")?.addEventListener("keydown", e => {
+    if (e.key === "Enter") getRecommendations();
   });
-}
 
+  init();
 </script>
-
 </body>
 </html>
