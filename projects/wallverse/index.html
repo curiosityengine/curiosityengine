@@ -193,7 +193,7 @@
     loader.style.display = "block";
     emptyState.style.display = "none";
 
-    const results = await searchWallpapers(currentQuery, currentPage);
+    const results = await searchWallpapers(currentQuery, currentPage, false, null, activeWidth, activeHeight);
 
     if (results.length === 0 && totalLoaded === 0) {
       emptyState.style.display = "block";
@@ -216,9 +216,12 @@
     totalLoaded = 0;
     showingFavs = false;
     gridTitle.textContent = title || query;
+    document.getElementById("resFilter").value = "";
+    activeWidth  = null;
+    activeHeight = null;
     document.getElementById("favToggle").classList.remove("active");
     activeColor = null;
-document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
     loadMore();
   }
 
@@ -331,7 +334,7 @@ async function loadMoreWithColor(color) {
   isLoading = true;
   loader.style.display = "block";
 
-  const results = await searchWallpapers(currentQuery, currentPage, false, color);
+  const results = await searchWallpapers(currentQuery, currentPage, false, color, activeWidth, activeHeight);
   results.forEach(item => gallery.appendChild(makeCard(item)));
   totalLoaded += results.length;
   wallCount.textContent = `${totalLoaded}+ wallpapers`;
@@ -452,7 +455,24 @@ async function renderWotd() {
     </div>
   `;
 }
+// ── Resolution filter ─────────────────────
+let activeWidth  = null;
+let activeHeight = null;
 
+function applyResolution() {
+  const val = document.getElementById("resFilter").value;
+  if (!val) {
+    activeWidth  = null;
+    activeHeight = null;
+  } else {
+    const [w, h] = val.split("x").map(Number);
+    activeWidth  = w;
+    activeHeight = h;
+  }
+  gallery.style.cssText = "";
+  gallery.classList.add("wv-masonry");
+  resetGallery(currentQuery, currentQuery);
+}
   // ── Random Wallpaper ──────────────────────
 const randomPool = [
   "nature", "space", "ocean", "mountains", "forest",
