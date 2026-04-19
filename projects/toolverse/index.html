@@ -329,9 +329,14 @@
 
   // ── Modal ─────────────────────────────────
   function openModal(id) {
-    const tool = TOOLS.find(t => t.id === Number(id));
-    if (!tool) return;
-    history.pushState({}, "", `?tool=${id}`);
+  const tool = TOOLS.find(t => t.id === Number(id));
+  if (!tool) return;
+
+  // Close stack panel if open so modal can appear on top
+  document.getElementById("stackOverlay").classList.remove("open");
+  document.getElementById("stackPanel").classList.remove("open");
+
+  history.pushState({}, "", `?tool=${id}`);
     const related = TOOLS.filter(t => t.category === tool.category && t.id !== tool.id).slice(0, 3);
 
     document.getElementById("modalContent").innerHTML = `
