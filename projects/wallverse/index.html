@@ -205,6 +205,8 @@
     showingFavs = false;
     gridTitle.textContent = title || query;
     document.getElementById("favToggle").classList.remove("active");
+    activeColor = null;
+document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
     loadMore();
   }
 
@@ -251,6 +253,47 @@
       resetGallery(btn.dataset.cat, btn.dataset.cat);
     });
   });
+
+  // ── Colour swatches ───────────────────────
+let activeColor = null;
+
+document.querySelectorAll(".wv-swatch").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const color = btn.dataset.color;
+    if (activeColor === color) {
+      // Deselect
+      activeColor = null;
+      btn.classList.remove("active");
+      resetGallery(currentQuery, currentQuery);
+      return;
+    }
+    activeColor = color;
+    document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    searchInput.value = "";
+    document.querySelectorAll(".wv-cat-btn").forEach(b => b.classList.remove("active"));
+    gridTitle.textContent = btn.title + " tones";
+    gallery.innerHTML = "";
+    currentPage = 1;
+    currentQuery = "wallpaper";
+    totalLoaded = 0;
+    loadMoreWithColor(color);
+  });
+});
+
+async function loadMoreWithColor(color) {
+  if (isLoading) return;
+  isLoading = true;
+  loader.style.display = "block";
+
+  const results = await searchWallpapers(currentQuery, currentPage, false, color);
+  results.forEach(item => gallery.appendChild(makeCard(item)));
+  totalLoaded += results.length;
+  wallCount.textContent = `${totalLoaded}+ wallpapers`;
+  currentPage++;
+  isLoading = false;
+  loader.style.display = "none";
+}
 
   // ── Modal ─────────────────────────────────
   function openModal(item) {
