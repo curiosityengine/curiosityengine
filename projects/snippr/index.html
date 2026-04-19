@@ -231,6 +231,83 @@
   });
 
   loadRecent();
+
+  const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
+ 
+// Languages handled by Prettier (client-side, instant)
+const PRETTIER_LANGS = {
+  javascript: { parser: "babel",      plugins: ["babel", "estree"] },
+  typescript: { parser: "typescript", plugins: ["typescript", "estree"] },
+  html:       { parser: "html",       plugins: ["html"] },
+  css:        { parser: "css",        plugins: ["postcss"] },
+  json:       { parser: "json",       plugins: ["babel", "estree"] },
+};
+ 
+// Languages handled by Groq (server-side)
+const GROQ_LANGS = ["python", "java", "cpp", "go", "sql", "bash"];
+ 
+async function formatCode() {
+  const lang    = document.getElementById("language").value;
+  const content = document.getElementById("content").value.trim();
+  const btn     = document.getElementById("formatBtn");
+ 
+  if (!content || lang === "plaintext") return;
+ 
+  btn.disabled = true;
+  btn.textContent = "✦ Formatting...";
+ 
+  try {
+    // ── Prettier (client-side) ──
+    if (PRETTIER_LANGS[lang]) {
+      const { parser, plugins: pluginNames } = PRETTIER_LANGS[lang];
+ 
+      const pluginMap = {
+        babel:      prettierPlugins.babel,
+        estree:     prettierPlugins.estree,
+        html:       prettierPlugins.html,
+        postcss:    prettierPlugins.postcss,
+        typescript: prettierPlugins.typescript,
+      };
+ 
+      const plugins = pluginNames.map(p => pluginMap[p]);
+ 
+      const formatted = await prettier.format(content, { parser, plugins, tabWidth: 2, printWidth: 80 });
+      document.getElementById("content").value = formatted.trimEnd();
+      btn.textContent = "✦ Formatted!";
+ 
+    // ── Groq (server-side) ──
+    } else if (GROQ_LANGS.includes(lang)) {
+      const res  = await fetch(`${WORKER_URL}/api/format`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: content, language: lang }),
+      });
+      const data = await res.json();
+      if (data.formatted) {
+        document.getElementById("content").value = data.formatted.trimEnd();
+        btn.textContent = "✦ Formatted!";
+      } else {
+        btn.textContent = "✦ Format";
+      }
+    }
+  } catch (err) {
+    console.error("Format error:", err);
+    btn.textContent = "✦ Error";
+  } finally {
+    btn.disabled = false;
+    setTimeout(() => {
+      if (btn.textContent !== "✦ Format") btn.textContent = "✦ Format";
+    }, 2000);
+  }
+}
+ 
+// Auto-format on Ctrl+Shift+F
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "F") {
+    e.preventDefault();
+    formatCode();
+  }
+});
 </script>
 </body>
 </html>
