@@ -2,62 +2,324 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WallVerse</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../../style.css">
+  <meta name="description" content="WallVerse — Discover stunning wallpapers from Unsplash, Pexels, Pixabay and more.">
+  <title>WallVerse — Discover Beautiful Wallpapers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="wallverse.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
 
-<div style="max-width:1100px; margin:0 auto; padding:20px;">
-  <a href="../../index.html" style="color: var(--text-secondary); text-decoration:none;">
-    ← Back to Home
-  </a>
+<!-- NAVBAR -->
+<nav class="wv-nav">
+  <a href="../../index.html" class="wv-logo">Wall<span>Verse</span></a>
+  <div class="wv-nav-right">
+    <button class="wv-fav-btn" id="favToggle" onclick="toggleFavView()">
+      ♡ Favourites
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="wv-hero">
+  <h1>Discover <em>stunning</em><br>wallpapers</h1>
+  <p class="wv-hero-sub">Millions of wallpapers from Unsplash, Pexels, Pixabay & Wallhaven</p>
+  <div class="wv-search-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="Search mountains, cities, anime, space...">
+  </div>
+</section>
+
+<!-- CATEGORY BAR -->
+<div class="wv-catbar-wrap">
+  <div class="wv-catbar">
+    <button class="wv-cat-btn active" data-cat="nature">Nature</button>
+    <button class="wv-cat-btn" data-cat="city">City</button>
+    <button class="wv-cat-btn" data-cat="space">Space</button>
+    <button class="wv-cat-btn" data-cat="anime">Anime</button>
+    <button class="wv-cat-btn" data-cat="abstract">Abstract</button>
+    <button class="wv-cat-btn" data-cat="mountains">Mountains</button>
+    <button class="wv-cat-btn" data-cat="ocean">Ocean</button>
+    <button class="wv-cat-btn" data-cat="forest">Forest</button>
+    <button class="wv-cat-btn" data-cat="minimal">Minimal</button>
+    <button class="wv-cat-btn" data-cat="dark">Dark</button>
+  </div>
 </div>
 
-<div class="container">
-  <div class="card" style="padding: 24px; margin-bottom: 10px;">
-    <h2>WallVerse</h2>
-    <p class="subtitle">Discover beautiful wallpapers</p>
-    <input
-      type="text"
-      id="search"
-      class="input"
-      placeholder="Search wallpapers..."
-      style="width:100%; padding:10px; border-radius:10px; font-size:1rem;"
-    >
-    <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-      <button class="btn" onclick="filterCategory('all')">All</button>
-      <button class="btn" onclick="filterCategory('nature')">Nature</button>
-      <button class="btn" onclick="filterCategory('city')">City</button>
-      <button class="btn" onclick="filterCategory('anime')">Anime</button>
-      <button class="btn" onclick="filterCategory('space')">Space</button>
-      <button class="btn" onclick="filterCategory('abstract')">Abstract</button>
+<!-- MAIN -->
+<main class="wv-main">
+  <div class="wv-grid-header">
+    <span class="wv-grid-title" id="gridTitle">Nature</span>
+    <span class="wv-count" id="wallCount"></span>
+  </div>
+  <div class="wv-masonry" id="gallery"></div>
+  <div class="wv-loader" id="loader">
+    <div class="wv-loader-dots">
+      <div class="wv-loader-dot"></div>
+      <div class="wv-loader-dot"></div>
+      <div class="wv-loader-dot"></div>
     </div>
   </div>
-
-  <!-- GALLERY -->
-  <div id="gallery" class="gallery"></div>
-
-  <!-- LOADER -->
-  <div id="loader" style="text-align:center; padding:20px; display:none;">
-    <p style="color: var(--text-secondary);">Loading wallpapers...</p>
+  <div class="wv-empty" id="emptyState" style="display:none">
+    <i class="fas fa-image"></i>
+    No wallpapers found. Try a different search.
   </div>
-</div>
+</main>
 
 <!-- MODAL -->
-<div id="modal" class="modal hidden">
-  <span id="closeModal">&times;</span>
-  <img id="modalImg" src="" alt="Wallpaper preview">
-  <div class="modal-actions">
-    <button id="downloadBtn" class="btn">Download</button>
+<div class="wv-modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <button class="wv-modal-close" onclick="closeModal()">
+    <i class="fas fa-xmark"></i>
+  </button>
+  <img class="wv-modal-img" id="modalImg" src="" alt="">
+  <div class="wv-modal-actions">
+    <span class="wv-modal-source" id="modalSource"></span>
+    <button class="wv-modal-fav" id="modalFavBtn" onclick="toggleModalFav()">♡ Save</button>
+    <button class="wv-download-btn" id="downloadBtn" onclick="downloadWall()">
+      ↓ Download
+    </button>
   </div>
 </div>
 
-<footer>
-  © 2026 ToolVerse | Built by Prince
-</footer>
+<footer class="wv-footer">© 2026 WallVerse · Built by Prince</footer>
 
 <script src="data.js"></script>
-<script src="script.js"></script>
+<script>
+  let currentPage   = 1;
+  let currentQuery  = "nature";
+  let isLoading     = false;
+  let totalLoaded   = 0;
+  let showingFavs   = false;
+  let currentItem   = null;
+
+  const gallery    = document.getElementById("gallery");
+  const loader     = document.getElementById("loader");
+  const emptyState = document.getElementById("emptyState");
+  const wallCount  = document.getElementById("wallCount");
+  const gridTitle  = document.getElementById("gridTitle");
+  const searchInput = document.getElementById("searchInput");
+
+  // ── Favourites ────────────────────────────
+  function getFavs() {
+    return JSON.parse(localStorage.getItem("wv_favs") || "[]");
+  }
+  function saveFavs(favs) {
+    localStorage.setItem("wv_favs", JSON.stringify(favs));
+  }
+  function isFaved(id) {
+    return getFavs().some(f => f.id === id);
+  }
+  function toggleFav(item) {
+    let favs = getFavs();
+    if (isFaved(item.id)) {
+      favs = favs.filter(f => f.id !== item.id);
+    } else {
+      favs.push(item);
+    }
+    saveFavs(favs);
+    return isFaved(item.id);
+  }
+
+  // ── Render card ───────────────────────────
+  function makeCard(item) {
+    const card = document.createElement("div");
+    card.className = "wv-card";
+    card.onclick = () => openModal(item);
+
+    const img = document.createElement("img");
+    img.src = item.thumb;
+    img.loading = "lazy";
+    img.alt = item.tags?.[0] || item.category || "wallpaper";
+
+    const overlay = document.createElement("div");
+    overlay.className = "wv-card-overlay";
+    overlay.innerHTML = `<span class="wv-card-source">${item.source || ""}</span>`;
+
+    const favIcon = document.createElement("button");
+    favIcon.className = "wv-fav-icon" + (isFaved(item.id) ? " saved" : "");
+    favIcon.textContent = isFaved(item.id) ? "♥" : "♡";
+    favIcon.title = "Save to favourites";
+    favIcon.onclick = (e) => {
+      e.stopPropagation();
+      const faved = toggleFav(item);
+      favIcon.textContent = faved ? "♥" : "♡";
+      favIcon.classList.toggle("saved", faved);
+    };
+
+    card.appendChild(img);
+    card.appendChild(overlay);
+    card.appendChild(favIcon);
+    return card;
+  }
+
+  // ── Load wallpapers ───────────────────────
+  async function loadMore() {
+    if (isLoading) return;
+    isLoading = true;
+    loader.style.display = "block";
+    emptyState.style.display = "none";
+
+    const results = await searchWallpapers(currentQuery, currentPage);
+
+    if (results.length === 0 && totalLoaded === 0) {
+      emptyState.style.display = "block";
+    }
+
+    results.forEach(item => gallery.appendChild(makeCard(item)));
+
+    totalLoaded += results.length;
+    wallCount.textContent = `${totalLoaded}+ wallpapers`;
+    currentPage++;
+    isLoading = false;
+    loader.style.display = "none";
+  }
+
+  // ── Reset gallery ─────────────────────────
+  function resetGallery(query, title) {
+    gallery.innerHTML = "";
+    currentPage = 1;
+    currentQuery = query;
+    totalLoaded = 0;
+    showingFavs = false;
+    gridTitle.textContent = title || query;
+    document.getElementById("favToggle").classList.remove("active");
+    loadMore();
+  }
+
+  // ── Favourites view ───────────────────────
+  function toggleFavView() {
+    showingFavs = !showingFavs;
+    const btn = document.getElementById("favToggle");
+    btn.classList.toggle("active", showingFavs);
+
+    if (showingFavs) {
+      gallery.innerHTML = "";
+      const favs = getFavs();
+      gridTitle.textContent = "Favourites";
+      wallCount.textContent = `${favs.length} saved`;
+      if (favs.length === 0) {
+        emptyState.style.display = "block";
+        emptyState.innerHTML = '<i class="fas fa-heart"></i>No favourites yet. Click ♡ on any wallpaper.';
+      } else {
+        emptyState.style.display = "none";
+        favs.forEach(item => gallery.appendChild(makeCard(item)));
+      }
+    } else {
+      resetGallery(currentQuery, currentQuery);
+    }
+  }
+
+  // ── Search ────────────────────────────────
+  let debounceTimer;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const q = searchInput.value.trim() || "nature";
+      document.querySelectorAll(".wv-cat-btn").forEach(b => b.classList.remove("active"));
+      resetGallery(q, q);
+    }, 500);
+  });
+
+  // ── Category buttons ──────────────────────
+  document.querySelectorAll(".wv-cat-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".wv-cat-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      searchInput.value = "";
+      resetGallery(btn.dataset.cat, btn.dataset.cat);
+    });
+  });
+
+  // ── Modal ─────────────────────────────────
+  function openModal(item) {
+    currentItem = item;
+    document.getElementById("modalImg").src = item.url;
+    document.getElementById("modalSource").textContent = item.source || "";
+    const favBtn = document.getElementById("modalFavBtn");
+    favBtn.textContent = isFaved(item.id) ? "♥ Saved" : "♡ Save";
+    favBtn.classList.toggle("saved", isFaved(item.id));
+    document.getElementById("modalOverlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").classList.remove("open");
+    document.getElementById("modalImg").src = "";
+    document.body.style.overflow = "";
+    currentItem = null;
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById("modalOverlay")) closeModal();
+  }
+
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+  // ── Modal fav ─────────────────────────────
+  function toggleModalFav() {
+    if (!currentItem) return;
+    const faved = toggleFav(currentItem);
+    const btn = document.getElementById("modalFavBtn");
+    btn.textContent = faved ? "♥ Saved" : "♡ Save";
+    btn.classList.toggle("saved", faved);
+    // Update card icon if visible
+    const cards = document.querySelectorAll(".wv-fav-icon");
+    cards.forEach(icon => {
+      const card = icon.closest(".wv-card");
+      if (card) {
+        icon.textContent = faved ? "♥" : "♡";
+        icon.classList.toggle("saved", faved);
+      }
+    });
+  }
+
+  // ── Download ──────────────────────────────
+  async function downloadWall() {
+    if (!currentItem) return;
+    const btn = document.getElementById("downloadBtn");
+    btn.textContent = "Downloading...";
+    btn.disabled = true;
+
+    try {
+      let url = currentItem.url;
+      if (currentItem.source === "Unsplash" && currentItem.download_url) {
+        const res = await fetch(currentItem.download_url, {
+          headers: { Authorization: `Client-ID jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM` }
+        });
+        const data = await res.json();
+        url = data.url;
+      }
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `wallverse-${currentItem.id}.jpg`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      btn.textContent = "✓ Downloaded";
+      setTimeout(() => { btn.textContent = "↓ Download"; btn.disabled = false; }, 2000);
+    } catch {
+      btn.textContent = "Failed";
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = "↓ Download"; }, 2000);
+    }
+  }
+
+  // ── Infinite scroll ───────────────────────
+  window.addEventListener("scroll", () => {
+    if (!showingFavs &&
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 &&
+        !isLoading) {
+      loadMore();
+    }
+  });
+
+  // ── Init ──────────────────────────────────
+  loadMore();
+</script>
 </body>
 </html>
