@@ -10,6 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="snippr.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://unpkg.com/prettier@3.3.3/standalone.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/babel.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/html.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/postcss.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/estree.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/typescript.js"></script>
 </head>
 <body>
 
@@ -39,22 +45,27 @@
 
         <div class="sn-field">
           <div class="sn-field-header">
-            <label>Content</label>
-            <select id="language">
-              <option value="plaintext">Plain Text</option>
-              <option value="javascript">JavaScript</option>
-              <option value="python">Python</option>
-              <option value="html">HTML</option>
-              <option value="css">CSS</option>
-              <option value="sql">SQL</option>
-              <option value="bash">Bash</option>
-              <option value="json">JSON</option>
-              <option value="typescript">TypeScript</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
-              <option value="go">Go</option>
-            </select>
-          </div>
+  <label>Content</label>
+  <div style="display:flex; align-items:center; gap:0.5rem;">
+    <select id="language">
+      <option value="plaintext">Plain Text</option>
+      <option value="javascript">JavaScript</option>
+      <option value="python">Python</option>
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="sql">SQL</option>
+      <option value="bash">Bash</option>
+      <option value="json">JSON</option>
+      <option value="typescript">TypeScript</option>
+      <option value="java">Java</option>
+      <option value="cpp">C++</option>
+      <option value="go">Go</option>
+    </select>
+    <button type="button" class="sn-format-btn" id="formatBtn" onclick="formatCode()">
+      ✦ Format
+    </button>
+  </div>
+</div>
           <textarea id="content" placeholder="Paste your code or text here..."></textarea>
         </div>
 
