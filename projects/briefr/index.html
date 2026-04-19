@@ -94,7 +94,26 @@
 <!-- EMPTY STATE -->
 <div class="br-empty" id="emptyState" style="display:none">
   <div class="br-empty-icon">◎</div>
-  <p>No articles found. Try a different search term.</p>
+  <h3 class="br-empty-title">No articles found</h3>
+  <p class="br-empty-sub">We couldn't find any articles matching your search. Here are some tips:</p>
+  <ul class="br-empty-tips">
+    <li>Try shorter or more general keywords — <em>"Modi"</em> instead of <em>"Modi 8.30 PM speech"</em></li>
+    <li>Check your spelling</li>
+    <li>Try a different category</li>
+    <li>News coverage may not exist yet for very recent events</li>
+  </ul>
+  <div class="br-empty-suggestions">
+    <p class="br-empty-suggest-label">Try one of these:</p>
+    <div class="br-empty-chips">
+      <button class="br-chip" onclick="quickSearch('US Iran ceasefire')">US Iran ceasefire</button>
+      <button class="br-chip" onclick="quickSearch('IPL 2026')">IPL 2026</button>
+      <button class="br-chip" onclick="quickSearch('AI regulation')">AI regulation</button>
+      <button class="br-chip" onclick="quickSearch('Gaza')">Gaza</button>
+      <button class="br-chip" onclick="quickSearch('Modi')">Modi</button>
+      <button class="br-chip" onclick="quickSearch('Trump tariffs')">Trump tariffs</button>
+    </div>
+  </div>
+  <button class="br-new-search" style="margin-top:1.5rem;" onclick="resetSearch()">← Try a new search</button>
 </div>
 
 <footer class="br-footer">
