@@ -26,7 +26,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Subtle grid */
 body::before {
   content: '';
   position: fixed; inset: 0;
@@ -78,17 +77,15 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ── HERO ── */
-.sn-hero {
-  text-align: center;
-  padding-bottom: 3rem;
-}
+.sn-hero { text-align: center; padding-bottom: 3rem; }
+
 .sn-hero-badge {
   display: inline-block; font-size: 0.65rem;
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--accent); border: 1px solid rgba(0,229,160,0.25);
-  padding: 0.25rem 0.8rem; border-radius: 999px;
-  margin-bottom: 1.25rem;
+  padding: 0.25rem 0.8rem; border-radius: 999px; margin-bottom: 1.25rem;
 }
+
 .sn-hero h1 {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 7vw, 4.5rem);
@@ -102,8 +99,7 @@ a { text-decoration: none; color: inherit; }
 .sn-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
-  gap: 1.5rem;
-  align-items: start;
+  gap: 1.5rem; align-items: start;
 }
 
 /* ── CARD ── */
@@ -115,15 +111,18 @@ a { text-decoration: none; color: inherit; }
 
 /* ── FORM ── */
 .sn-field { margin-bottom: 1.25rem; }
+
 .sn-field label {
-  display: block; font-size: 0.7rem;
-  color: var(--muted); text-transform: uppercase;
-  letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 500;
+  display: block; font-size: 0.7rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.5rem; font-weight: 500;
 }
+
 .sn-optional {
   text-transform: none; letter-spacing: 0;
   font-size: 0.65rem; color: var(--muted); margin-left: 0.25rem;
 }
+
 .sn-field-header {
   display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 0.5rem;
@@ -159,13 +158,9 @@ select {
 }
 select option { background: var(--card); }
 
-.sn-row {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-}
+.sn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-.sn-pass-wrap {
-  position: relative;
-}
+.sn-pass-wrap { position: relative; }
 .sn-pass-wrap input { padding-right: 2.5rem; }
 .sn-pass-toggle {
   position: absolute; right: 10px; top: 50%;
@@ -181,8 +176,7 @@ select option { background: var(--card); }
   font-family: var(--font-display); font-size: 0.95rem;
   font-weight: 700; border: none; border-radius: 9px;
   cursor: pointer; letter-spacing: -0.01em;
-  transition: opacity 0.2s, transform 0.15s;
-  margin-top: 0.25rem;
+  transition: opacity 0.2s, transform 0.15s; margin-top: 0.25rem;
 }
 .sn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
 .sn-submit:active { transform: translateY(0); }
@@ -190,15 +184,16 @@ select option { background: var(--card); }
 
 /* ── SIDEBAR ── */
 .sn-sidebar { position: sticky; top: 80px; }
+
 .sn-sidebar-title {
   font-size: 0.7rem; color: var(--muted);
   text-transform: uppercase; letter-spacing: 0.1em;
   margin-bottom: 1rem; font-weight: 600;
 }
+
 .sn-recent-item {
   display: flex; flex-direction: column; gap: 2px;
-  padding: 0.65rem 0.75rem; border-radius: 8px;
-  transition: background 0.15s; cursor: pointer;
+  padding: 0.65rem 0.75rem; border-radius: 8px; transition: background 0.15s;
 }
 .sn-recent-item:hover { background: var(--surface); }
 .sn-recent-title {
@@ -208,7 +203,7 @@ select option { background: var(--card); }
 .sn-recent-time { font-size: 0.7rem; color: var(--muted); }
 .sn-loading, .sn-empty { font-size: 0.8rem; color: var(--muted); padding: 0.5rem; }
 
-/* ── VIEW PAGE ── */
+/* ── VIEW HEADER ── */
 .sn-view-header {
   display: flex; justify-content: space-between; align-items: flex-start;
   margin-bottom: 1.5rem; gap: 1rem;
@@ -219,8 +214,7 @@ select option { background: var(--card); }
 }
 .sn-view-meta {
   display: flex; align-items: center; gap: 0.5rem;
-  font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem;
-  flex-wrap: wrap;
+  font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; flex-wrap: wrap;
 }
 .sn-vis-badge {
   font-size: 0.65rem; padding: 0.15rem 0.5rem;
@@ -237,50 +231,67 @@ select option { background: var(--card); }
 }
 .sn-action-btn:hover { border-color: var(--border-hover); }
 
-/* ── INFO ROW ── */
-.sn-info-row {
-  display: flex; gap: 1.25rem; align-items: flex-start;
-  margin-bottom: 1.25rem;
-}
-
 /* ── SHARE CARD ── */
 .sn-share-card {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.1rem;
-  margin-bottom: 1.25rem;
+  border-radius: 12px; padding: 1.1rem; margin-bottom: 1.25rem;
 }
+
 .sn-share-url-wrap {
-  display: flex; gap: 0.6rem; margin-bottom: 1rem;
-  padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  display: flex; gap: 0.6rem;
+  margin-bottom: 1rem; padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
+
+.sn-share-url {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.6rem 0.9rem;
+  color: var(--muted-light); font-size: 0.8rem;
+  font-family: var(--font-mono); outline: none;
+}
+
+.sn-copy-btn {
+  padding: 0.6rem 1.1rem; background: var(--accent); color: #080808;
+  font-family: var(--font-body); font-size: 0.78rem; font-weight: 600;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: opacity 0.15s; white-space: nowrap; flex-shrink: 0;
+}
+.sn-copy-btn:hover { opacity: 0.85; }
+
 .sn-share-body {
   display: flex; gap: 1.5rem; align-items: center;
 }
+
 .sn-share-left { flex: 1; }
+
 .sn-share-label {
   font-size: 0.68rem; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;
 }
+
+.sn-share-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.sn-share-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.8rem; font-size: 0.75rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--muted-light);
+  transition: all 0.15s; font-family: var(--font-body); text-decoration: none;
+}
+.sn-share-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.sn-share-btn:hover { border-color: var(--border-hover); }
+.sn-wa:hover { color: #25D366; border-color: #25D366; }
+.sn-tg:hover { color: #0088cc; border-color: #0088cc; }
+.sn-tw:hover { color: #1DA1F2; border-color: #1DA1F2; }
+.sn-em:hover { color: var(--accent); border-color: var(--accent); }
+
 .sn-share-right {
   display: flex; flex-direction: column;
   align-items: center; gap: 0.6rem; flex-shrink: 0;
 }
-.sn-share-btns {
-  display: flex; gap: 0.5rem; flex-wrap: wrap;
-}
 
-/* Remove old qr-center */
-.sn-qr-center { display: none; }
+.sn-share-right canvas { border-radius: 8px; }
 
-/* ── QR CARD ── */
-.sn-qr-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.1rem;
-  display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
-  flex-shrink: 0;
-}
-.sn-qr-card canvas { border-radius: 8px; }
 .sn-qr-download {
   font-size: 0.72rem; color: var(--accent);
   background: var(--accent-dim); border: 1px solid rgba(0,229,160,0.2);
@@ -301,8 +312,7 @@ select option { background: var(--card); }
 }
 .sn-lang-badge {
   font-size: 0.68rem; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.1em;
-  font-family: var(--font-mono);
+  text-transform: uppercase; letter-spacing: 0.1em; font-family: var(--font-mono);
 }
 .sn-copy-inline {
   font-size: 0.72rem; color: var(--muted-light);
@@ -322,8 +332,7 @@ select option { background: var(--card); }
 .sn-gate {
   position: fixed; inset: 0; z-index: 200;
   background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1.5rem;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
 }
 .sn-gate-card {
   background: var(--card); border: 1px solid var(--border);
@@ -354,7 +363,7 @@ select option { background: var(--card); }
 .sn-loader-dot:nth-child(3) { animation-delay: 0.3s; }
 @keyframes pulse { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1)} }
 
-/* ── ERROR / NOT FOUND ── */
+/* ── ERROR ── */
 .sn-error {
   position: fixed; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -373,17 +382,11 @@ select option { background: var(--card); }
 @media (max-width: 700px) {
   .sn-layout { grid-template-columns: 1fr; }
   .sn-sidebar { position: static; }
-  .sn-info-row { flex-direction: column; }
+  .sn-share-body { flex-direction: column; }
+  .sn-share-right { width: 100%; }
   .sn-nav { padding: 0 1.25rem; }
   .sn-main { padding: 2rem 1.25rem 4rem; }
   .sn-hero h1 { font-size: 2.2rem; }
   .sn-view-header { flex-direction: column; }
   .sn-row { grid-template-columns: 1fr; }
-}
-
-/* ── QR CENTER ── */
-.sn-qr-center {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 0.75rem; margin-top: 1.25rem;
-  padding-top: 1.25rem; border-top: 1px solid var(--border);
 }
