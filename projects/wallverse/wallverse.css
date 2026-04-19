@@ -323,3 +323,25 @@ a { text-decoration: none; color: inherit; }
 .wv-wotd-meta {
   font-size: 0.72rem; color: rgba(255,255,255,0.5);
 }
+
+/* ── COLOUR SEARCH ── */
+.wv-color-row {
+  display: flex; align-items: center; gap: 0.85rem;
+  margin-top: 1rem; justify-content: center; flex-wrap: wrap;
+}
+.wv-color-label {
+  font-size: 0.72rem; color: var(--muted);
+  letter-spacing: 0.05em; white-space: nowrap;
+}
+.wv-color-swatches { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.wv-swatch {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  padding: 0;
+}
+.wv-swatch:hover { transform: scale(1.25); }
+.wv-swatch.active {
+  border-color: white;
+  transform: scale(1.25);
+}
