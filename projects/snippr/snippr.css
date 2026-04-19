@@ -239,13 +239,8 @@ select option { background: var(--card); }
 
 /* ── INFO ROW ── */
 .sn-info-row {
+  display: flex; gap: 1.25rem; align-items: flex-start;
   margin-bottom: 1.25rem;
-}
-
-.sn-qr-center {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 0.75rem; margin-top: 1.25rem;
-  padding-top: 1.25rem; border-top: 1px solid var(--border);
 }
 
 /* ── SHARE CARD ── */
@@ -389,4 +384,11 @@ select option { background: var(--card); }
   .sn-hero h1 { font-size: 2.2rem; }
   .sn-view-header { flex-direction: column; }
   .sn-row { grid-template-columns: 1fr; }
+}
+
+/* ── QR CENTER ── */
+.sn-qr-center {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.75rem; margin-top: 1.25rem;
+  padding-top: 1.25rem; border-top: 1px solid var(--border);
 }
