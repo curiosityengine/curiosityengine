@@ -151,6 +151,7 @@
     document.title = `${data.title || "Untitled"} — Snippr`;
 
     const url = `${location.origin}${location.pathname}?code=${code}`;
+const shortUrl = await shortenUrl(url);
 
     document.getElementById("pasteTitle").textContent = data.title || "Untitled";
     document.getElementById("pasteMeta").innerHTML = `
@@ -162,13 +163,13 @@
       ${data.expiry ? `<span>·</span><span>Expires ${timeAgo(data.expiry, true)}</span>` : ""}
     `;
 
-    document.getElementById("shareUrl").value = url;
+    document.getElementById("shareUrl").value = shortUrl;
 
     // Share links
-    document.getElementById("waLink").href = `https://wa.me/?text=${encodeURIComponent(url)}`;
-    document.getElementById("tgLink").href = `https://t.me/share/url?url=${encodeURIComponent(url)}`;
-    document.getElementById("twLink").href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
-    document.getElementById("emLink").href = `mailto:?subject=${encodeURIComponent(data.title || "Snippet")}&body=${encodeURIComponent(url)}`;
+    document.getElementById("waLink").href = `https://wa.me/?text=${encodeURIComponent(shortUrl)}`;
+    document.getElementById("tgLink").href = `https://t.me/share/url?url=${encodeURIComponent(shortUrl)}`;
+    document.getElementById("twLink").href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shortUrl)}`;
+    document.getElementById("emLink").href = `mailto:?subject=${encodeURIComponent(data.title || "Snippet")}&body=${encodeURIComponent(shortUrl)}`;
 
     // Code block
     const block = document.getElementById("codeBlock");
@@ -179,7 +180,15 @@
 
     // QR code
     generateQR(url);
-
+    async function shortenUrl(url) {
+  try {
+    const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+    const short = await res.text();
+    return short.startsWith("http") ? short : url;
+  } catch {
+    return url; // fallback to original if it fails
+  }
+}
     // Increment views
     sb.from("pastes").update({ views: data.views + 1 }).eq("short_code", code);
 
