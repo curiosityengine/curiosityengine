@@ -147,7 +147,7 @@
   }
 
   // ── Render paste ──────────────────────────
-  function renderPaste(data) {
+ async function renderPaste(data) {
     document.title = `${data.title || "Untitled"} — Snippr`;
 
     const url = `${location.origin}${location.pathname}?code=${code}`;
