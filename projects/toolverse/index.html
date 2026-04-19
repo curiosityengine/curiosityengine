@@ -107,13 +107,13 @@
     renderGrid();
     setupCatBtns();
     setupUsecaseBtns();
+    checkUrlTool();
   }
 
   // ── Search ────────────────────────────────
   function handleSearch(val) {
     searchQuery = val.toLowerCase().trim();
-    document.getElementById("navSearch").value  = val;
-    // Clear filters when searching
+    document.getElementById("navSearch").value = val;
     if (searchQuery) {
       activeCategory = "all";
       activeUsecase  = null;
@@ -133,7 +133,7 @@
         activeCategory = btn.dataset.cat;
         activeUsecase  = null;
         searchQuery    = "";
-        document.getElementById("navSearch").value  = "";
+        document.getElementById("navSearch").value = "";
         document.querySelectorAll(".tv-usecase-btn").forEach(b => b.classList.remove("active"));
         renderGrid();
       });
@@ -154,7 +154,7 @@
           activeUsecase  = uc;
           activeCategory = "all";
           searchQuery    = "";
-          document.getElementById("navSearch").value  = "";
+          document.getElementById("navSearch").value = "";
           document.querySelectorAll(".tv-cat-btn").forEach(b => b.classList.remove("active"));
           document.querySelector('[data-cat="all"]').classList.add("active");
         }
@@ -190,8 +190,7 @@
     }
 
     grid.innerHTML = filtered.map((t, i) => `
-      <div class="tv-card" style="animation-delay:${i * 0.03}s"
-           onclick="openModal(${t.id})">
+      <div class="tv-card" style="animation-delay:${i * 0.03}s" onclick="openModal(${t.id})">
         <div class="tv-card-top">
           <img class="tv-card-logo" src="${t.logo}" alt="${t.name}"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -218,12 +217,18 @@
     if (p === "Paid") return "pricing-paid";
     return "pricing-freemium";
   }
-updateUrl(id);
+
   // ── Modal ─────────────────────────────────
   function openModal(id) {
-  const tool = TOOLS.find(t => t.id === Number(id));
-  if (!tool) return;
-  const related = TOOLS.filter(t => t.category === tool.category && t.id !== tool.id)
+    const tool = TOOLS.find(t => t.id === Number(id));
+    if (!tool) return;
+
+    // Update URL so the modal is shareable
+    history.pushState({}, "", `?tool=${id}`);
+
+    const related = TOOLS
+      .filter(t => t.category === tool.category && t.id !== tool.id)
+      .slice(0, 3);
 
     document.getElementById("modalContent").innerHTML = `
       <img class="tv-modal-logo" src="${tool.logo}" alt="${tool.name}"
@@ -242,16 +247,15 @@ updateUrl(id);
       </ul>
       <a href="${tool.url}" target="_blank" rel="noopener noreferrer"
          class="tv-modal-visit">Visit ${tool.name} →</a>
-         <button class="tv-share-btn" onclick="shareTool(${tool.id})">
-  ↗ Share this tool
-</button>
+      <button class="tv-share-btn" onclick="shareTool(${tool.id})">
+        ↗ Share this tool
+      </button>
       ${related.length ? `
         <div class="tv-modal-label">Related Tools</div>
         <div class="tv-related-grid">
           ${related.map(r => `
             <div class="tv-related-item" onclick="openModal(${r.id})">
-              <img class="tv-related-logo" src="${r.logo}" alt="${r.name}"
-                onerror="this.src=''">
+              <img class="tv-related-logo" src="${r.logo}" alt="${r.name}" onerror="this.src=''">
               <div>
                 <div class="tv-related-name">${r.name}</div>
                 <div class="tv-related-desc">${r.description}</div>
@@ -276,28 +280,23 @@ updateUrl(id);
 
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-  // Copy shareable URL to clipboard
-function shareTool(id) {
-  const url = `${location.origin}${location.pathname}?tool=${id}`;
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = document.querySelector(".tv-share-btn");
-    const orig = btn.textContent;
-    btn.textContent = "✓ Link copied!";
-    setTimeout(() => btn.textContent = orig, 2000);
-  });
-}
+  // ── Share ─────────────────────────────────
+  function shareTool(id) {
+    const url = `${location.origin}${location.pathname}?tool=${id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.querySelector(".tv-share-btn");
+      const orig = btn.textContent;
+      btn.textContent = "✓ Link copied!";
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  }
 
-// Auto-open modal if ?tool= is in the URL
-function checkUrlTool() {
-  const params = new URLSearchParams(location.search);
-  const id = params.get("tool");
-  if (id) openModal(Number(id));
-}
-
-// Update URL when modal opens (so back button works naturally)
-function updateUrl(id) {
-  history.pushState({}, "", `?tool=${id}`);
-}
+  // ── Auto-open from URL ────────────────────
+  function checkUrlTool() {
+    const params = new URLSearchParams(location.search);
+    const id = params.get("tool");
+    if (id) openModal(Number(id));
+  }
 
   // ── AI Recommendation ─────────────────────
   function toggleRecommend() {
@@ -336,7 +335,7 @@ function updateUrl(id) {
         chips.innerHTML = names.map(name => {
           const tool = TOOLS.find(t => t.name.toLowerCase() === name.toLowerCase());
           return tool
-            ? `<button class="tv-recommend-chip" onclick='openModal(${JSON.stringify(tool)})'>${tool.name}</button>`
+            ? `<button class="tv-recommend-chip" onclick="openModal(${tool.id})">${tool.name}</button>`
             : `<span class="tv-recommend-chip">${name}</span>`;
         }).join("");
       }
@@ -354,7 +353,6 @@ function updateUrl(id) {
   });
 
   init();
-  checkUrlTool();
 </script>
 </body>
 </html>
