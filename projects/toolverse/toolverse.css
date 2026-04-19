@@ -418,3 +418,14 @@ a { text-decoration: none; color: inherit; }
   .tv-grid { grid-template-columns: 1fr; }
   .tv-catbar { padding: 0 1.25rem; }
 }
+.tv-share-btn {
+  display: block; width: 100%; padding: 0.75rem;
+  background: transparent; color: var(--muted-light);
+  font-family: var(--font-body); font-size: 0.82rem;
+  border: 1px solid var(--border); border-radius: 10px;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 1.75rem;
+  text-align: center;
+}
+.tv-share-btn:hover {
+  border-color: var(--border-hover); color: var(--text);
+}
