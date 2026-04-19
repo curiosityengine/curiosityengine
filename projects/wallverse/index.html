@@ -451,7 +451,41 @@ async function showRandom() {
 }
   // ── Init ──────────────────────────────────
   renderWotd();
+  renderHistory();
   loadMore();
+
+  // ── Download History ──────────────────────
+function getHistory() {
+  return JSON.parse(localStorage.getItem("wv_history") || "[]");
+}
+
+function saveToHistory(item) {
+  let history = getHistory();
+  history = history.filter(h => h.id !== item.id); // no duplicates
+  history.unshift(item);                            // add to front
+  if (history.length > 10) history = history.slice(0, 10); // max 10
+  localStorage.setItem("wv_history", JSON.stringify(history));
+}
+
+function renderHistory() {
+  const history = getHistory();
+  const section = document.getElementById("downloadHistory");
+  const gallery = document.getElementById("historyGallery");
+
+  if (!history.length) {
+    section.style.display = "none";
+    return;
+  }
+
+  section.style.display = "block";
+  gallery.innerHTML = "";
+  history.forEach(item => gallery.appendChild(makeCard(item)));
+}
+
+function clearHistory() {
+  localStorage.removeItem("wv_history");
+  renderHistory();
+}
 </script>
 </body>
 </html>
