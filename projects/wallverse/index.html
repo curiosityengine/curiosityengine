@@ -478,7 +478,53 @@
       </div>
     `;
   }
+// ── AI Mood Search ────────────────────────
+const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
 
+async function moodSearch() {
+  const mood = document.getElementById("moodInput").value.trim();
+  if (!mood) return;
+
+  const btn = document.getElementById("moodBtn");
+  btn.textContent = "✦ Thinking...";
+  btn.disabled = true;
+
+  try {
+    const res  = await fetch(`${WORKER_URL}/api/wallsearch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mood }),
+    });
+    const data = await res.json();
+    const query = data.query;
+    if (!query) throw new Error();
+
+    document.querySelectorAll(".wv-cat-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
+    searchInput.value = "";
+    activeColor = null;
+
+    gallery.innerHTML = "";
+    currentPage  = 1;
+    currentQuery = query;
+    totalLoaded  = 0;
+    showingFavs  = false;
+    gridTitle.textContent = `✦ "${mood}"`;
+    wallCount.textContent = "";
+    loadMore();
+
+  } catch {
+    btn.textContent = "✦ Try again";
+    setTimeout(() => { btn.textContent = "✦ Find by Mood"; }, 2000);
+  } finally {
+    btn.disabled = false;
+    if (btn.textContent === "✦ Thinking...") btn.textContent = "✦ Find by Mood";
+  }
+}
+
+document.getElementById("moodInput")?.addEventListener("keydown", e => {
+  if (e.key === "Enter") moodSearch();
+});
   // ── Infinite scroll ───────────────────────
   window.addEventListener("scroll", () => {
     if (!showingFavs &&
