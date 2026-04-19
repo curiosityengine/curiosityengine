@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diff Viewer — Snippr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="snippr.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <style>
+    .diff-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .diff-panel-label {
+      font-size: 0.68rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 0.5rem; font-weight: 600;
+    }
+
+    .diff-textarea {
+      width: 100%; min-height: 280px; resize: vertical;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 9px; padding: 0.9rem 1rem;
+      color: var(--text); font-family: var(--font-mono);
+      font-size: 0.82rem; line-height: 1.65;
+      outline: none; transition: border-color 0.2s;
+    }
+    .diff-textarea:focus {
+      border-color: rgba(0,229,160,0.4);
+      box-shadow: 0 0 0 3px rgba(0,229,160,0.06);
+    }
+
+    .diff-actions {
+      display: flex; gap: 0.75rem; align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .diff-compare-btn {
+      padding: 0.75rem 1.75rem;
+      background: var(--accent); color: #080808;
+      font-family: var(--font-display); font-size: 0.9rem;
+      font-weight: 700; border: none; border-radius: 9px;
+      cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+    }
+    .diff-compare-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .diff-clear-btn {
+      padding: 0.75rem 1rem; font-size: 0.82rem;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 9px; color: var(--muted-light);
+      cursor: pointer; font-family: var(--font-body);
+      transition: all 0.15s;
+    }
+    .diff-clear-btn:hover { border-color: var(--border-hover); color: var(--text); }
+
+    .diff-stats {
+      display: flex; gap: 1rem; align-items: center;
+      margin-left: auto; font-size: 0.78rem;
+    }
+    .diff-stat-add { color: #4ade80; }
+    .diff-stat-rem { color: #f87171; }
+    .diff-stat-unch { color: var(--muted); }
+
+    /* Result */
+    .diff-result {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+
+    .diff-result-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .diff-result-title {
+      font-size: 0.72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      font-family: var(--font-mono);
+    }
+    .diff-copy-btn {
+      font-size: 0.72rem; color: var(--muted-light);
+      background: none; border: 1px solid var(--border);
+      border-radius: 5px; padding: 0.2rem 0.6rem;
+      cursor: pointer; font-family: var(--font-body);
+      transition: all 0.15s;
+    }
+    .diff-copy-btn:hover { color: var(--text); border-color: var(--border-hover); }
+
+    .diff-lines {
+      font-family: var(--font-mono); font-size: 0.82rem;
+      line-height: 1.7; overflow-x: auto;
+    }
+
+    .diff-line {
+      display: flex; align-items: stretch;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+    .diff-line:last-child { border-bottom: none; }
+
+    .diff-line-num {
+      min-width: 42px; text-align: right;
+      padding: 0.1rem 0.75rem; color: var(--muted);
+      font-size: 0.72rem; user-select: none;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .diff-line-sign {
+      min-width: 28px; text-align: center;
+      padding: 0.1rem 0; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .diff-line-text {
+      padding: 0.1rem 1rem; flex: 1;
+      white-space: pre; overflow-x: auto;
+    }
+
+    /* Line types */
+    .diff-line.added {
+      background: rgba(74,222,128,0.07);
+    }
+    .diff-line.added .diff-line-sign { color: #4ade80; }
+    .diff-line.added .diff-line-num  { background: rgba(74,222,128,0.05); }
+
+    .diff-line.removed {
+      background: rgba(248,113,113,0.07);
+    }
+    .diff-line.removed .diff-line-sign { color: #f87171; }
+    .diff-line.removed .diff-line-num  { background: rgba(248,113,113,0.05); }
+
+    .diff-line.unchanged .diff-line-sign { color: var(--muted); }
+
+    /* Empty state */
+    .diff-empty {
+      text-align: center; padding: 4rem 2rem;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    .diff-empty i {
+      font-size: 2rem; display: block;
+      margin-bottom: 0.75rem; opacity: 0.4;
+    }
+
+    @media (max-width: 700px) {
+      .diff-layout { grid-template-columns: 1fr; }
+      .diff-stats { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="sn-nav">
+  <a href="index.html" class="sn-logo">Snip<span>pr</span></a>
+  <div class="sn-nav-right">
+    <a href="diff.html" class="sn-new-btn" style="background:var(--accent-dim);border-color:rgba(0,229,160,0.4);">⟷ Diff</a>
+    <a href="index.html" class="sn-new-btn">+ New Snippet</a>
+  </div>
+</nav>
+
+<main class="sn-main">
+  <div class="sn-hero" style="padding-bottom:2rem;">
+    <div class="sn-hero-badge">Code Comparison</div>
+    <h1>Diff <em>Viewer</em></h1>
+    <p class="sn-hero-sub">Paste two versions of your code and see exactly what changed.</p>
+  </div>
+
+  <!-- INPUT PANELS -->
+  <div class="diff-layout">
+    <div>
+      <div class="diff-panel-label">Original</div>
+      <textarea class="diff-textarea" id="originalCode" placeholder="Paste the original code here..."></textarea>
+    </div>
+    <div>
+      <div class="diff-panel-label">Modified</div>
+      <textarea class="diff-textarea" id="modifiedCode" placeholder="Paste the modified code here..."></textarea>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="diff-actions">
+    <button class="diff-compare-btn" onclick="runDiff()">Compare →</button>
+    <button class="diff-clear-btn" onclick="clearDiff()">Clear</button>
+    <div class="diff-stats" id="diffStats" style="display:none;">
+      <span class="diff-stat-add" id="statAdded"></span>
+      <span class="diff-stat-rem" id="statRemoved"></span>
+      <span class="diff-stat-unch" id="statUnchanged"></span>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="diff-result" id="diffResult">
+    <div class="diff-empty">
+      <i>⟷</i>
+      Paste two versions above and click Compare to see the diff.
+    </div>
+  </div>
+
+</main>
+
+<footer class="sn-footer">© 2026 Snippr · Built by Prince</footer>
+
+<script>
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function computeDiff(original, modified) {
+    const origLines = original.split("\n");
+    const modLines  = modified.split("\n");
+
+    // LCS-based diff
+    const m = origLines.length;
+    const n = modLines.length;
+
+    // Build LCS table
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        if (origLines[i - 1] === modLines[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+          dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        }
+      }
+    }
+
+    // Backtrack to get diff
+    const result = [];
+    let i = m, j = n;
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 && origLines[i - 1] === modLines[j - 1]) {
+        result.unshift({ type: "unchanged", text: origLines[i - 1] });
+        i--; j--;
+      } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+        result.unshift({ type: "added", text: modLines[j - 1] });
+        j--;
+      } else {
+        result.unshift({ type: "removed", text: origLines[i - 1] });
+        i--;
+      }
+    }
+
+    return result;
+  }
+
+  function runDiff() {
+    const original = document.getElementById("originalCode").value;
+    const modified = document.getElementById("modifiedCode").value;
+
+    if (!original.trim() && !modified.trim()) return;
+
+    const diff = computeDiff(original, modified);
+
+    let added = 0, removed = 0, unchanged = 0;
+    let lineNumOrig = 0, lineNumMod = 0;
+
+    const html = diff.map(line => {
+      let sign = " ", numOrig = "", numMod = "";
+
+      if (line.type === "added") {
+        added++;
+        lineNumMod++;
+        sign = "+";
+        numMod = lineNumMod;
+      } else if (line.type === "removed") {
+        removed++;
+        lineNumOrig++;
+        sign = "−";
+        numOrig = lineNumOrig;
+      } else {
+        unchanged++;
+        lineNumOrig++;
+        lineNumMod++;
+        numOrig = lineNumOrig;
+      }
+
+      const num = numOrig || numMod;
+
+      return `<div class="diff-line ${line.type}">
+        <span class="diff-line-num">${num}</span>
+        <span class="diff-line-sign">${sign}</span>
+        <span class="diff-line-text">${escapeHtml(line.text)}</span>
+      </div>`;
+    }).join("");
+
+    document.getElementById("diffResult").innerHTML = `
+      <div class="diff-result-header">
+        <span class="diff-result-title">Diff output</span>
+        <button class="diff-copy-btn" onclick="copyDiff()">Copy diff</button>
+      </div>
+      <div class="diff-lines" id="diffLines">${html}</div>
+    `;
+
+    // Stats
+    const stats = document.getElementById("diffStats");
+    stats.style.display = "flex";
+    document.getElementById("statAdded").textContent    = `+${added} added`;
+    document.getElementById("statRemoved").textContent  = `−${removed} removed`;
+    document.getElementById("statUnchanged").textContent = `${unchanged} unchanged`;
+  }
+
+  function clearDiff() {
+    document.getElementById("originalCode").value = "";
+    document.getElementById("modifiedCode").value = "";
+    document.getElementById("diffStats").style.display = "none";
+    document.getElementById("diffResult").innerHTML = `
+      <div class="diff-empty">
+        <i>⟷</i>
+        Paste two versions above and click Compare to see the diff.
+      </div>`;
+  }
+
+  function copyDiff() {
+    const lines = document.querySelectorAll(".diff-line");
+    const text  = Array.from(lines).map(l => {
+      const sign = l.querySelector(".diff-line-sign").textContent.trim();
+      const code = l.querySelector(".diff-line-text").textContent;
+      return `${sign} ${code}`;
+    }).join("\n");
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector(".diff-copy-btn");
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = "Copy diff", 2000);
+    });
+  }
+
+  // Ctrl+Enter to compare
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runDiff();
+  });
+</script>
+</body>
+</html>
