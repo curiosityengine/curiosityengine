@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Briefr — Search any news event and see coverage from across the political spectrum.">
+  <title>Briefr — News Through Every Lens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="briefr.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<nav class="br-nav">
+  <a href="../../index.html" class="br-logo">Bri<span>efr</span></a>
+  <span class="br-tagline">News through every lens</span>
+</nav>
+
+<section class="br-hero">
+  <div class="br-hero-badge">AI-Powered News Analysis</div>
+  <h1>See the full<br><em>picture</em></h1>
+  <p class="br-hero-sub">Search any news event. Get top articles categorized by political lean, credibility, and source — all in one place.</p>
+
+  <div class="br-search-wrap">
+    <div class="br-search-box">
+      <i class="br-search-icon">⌕</i>
+      <input type="text" id="searchInput" class="br-search-input"
+        placeholder="Try 'US election', 'Gaza ceasefire', 'AI regulation'...">
+      <button class="br-search-btn" id="searchBtn" onclick="searchNews()">Search →</button>
+    </div>
+    <div class="br-category-row">
+      <span class="br-cat-label">Category</span>
+      <div class="br-cats">
+        <button class="br-cat active" data-cat="general">General</button>
+        <button class="br-cat" data-cat="politics">Politics</button>
+        <button class="br-cat" data-cat="sports">Sports</button>
+        <button class="br-cat" data-cat="technology">Technology</button>
+        <button class="br-cat" data-cat="business">Business</button>
+        <button class="br-cat" data-cat="science">Science</button>
+        <button class="br-cat" data-cat="health">Health</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<main class="br-main" id="resultsMain" style="display:none">
+
+  <div class="br-results-header">
+    <div>
+      <h2 class="br-results-title" id="resultsTitle"></h2>
+      <p class="br-results-sub" id="resultsSub"></p>
+    </div>
+    <button class="br-new-search" onclick="resetSearch()">← New Search</button>
+  </div>
+
+  <!-- POLITICAL LEAN LEGEND (shown only for politics) -->
+  <div class="br-lean-legend" id="leanLegend" style="display:none">
+    <span class="br-legend-item">
+      <span class="br-lean-dot left"></span> Left
+    </span>
+    <span class="br-legend-item">
+      <span class="br-lean-dot center-left"></span> Center-Left
+    </span>
+    <span class="br-legend-item">
+      <span class="br-lean-dot center"></span> Center
+    </span>
+    <span class="br-legend-item">
+      <span class="br-lean-dot center-right"></span> Center-Right
+    </span>
+    <span class="br-legend-item">
+      <span class="br-lean-dot right"></span> Right
+    </span>
+  </div>
+
+  <div class="br-grid" id="articlesGrid"></div>
+
+</main>
+
+<!-- LOADER -->
+<div class="br-loader" id="loader" style="display:none">
+  <div class="br-loader-inner">
+    <div class="br-loader-dots">
+      <div class="br-dot"></div>
+      <div class="br-dot"></div>
+      <div class="br-dot"></div>
+    </div>
+    <p class="br-loader-text">Fetching articles and analysing sources...</p>
+  </div>
+</div>
+
+<!-- EMPTY STATE -->
+<div class="br-empty" id="emptyState" style="display:none">
+  <div class="br-empty-icon">◎</div>
+  <p>No articles found. Try a different search term.</p>
+</div>
+
+<footer class="br-footer">
+  © 2026 Briefr · Built by Prince · Powered by NewsAPI & Groq
+  <span class="br-footer-note">Political lean is based on source, not individual article content.</span>
+</footer>
+
+<script>
+  const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
+  let activeCategory = "general";
+
+  // ── Category buttons ──────────────────────
+  document.querySelectorAll(".br-cat").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".br-cat").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeCategory = btn.dataset.cat;
+    });
+  });
+
+  // ── Search ────────────────────────────────
+  async function searchNews() {
+    const query = document.getElementById("searchInput").value.trim();
+    if (!query) {
+      document.getElementById("searchInput").focus();
+      return;
+    }
+
+    // Show loader
+    document.getElementById("loader").style.display = "flex";
+    document.getElementById("resultsMain").style.display = "none";
+    document.getElementById("emptyState").style.display = "none";
+    document.querySelector(".br-hero").style.display = "none";
+
+    try {
+      const res  = await fetch(`${WORKER_URL}/api/briefr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, category: activeCategory }),
+      });
+      const data = await res.json();
+
+      document.getElementById("loader").style.display = "none";
+
+      if (!data.articles || data.articles.length === 0) {
+        document.getElementById("emptyState").style.display = "flex";
+        return;
+      }
+
+      renderArticles(data.articles, query);
+
+    } catch (err) {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("emptyState").style.display = "flex";
+    }
+  }
+
+  // ── Render articles ───────────────────────
+  function renderArticles(articles, query) {
+    const isPolitical = articles[0]?.isPolitical;
+
+    document.getElementById("resultsTitle").textContent = `"${query}"`;
+    document.getElementById("resultsSub").textContent =
+      `${articles.length} articles · ${isPolitical ? "Political lean analysis" : "Source analysis"} by Groq`;
+
+    document.getElementById("leanLegend").style.display = isPolitical ? "flex" : "none";
+
+    const grid = document.getElementById("articlesGrid");
+    grid.innerHTML = articles.map(a => {
+      const timeStr = timeAgo(a.publishedAt);
+      const badge   = isPolitical ? leanBadge(a.lean) : tagBadge(a.tag);
+      const cred    = credBadge(a.credibility);
+
+      return `
+        <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="br-card">
+          ${a.urlToImage ? `<div class="br-card-img" style="background-image:url('${a.urlToImage}')"></div>` : `<div class="br-card-img br-card-img-empty"></div>`}
+          <div class="br-card-body">
+            <div class="br-card-badges">
+              ${badge}
+              ${cred}
+            </div>
+            <h3 class="br-card-title">${escHtml(a.title)}</h3>
+            ${a.description ? `<p class="br-card-desc">${escHtml(a.description.slice(0, 120))}...</p>` : ""}
+            <div class="br-card-footer">
+              <span class="br-card-source">${escHtml(a.source)}</span>
+              <span class="br-card-time">${timeStr}</span>
+            </div>
+          </div>
+        </a>
+      `;
+    }).join("");
+
+    document.getElementById("resultsMain").style.display = "block";
+  }
+
+  // ── Badge helpers ─────────────────────────
+  function leanBadge(lean) {
+    const map = {
+      "Left":         { cls: "left",         label: "◀ Left" },
+      "Center-Left":  { cls: "center-left",  label: "◁ Center-Left" },
+      "Center":       { cls: "center",       label: "● Center" },
+      "Center-Right": { cls: "center-right", label: "▷ Center-Right" },
+      "Right":        { cls: "right",        label: "▶ Right" },
+    };
+    const m = map[lean] || { cls: "center", label: "● Center" };
+    return `<span class="br-lean-badge ${m.cls}">${m.label}</span>`;
+  }
+
+  function tagBadge(tag) {
+    return `<span class="br-tag-badge">${tag || "Latest"}</span>`;
+  }
+
+  function credBadge(cred) {
+    const cls = cred === "High" ? "cred-high" : cred === "Low" ? "cred-low" : "cred-med";
+    return `<span class="br-cred-badge ${cls}">${cred || "Medium"} credibility</span>`;
+  }
+
+  // ── Helpers ───────────────────────────────
+  function escHtml(str) {
+    return str?.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") || "";
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return "";
+    const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+    if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
+  function resetSearch() {
+    document.getElementById("resultsMain").style.display = "none";
+    document.getElementById("emptyState").style.display = "none";
+    document.querySelector(".br-hero").style.display = "block";
+    document.getElementById("searchInput").value = "";
+    document.getElementById("searchInput").focus();
+  }
+
+  // ── Keyboard shortcut ─────────────────────
+  document.getElementById("searchInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") searchNews();
+  });
+</script>
+</body>
+</html>
