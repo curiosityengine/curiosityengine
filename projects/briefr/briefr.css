@@ -327,3 +327,45 @@ a { text-decoration: none; color: inherit; }
   .br-results-header { flex-direction: column; }
   .br-lean-legend { gap: 0.75rem; }
 }
+
+/* ── EMPTY STATE IMPROVED ── */
+.br-empty-title {
+  font-family: var(--font-serif); font-size: 1.4rem;
+  font-weight: 400; color: var(--text); margin-bottom: 0.5rem;
+}
+.br-empty-sub {
+  font-size: 0.85rem; color: var(--muted-light);
+  margin-bottom: 1.25rem; max-width: 400px; text-align: center;
+}
+.br-empty-tips {
+  list-style: none; text-align: left;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.25rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  max-width: 420px; width: 100%; margin-bottom: 1.5rem;
+}
+.br-empty-tips li {
+  font-size: 0.8rem; color: var(--muted-light);
+  display: flex; gap: 0.5rem; align-items: flex-start;
+}
+.br-empty-tips li::before {
+  content: '→'; color: var(--accent); flex-shrink: 0;
+}
+.br-empty-tips em { color: var(--text); font-style: normal; }
+
+.br-empty-suggest-label {
+  font-size: 0.68rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+.br-empty-chips {
+  display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+}
+.br-chip {
+  font-size: 0.78rem; padding: 0.4rem 0.9rem;
+  background: var(--accent-dim); border: 1px solid rgba(79,142,255,0.25);
+  border-radius: 999px; color: var(--accent);
+  cursor: pointer; font-family: var(--font-body);
+  transition: all 0.15s;
+}
+.br-chip:hover { background: var(--accent-glow); border-color: rgba(79,142,255,0.5); }
