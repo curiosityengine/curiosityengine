@@ -373,6 +373,8 @@ async function loadMoreWithColor(color) {
       a.download = `wallverse-${currentItem.id}.jpg`;
       a.click();
       URL.revokeObjectURL(a.href);
+      saveToHistory(currentItem);
+      renderHistory();
       btn.textContent = "✓ Downloaded";
       setTimeout(() => { btn.textContent = "↓ Download"; btn.disabled = false; }, 2000);
     } catch {
