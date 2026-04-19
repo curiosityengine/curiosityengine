@@ -16,23 +16,19 @@
 
 <!-- NAVBAR -->
 <nav class="wv-nav">
-  <a href="index.html" class="wv-logo">Wall<span>Verse</span></a>
+  <a href="../../index.html" class="wv-logo">Wall<span>Verse</span></a>
   <div class="wv-res-wrap">
-  <select class="wv-res-select" id="resFilter" onchange="applyResolution()">
-    <option value="">Any Resolution</option>
-    <option value="1920x1080">1080p (1920×1080)</option>
-    <option value="2560x1440">2K (2560×1440)</option>
-    <option value="3840x2160">4K (3840×2160)</option>
-    <option value="1280x720">720p (1280×720)</option>
-  </select>
-</div>
+    <select class="wv-res-select" id="resFilter" onchange="applyResolution()">
+      <option value="">Any Resolution</option>
+      <option value="1920x1080">1080p (1920×1080)</option>
+      <option value="2560x1440">2K (2560×1440)</option>
+      <option value="3840x2160">4K (3840×2160)</option>
+      <option value="1280x720">720p (1280×720)</option>
+    </select>
+  </div>
   <div class="wv-nav-right">
-    <button class="wv-fav-btn" id="favToggle" onclick="toggleFavView()">
-      ♡ Favourites
-    </button>
-    <button class="wv-fav-btn" id="randomBtn" onclick="showRandom()">
-  ⚡ Random
-</button>
+    <button class="wv-fav-btn" id="favToggle" onclick="toggleFavView()">♡ Favourites</button>
+    <button class="wv-fav-btn" id="randomBtn" onclick="showRandom()">⚡ Random</button>
   </div>
 </nav>
 
@@ -45,25 +41,25 @@
     <input type="text" id="searchInput" placeholder="Search mountains, cities, anime, space...">
   </div>
   <div class="wv-color-row">
-  <span class="wv-color-label">Or search by colour</span>
-  <div class="wv-color-swatches">
-    <button class="wv-swatch" data-color="black"      style="background:#111111" title="Black"></button>
-    <button class="wv-swatch" data-color="white"      style="background:#f5f5f5" title="White"></button>
-    <button class="wv-swatch" data-color="yellow"     style="background:#f59e0b" title="Amber"></button>
-    <button class="wv-swatch" data-color="orange"     style="background:#f97316" title="Orange"></button>
-    <button class="wv-swatch" data-color="red"        style="background:#ef4444" title="Red"></button>
-    <button class="wv-swatch" data-color="purple"     style="background:#8b5cf6" title="Purple"></button>
-    <button class="wv-swatch" data-color="blue"       style="background:#3b82f6" title="Blue"></button>
-    <button class="wv-swatch" data-color="teal"       style="background:#14b8a6" title="Teal"></button>
-    <button class="wv-swatch" data-color="green"      style="background:#22c55e" title="Green"></button>
-    <button class="wv-swatch" data-color="magenta"    style="background:#d946ef" title="Pink"></button>
+    <span class="wv-color-label">Or search by colour</span>
+    <div class="wv-color-swatches">
+      <button class="wv-swatch" data-color="black"   style="background:#111111" title="Black"></button>
+      <button class="wv-swatch" data-color="white"   style="background:#f5f5f5" title="White"></button>
+      <button class="wv-swatch" data-color="yellow"  style="background:#f59e0b" title="Amber"></button>
+      <button class="wv-swatch" data-color="orange"  style="background:#f97316" title="Orange"></button>
+      <button class="wv-swatch" data-color="red"     style="background:#ef4444" title="Red"></button>
+      <button class="wv-swatch" data-color="purple"  style="background:#8b5cf6" title="Purple"></button>
+      <button class="wv-swatch" data-color="blue"    style="background:#3b82f6" title="Blue"></button>
+      <button class="wv-swatch" data-color="teal"    style="background:#14b8a6" title="Teal"></button>
+      <button class="wv-swatch" data-color="green"   style="background:#22c55e" title="Green"></button>
+      <button class="wv-swatch" data-color="magenta" style="background:#d946ef" title="Pink"></button>
+    </div>
   </div>
-</div>
 </section>
 
-  <!-- WALLPAPER OF THE DAY -->
+<!-- WALLPAPER OF THE DAY -->
 <div class="wv-wotd" id="wotd"></div>
-  
+
 <!-- CATEGORY BAR -->
 <div class="wv-catbar-wrap">
   <div class="wv-catbar">
@@ -109,9 +105,7 @@
   <div class="wv-modal-actions">
     <span class="wv-modal-source" id="modalSource"></span>
     <button class="wv-modal-fav" id="modalFavBtn" onclick="toggleModalFav()">♡ Save</button>
-    <button class="wv-download-btn" id="downloadBtn" onclick="downloadWall()">
-      ↓ Download
-    </button>
+    <button class="wv-download-btn" id="downloadBtn" onclick="downloadWall()">↓ Download</button>
   </div>
 </div>
 
@@ -119,42 +113,48 @@
 
 <script src="data.js"></script>
 <script>
-  let currentPage   = 1;
-  let currentQuery  = "nature";
-  let isLoading     = false;
-  let totalLoaded   = 0;
-  let showingFavs   = false;
-  let currentItem   = null;
+  // ── State ─────────────────────────────────
+  let currentPage  = 1;
+  let currentQuery = "nature";
+  let isLoading    = false;
+  let totalLoaded  = 0;
+  let showingFavs  = false;
+  let currentItem  = null;
+  let activeColor  = null;
+  let activeWidth  = null;
+  let activeHeight = null;
 
-  const gallery    = document.getElementById("gallery");
-  const loader     = document.getElementById("loader");
-  const emptyState = document.getElementById("emptyState");
-  const wallCount  = document.getElementById("wallCount");
-  const gridTitle  = document.getElementById("gridTitle");
+  const gallery     = document.getElementById("gallery");
+  const loader      = document.getElementById("loader");
+  const emptyState  = document.getElementById("emptyState");
+  const wallCount   = document.getElementById("wallCount");
+  const gridTitle   = document.getElementById("gridTitle");
   const searchInput = document.getElementById("searchInput");
 
-  // ── Favourites ────────────────────────────
-  function getFavs() {
-    return JSON.parse(localStorage.getItem("wv_favs") || "[]");
-  }
-  function saveFavs(favs) {
-    localStorage.setItem("wv_favs", JSON.stringify(favs));
-  }
-  function isFaved(id) {
-    return getFavs().some(f => f.id === id);
-  }
+  // ── LocalStorage helpers ──────────────────
+  function getFavs()          { return JSON.parse(localStorage.getItem("wv_favs")    || "[]"); }
+  function saveFavs(f)        { localStorage.setItem("wv_favs", JSON.stringify(f)); }
+  function getHistory()       { return JSON.parse(localStorage.getItem("wv_history") || "[]"); }
+  function saveHistory(h)     { localStorage.setItem("wv_history", JSON.stringify(h)); }
+
+  function isFaved(id)        { return getFavs().some(f => f.id === id); }
+
   function toggleFav(item) {
     let favs = getFavs();
-    if (isFaved(item.id)) {
-      favs = favs.filter(f => f.id !== item.id);
-    } else {
-      favs.push(item);
-    }
+    if (isFaved(item.id)) favs = favs.filter(f => f.id !== item.id);
+    else favs.push(item);
     saveFavs(favs);
     return isFaved(item.id);
   }
 
-  // ── Render card ───────────────────────────
+  function saveToHistory(item) {
+    let h = getHistory().filter(x => x.id !== item.id);
+    h.unshift(item);
+    if (h.length > 10) h = h.slice(0, 10);
+    saveHistory(h);
+  }
+
+  // ── Make card ─────────────────────────────
   function makeCard(item) {
     const card = document.createElement("div");
     card.className = "wv-card";
@@ -163,7 +163,7 @@
     const img = document.createElement("img");
     img.src = item.thumb;
     img.loading = "lazy";
-    img.alt = item.tags?.[0] || item.category || "wallpaper";
+    img.alt = item.tags?.[0] || "wallpaper";
 
     const overlay = document.createElement("div");
     overlay.className = "wv-card-overlay";
@@ -200,7 +200,6 @@
     }
 
     results.forEach(item => gallery.appendChild(makeCard(item)));
-
     totalLoaded += results.length;
     wallCount.textContent = `${totalLoaded}+ wallpapers`;
     currentPage++;
@@ -211,75 +210,21 @@
   // ── Reset gallery ─────────────────────────
   function resetGallery(query, title) {
     gallery.innerHTML = "";
-    currentPage = 1;
+    gallery.classList.add("wv-masonry");
+    gallery.style.cssText = "";
+    currentPage  = 1;
     currentQuery = query;
-    totalLoaded = 0;
-    showingFavs = false;
-    gridTitle.textContent = title || query;
-    document.getElementById("resFilter").value = "";
+    totalLoaded  = 0;
+    showingFavs  = false;
+    activeColor  = null;
     activeWidth  = null;
     activeHeight = null;
+    gridTitle.textContent = title || query;
     document.getElementById("favToggle").classList.remove("active");
-    activeColor = null;
+    document.getElementById("resFilter").value = "";
     document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
     loadMore();
   }
-
-  // ── Favourites view ───────────────────────
-  function toggleFavView() {
-  showingFavs = !showingFavs;
-  const btn = document.getElementById("favToggle");
-  btn.classList.toggle("active", showingFavs);
- 
-  if (showingFavs) {
-    // Remove masonry from gallery so labels span full width
-    gallery.classList.remove("wv-masonry");
-    gallery.innerHTML = "";
-    emptyState.style.display = "none";
-    gridTitle.textContent = "Saved & Downloaded";
- 
-    const favs    = getFavs();
-    const history = getHistory();
- 
-    if (!favs.length && !history.length) {
-      wallCount.textContent = "";
-      emptyState.style.display = "block";
-      emptyState.innerHTML = '<i class="fas fa-heart"></i>Nothing here yet.';
-      return;
-    }
- 
-    wallCount.textContent = `${favs.length + history.length} total`;
- 
-    if (favs.length) {
-      const label = document.createElement("p");
-      label.style.cssText = "font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:1rem;";
-      label.textContent = `♥ Favourites · ${favs.length} saved`;
-      gallery.appendChild(label);
- 
-      const favGrid = document.createElement("div");
-      favGrid.className = "wv-masonry";
-      favs.forEach(item => favGrid.appendChild(makeCard(item)));
-      gallery.appendChild(favGrid);
-    }
- 
-    if (history.length) {
-      const histLabel = document.createElement("div");
-      histLabel.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin:2rem 0 1rem;";
-      histLabel.innerHTML = `<span>↓ Recently Downloaded · ${history.length}</span><button class="wv-clear-history" onclick="clearHistory()">Clear</button>`;
-      gallery.appendChild(histLabel);
- 
-      const histGrid = document.createElement("div");
-      histGrid.className = "wv-masonry";
-      history.forEach(item => histGrid.appendChild(makeCard(item)));
-      gallery.appendChild(histGrid);
-    }
- 
-  } else {
-    // Restore masonry and reload grid
-    gallery.classList.add("wv-masonry");
-    resetGallery(currentQuery, currentQuery);
-  }
-}
 
   // ── Search ────────────────────────────────
   let debounceTimer;
@@ -303,45 +248,57 @@
   });
 
   // ── Colour swatches ───────────────────────
-let activeColor = null;
+  document.querySelectorAll(".wv-swatch").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const color = btn.dataset.color;
+      if (activeColor === color) {
+        activeColor = null;
+        btn.classList.remove("active");
+        resetGallery(currentQuery, currentQuery);
+        return;
+      }
+      activeColor = color;
+      document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      searchInput.value = "";
+      document.querySelectorAll(".wv-cat-btn").forEach(b => b.classList.remove("active"));
+      gridTitle.textContent = btn.title + " tones";
+      gallery.innerHTML = "";
+      currentPage  = 1;
+      currentQuery = "wallpaper";
+      totalLoaded  = 0;
+      loadMoreWithColor(color);
+    });
+  });
 
-document.querySelectorAll(".wv-swatch").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const color = btn.dataset.color;
-    if (activeColor === color) {
-      // Deselect
-      activeColor = null;
-      btn.classList.remove("active");
-      resetGallery(currentQuery, currentQuery);
-      return;
+  async function loadMoreWithColor(color) {
+    if (isLoading) return;
+    isLoading = true;
+    loader.style.display = "block";
+    const results = await searchWallpapers(currentQuery, currentPage, false, color, activeWidth, activeHeight);
+    results.forEach(item => gallery.appendChild(makeCard(item)));
+    totalLoaded += results.length;
+    wallCount.textContent = `${totalLoaded}+ wallpapers`;
+    currentPage++;
+    isLoading = false;
+    loader.style.display = "none";
+  }
+
+  // ── Resolution filter ─────────────────────
+  function applyResolution() {
+    const val = document.getElementById("resFilter").value;
+    if (!val) { activeWidth = null; activeHeight = null; }
+    else {
+      const [w, h] = val.split("x").map(Number);
+      activeWidth = w; activeHeight = h;
     }
-    activeColor = color;
-    document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    searchInput.value = "";
-    document.querySelectorAll(".wv-cat-btn").forEach(b => b.classList.remove("active"));
-    gridTitle.textContent = btn.title + " tones";
+    gallery.classList.add("wv-masonry");
+    gallery.style.cssText = "";
     gallery.innerHTML = "";
     currentPage = 1;
-    currentQuery = "wallpaper";
     totalLoaded = 0;
-    loadMoreWithColor(color);
-  });
-});
-
-async function loadMoreWithColor(color) {
-  if (isLoading) return;
-  isLoading = true;
-  loader.style.display = "block";
-
-  const results = await searchWallpapers(currentQuery, currentPage, false, color, activeWidth, activeHeight);
-  results.forEach(item => gallery.appendChild(makeCard(item)));
-  totalLoaded += results.length;
-  wallCount.textContent = `${totalLoaded}+ wallpapers`;
-  currentPage++;
-  isLoading = false;
-  loader.style.display = "none";
-}
+    loadMore();
+  }
 
   // ── Modal ─────────────────────────────────
   function openModal(item) {
@@ -368,22 +325,12 @@ async function loadMoreWithColor(color) {
 
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-  // ── Modal fav ─────────────────────────────
   function toggleModalFav() {
     if (!currentItem) return;
     const faved = toggleFav(currentItem);
     const btn = document.getElementById("modalFavBtn");
     btn.textContent = faved ? "♥ Saved" : "♡ Save";
     btn.classList.toggle("saved", faved);
-    // Update card icon if visible
-    const cards = document.querySelectorAll(".wv-fav-icon");
-    cards.forEach(icon => {
-      const card = icon.closest(".wv-card");
-      if (card) {
-        icon.textContent = faved ? "♥" : "♡";
-        icon.classList.toggle("saved", faved);
-      }
-    });
   }
 
   // ── Download ──────────────────────────────
@@ -396,16 +343,16 @@ async function loadMoreWithColor(color) {
     try {
       let url = currentItem.url;
       if (currentItem.source === "Unsplash" && currentItem.download_url) {
-        const res = await fetch(currentItem.download_url, {
+        const res  = await fetch(currentItem.download_url, {
           headers: { Authorization: `Client-ID jG8I0T_9dNVF3p2zFjjjxdTHJi9l2cuzutlpiytWXfM` }
         });
         const data = await res.json();
         url = data.url;
       }
-      const res = await fetch(url);
+      const res  = await fetch(url);
       const blob = await res.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
       a.download = `wallverse-${currentItem.id}.jpg`;
       a.click();
       URL.revokeObjectURL(a.href);
@@ -413,10 +360,113 @@ async function loadMoreWithColor(color) {
       btn.textContent = "✓ Downloaded";
       setTimeout(() => { btn.textContent = "↓ Download"; btn.disabled = false; }, 2000);
     } catch {
-      btn.textContent = "Failed";
+      btn.textContent = "↓ Download";
       btn.disabled = false;
-      setTimeout(() => { btn.textContent = "↓ Download"; }, 2000);
     }
+  }
+
+  // ── Favourites panel ──────────────────────
+  function toggleFavView() {
+    showingFavs = !showingFavs;
+    const btn = document.getElementById("favToggle");
+    btn.classList.toggle("active", showingFavs);
+
+    if (showingFavs) {
+      gallery.classList.remove("wv-masonry");
+      gallery.style.cssText = "display:block;";
+      gallery.innerHTML = "";
+      emptyState.style.display = "none";
+      gridTitle.textContent = "Saved & Downloaded";
+
+      const favs = getFavs();
+      const hist = getHistory();
+
+      if (!favs.length && !hist.length) {
+        wallCount.textContent = "";
+        emptyState.style.display = "block";
+        emptyState.innerHTML = '<i class="fas fa-heart"></i>Nothing here yet. Save or download wallpapers to see them here.';
+        return;
+      }
+
+      wallCount.textContent = `${favs.length + hist.length} total`;
+
+      if (favs.length) {
+        const label = document.createElement("p");
+        label.style.cssText = "font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:1rem;";
+        label.textContent = `♥ Favourites · ${favs.length} saved`;
+        gallery.appendChild(label);
+
+        const favGrid = document.createElement("div");
+        favGrid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem;";
+        favs.forEach(item => favGrid.appendChild(makeCard(item)));
+        gallery.appendChild(favGrid);
+      }
+
+      if (hist.length) {
+        const histLabel = document.createElement("div");
+        histLabel.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:1rem;";
+        histLabel.innerHTML = `<span>↓ Recently Downloaded · ${hist.length}</span><button class="wv-clear-history" onclick="clearHistory()">Clear</button>`;
+        gallery.appendChild(histLabel);
+
+        const histGrid = document.createElement("div");
+        histGrid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;";
+        hist.forEach(item => histGrid.appendChild(makeCard(item)));
+        gallery.appendChild(histGrid);
+      }
+
+    } else {
+      gallery.style.cssText = "";
+      gallery.classList.add("wv-masonry");
+      resetGallery(currentQuery, currentQuery);
+    }
+  }
+
+  function clearHistory() {
+    localStorage.removeItem("wv_history");
+    showingFavs = false;
+    toggleFavView();
+  }
+
+  // ── Random wallpaper ──────────────────────
+  const randomPool = ["nature","space","ocean","mountains","forest","city","abstract","aurora","desert","storm","waterfall","canyon","glacier","sunset","minimal"];
+
+  async function showRandom() {
+    const btn = document.getElementById("randomBtn");
+    btn.textContent = "⏳ Loading...";
+    btn.disabled = true;
+    try {
+      const query   = randomPool[Math.floor(Math.random() * randomPool.length)];
+      const page    = Math.floor(Math.random() * 5) + 1;
+      const results = await searchWallpapers(query, page);
+      if (results.length) openModal(results[Math.floor(Math.random() * results.length)]);
+    } catch {}
+    finally {
+      btn.textContent = "⚡ Random";
+      btn.disabled = false;
+    }
+  }
+
+  // ── Wallpaper of the Day ──────────────────
+  async function renderWotd() {
+    const pool  = ["mountains","ocean","forest","aurora","desert","waterfall","sunrise","storm","canyon","glacier","volcano","coral reef","savanna","fjord","milky way"];
+    const now   = new Date();
+    const day   = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+    const query = pool[day % pool.length];
+
+    const results = await searchWallpapers(query, 1);
+    if (!results.length) return;
+
+    const item = results[Math.floor(Math.random() * Math.min(results.length, 5))];
+    document.getElementById("wotd").innerHTML = `
+      <div class="wv-wotd-inner" onclick='openModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+        <img src="${item.url}" alt="Wallpaper of the Day">
+        <div class="wv-wotd-overlay">
+          <div class="wv-wotd-badge">Wallpaper of the Day</div>
+          <div class="wv-wotd-title">${query.charAt(0).toUpperCase() + query.slice(1)}</div>
+          <div class="wv-wotd-meta">Click to preview · ${item.source}</div>
+        </div>
+      </div>
+    `;
   }
 
   // ── Infinite scroll ───────────────────────
@@ -424,112 +474,14 @@ async function loadMoreWithColor(color) {
     if (!showingFavs &&
         window.innerHeight + window.scrollY >= document.body.offsetHeight - 400 &&
         !isLoading) {
-      loadMore();
+      if (activeColor) loadMoreWithColor(activeColor);
+      else loadMore();
     }
   });
-// ── Wallpaper of the Day ──────────────────
-async function renderWotd() {
-  const pool = [
-    "mountains", "ocean", "forest", "aurora", "desert",
-    "waterfall", "sunrise", "storm", "canyon", "glacier",
-    "volcano", "coral reef", "savanna", "fjord", "milky way"
-  ];
-  const now   = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const day   = Math.floor((now - start) / 86400000);
-  const query = pool[day % pool.length];
 
-  const results = await searchWallpapers(query, 1);
-  if (!results.length) return;
-
-  const item = results[Math.floor(Math.random() * Math.min(results.length, 5))];
-
-  document.getElementById("wotd").innerHTML = `
-    <div class="wv-wotd-inner" onclick='openModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
-      <img src="${item.url}" alt="Wallpaper of the Day">
-      <div class="wv-wotd-overlay">
-        <div class="wv-wotd-badge">Wallpaper of the Day</div>
-        <div class="wv-wotd-title">${query.charAt(0).toUpperCase() + query.slice(1)}</div>
-        <div class="wv-wotd-meta">Click to preview · ${item.source}</div>
-      </div>
-    </div>
-  `;
-}
-// ── Resolution filter ─────────────────────
-let activeWidth  = null;
-let activeHeight = null;
-
-function applyResolution() {
-  const val = document.getElementById("resFilter").value;
-  if (!val) {
-    activeWidth  = null;
-    activeHeight = null;
-  } else {
-    const [w, h] = val.split("x").map(Number);
-    activeWidth  = w;
-    activeHeight = h;
-  }
-  gallery.style.cssText = "";
-  gallery.classList.add("wv-masonry");
-  resetGallery(currentQuery, currentQuery);
-}
-  // ── Random Wallpaper ──────────────────────
-const randomPool = [
-  "nature", "space", "ocean", "mountains", "forest",
-  "city", "abstract", "aurora", "desert", "storm",
-  "waterfall", "canyon", "glacier", "sunset", "minimal"
-];
-
-async function showRandom() {
-  const btn = document.getElementById("randomBtn");
-  btn.textContent = "⏳ Loading...";
-  btn.disabled = true;
-
-  try {
-    const query = randomPool[Math.floor(Math.random() * randomPool.length)];
-    const page  = Math.floor(Math.random() * 5) + 1;
-    const results = await searchWallpapers(query, page);
-
-    if (results.length) {
-      const item = results[Math.floor(Math.random() * results.length)];
-      openModal(item);
-    }
-  } catch {
-    // silently fail
-  } finally {
-    btn.textContent = "⚡ Random";
-    btn.disabled = false;
-  }
-}
   // ── Init ──────────────────────────────────
   renderWotd();
   loadMore();
-
-  // ── Download History ──────────────────────
-function getHistory() {
-  return JSON.parse(localStorage.getItem("wv_history") || "[]");
-}
-
-function saveToHistory(item) {
-  let history = getHistory();
-  history = history.filter(h => h.id !== item.id); // no duplicates
-  history.unshift(item);                            // add to front
-  if (history.length > 10) history = history.slice(0, 10); // max 10
-  localStorage.setItem("wv_history", JSON.stringify(history));
-}
-
-function renderHistory() {
-  // History is shown inside the Favourites panel — nothing to do here
-}
-
-function clearHistory() {
-  localStorage.removeItem("wv_history");
-  // Re-render the favourites panel
-  showingFavs = false;
-  gallery.classList.add("wv-masonry");
-  gallery.style.cssText = "";
-  toggleFavView();
-}
 </script>
 </body>
 </html>
