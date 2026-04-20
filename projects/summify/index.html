@@ -60,9 +60,10 @@
     <div class="sm-mode-row">
       <span class="sm-mode-label">Summary type</span>
       <div class="sm-modes">
-        <button class="sm-mode active" data-mode="quick">⚡ Quick</button>
-        <button class="sm-mode" data-mode="detailed">📋 Detailed</button>
-      </div>
+  <button class="sm-mode active" data-mode="quick">⚡ Quick</button>
+  <button class="sm-mode" data-mode="detailed">📋 Detailed</button>
+  <button class="sm-mode" data-mode="comments">💬 Comments</button>
+</div>
       <button class="sm-submit" id="submitBtn" onclick="summarize()">Summarize →</button>
     </div>
   </div>
@@ -141,7 +142,98 @@
   </div>
 
 </main>
+<!-- RESULT — COMMENTS -->
+<div class="sm-result" id="resultComments" style="display:none">
 
+  <!-- VIDEO CARD (reuse same structure) -->
+  <div class="sm-video-card">
+    <img class="sm-thumbnail" id="cThumbnail" src="" alt="">
+    <div class="sm-video-info">
+      <h2 class="sm-video-title" id="cVideoTitle"></h2>
+      <div class="sm-video-meta">
+        <span id="cVideoChannel"></span>
+        <span class="sm-meta-dot">·</span>
+        <span id="cVideoDuration"></span>
+        <span class="sm-meta-dot">·</span>
+        <span id="cCommentCount" style="color:var(--muted-light)"></span>
+      </div>
+    </div>
+    <a class="sm-watch-btn" id="cWatchBtn" href="#" target="_blank" rel="noopener noreferrer">
+      ▶ Watch
+    </a>
+  </div>
+
+  <!-- SENTIMENT OVERVIEW -->
+  <div class="sm-card">
+    <div class="sm-card-header">
+      <span class="sm-card-label">Audience Sentiment</span>
+      <span class="sm-sentiment-badge" id="cOverallSentiment"></span>
+    </div>
+    <p class="sm-summary-text" id="cOneLiner" style="margin-bottom:1rem;"></p>
+
+    <!-- Support/Oppose/Neutral bars -->
+    <div class="sm-sentiment-bars" id="cSentimentBars"></div>
+  </div>
+
+  <!-- WHAT PEOPLE LOVE / DISLIKE -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <span class="sm-card-label">👍 What people love</span>
+      </div>
+      <ul class="sm-key-points" id="cLove"></ul>
+    </div>
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <span class="sm-card-label">👎 What people dislike</span>
+      </div>
+      <ul class="sm-key-points" id="cDislike"></ul>
+    </div>
+  </div>
+
+  <!-- MAIN THEMES -->
+  <div class="sm-card">
+    <div class="sm-card-header">
+      <span class="sm-card-label">Main Themes</span>
+    </div>
+    <div id="cThemes"></div>
+  </div>
+
+  <!-- CONTROVERSIAL POINT -->
+  <div class="sm-card" id="cControversialCard" style="display:none">
+    <div class="sm-card-header">
+      <span class="sm-card-label">🔥 Most Controversial Point</span>
+    </div>
+    <p class="sm-summary-text" id="cControversial"></p>
+  </div>
+
+  <!-- COMMON QUESTIONS -->
+  <div class="sm-card" id="cQuestionsCard">
+    <div class="sm-card-header">
+      <span class="sm-card-label">❓ Common Questions</span>
+    </div>
+    <ul class="sm-key-points" id="cQuestions"></ul>
+  </div>
+
+  <!-- MEMORABLE COMMENT -->
+  <div class="sm-quote-card" id="cMemorableCard">
+    <span class="sm-quote-mark">"</span>
+    <p class="sm-quote-text" id="cMemorable"></p>
+  </div>
+
+  <!-- TOP COMMENTS -->
+  <div class="sm-card">
+    <div class="sm-card-header">
+      <span class="sm-card-label">Top Comments</span>
+    </div>
+    <div id="cTopComments"></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="sm-actions">
+    <button class="sm-action-btn" onclick="resetApp()">← Summarize Another</button>
+  </div>
+</div>
 <!-- NO TRANSCRIPT -->
 <div class="sm-no-transcript" id="noTranscript" style="display:none">
   <div class="sm-nt-icon">⚠</div>
@@ -206,6 +298,7 @@
 
   // ── Summarize ─────────────────────────────
   async function summarize() {
+    if (activeMode === "comments") { analyzeComments(); return; }
     const videoUrl = document.getElementById("urlInput").value.trim();
     if (!videoUrl) {
       document.getElementById("urlInput").focus();
@@ -263,6 +356,131 @@
       resetApp();
     }
   }
+  // ── Analyze Comments ──────────────────────
+async function analyzeComments() {
+  const videoUrl = document.getElementById("urlInput").value.trim();
+  if (!videoUrl) { document.getElementById("urlInput").focus(); return; }
+
+  document.getElementById("hero").style.display         = "none";
+  document.getElementById("result").style.display       = "none";
+  document.getElementById("resultComments").style.display = "none";
+  document.getElementById("noTranscript").style.display = "none";
+  document.getElementById("loader").style.display       = "flex";
+
+  const loaderTexts = ["Fetching video info...", "Loading comments...", "Analysing audience sentiment...", "Building insights..."];
+  let li = 0;
+  const loaderInterval = setInterval(() => {
+    li = (li + 1) % loaderTexts.length;
+    document.getElementById("loaderText").textContent = loaderTexts[li];
+  }, 1500);
+
+  try {
+    const res  = await fetch(`${WORKER_URL}/api/summify-comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ videoUrl }),
+    });
+    const data = await res.json();
+
+    clearInterval(loaderInterval);
+    document.getElementById("loader").style.display = "none";
+
+    if (data.error) { alert(data.error); resetApp(); return; }
+
+    renderComments(data);
+  } catch {
+    clearInterval(loaderInterval);
+    document.getElementById("loader").style.display = "none";
+    alert("Something went wrong. Please try again.");
+    resetApp();
+  }
+}
+
+function renderComments(data) {
+  // Video card
+  document.getElementById("cThumbnail").src      = data.thumbnail;
+  document.getElementById("cVideoTitle").textContent  = data.title;
+  document.getElementById("cVideoChannel").textContent = data.channel;
+  document.getElementById("cVideoDuration").textContent = data.duration;
+  document.getElementById("cCommentCount").textContent = Number(data.commentCount).toLocaleString() + " comments";
+  document.getElementById("cWatchBtn").href = `https://youtube.com/watch?v=${data.videoId}`;
+
+  // Overall sentiment badge
+  const sentBadge = document.getElementById("cOverallSentiment");
+  sentBadge.textContent = data.overallSentiment;
+  const sentClass = data.overallSentiment?.toLowerCase().includes("positive") ? "sent-pos"
+    : data.overallSentiment?.toLowerCase().includes("negative") ? "sent-neg"
+    : data.overallSentiment?.toLowerCase().includes("divided") ? "sent-mix"
+    : "sent-neu";
+  sentBadge.className = `sm-sentiment-badge ${sentClass}`;
+
+  // One liner
+  document.getElementById("cOneLiner").textContent = data.oneLiner || "";
+
+  // Sentiment bars
+  document.getElementById("cSentimentBars").innerHTML = [
+    { label: "👍 Support", val: data.supportPercent || 0, color: "#22c55e" },
+    { label: "👎 Oppose",  val: data.opposePercent  || 0, color: "#ef4444" },
+    { label: "😐 Neutral", val: data.neutralPercent || 0, color: "#6b7280" },
+  ].map(b => `
+    <div class="sm-sent-bar-row">
+      <span class="sm-sent-bar-label">${b.label}</span>
+      <div class="sm-sent-bar-track">
+        <div class="sm-sent-bar-fill" style="width:${b.val}%;background:${b.color}"></div>
+      </div>
+      <span class="sm-sent-bar-val">${b.val}%</span>
+    </div>
+  `).join("");
+
+  // What people love
+  document.getElementById("cLove").innerHTML =
+    (data.whatPeopleLove || []).map(p => `<li>${p}</li>`).join("") || "<li>No specific praise found</li>";
+
+  // What people dislike
+  document.getElementById("cDislike").innerHTML =
+    (data.whatPeopleDislike || []).map(p => `<li>${p}</li>`).join("") || "<li>No specific criticism found</li>";
+
+  // Main themes
+  document.getElementById("cThemes").innerHTML =
+    (data.mainThemes || []).map(t => `
+      <div class="sm-theme-item">
+        <span class="sm-theme-badge sm-theme-${(t.sentiment||"neutral").toLowerCase()}">${t.sentiment}</span>
+        <div>
+          <div class="sm-theme-title">${t.theme}</div>
+          <div class="sm-theme-desc">${t.description}</div>
+        </div>
+      </div>
+    `).join("");
+
+  // Controversial point
+  if (data.controversialPoint) {
+    document.getElementById("cControversial").textContent = data.controversialPoint;
+    document.getElementById("cControversialCard").style.display = "block";
+  } else {
+    document.getElementById("cControversialCard").style.display = "none";
+  }
+
+  // Common questions
+  document.getElementById("cQuestions").innerHTML =
+    (data.commonQuestions || []).map(q => `<li>${q}</li>`).join("");
+
+  // Memorable comment
+  document.getElementById("cMemorable").textContent = data.memorableComment || "";
+
+  // Top comments
+  document.getElementById("cTopComments").innerHTML =
+    (data.topComments || []).map(c => `
+      <div class="sm-comment-item">
+        <div class="sm-comment-meta">
+          <span>${c.author}</span>
+          <span class="sm-comment-likes">👍 ${c.likes.toLocaleString()}</span>
+        </div>
+        <p class="sm-comment-text">${c.text}</p>
+      </div>
+    `).join("");
+
+  document.getElementById("resultComments").style.display = "block";
+}
 
   // ── Render result ─────────────────────────
   function renderResult(data) {
@@ -359,12 +577,13 @@ if (data.sourceNote === "metadata") {
 
   // ── Reset ─────────────────────────────────
   function resetApp() {
-    document.getElementById("hero").style.display = "block";
-    document.getElementById("result").style.display = "none";
-    document.getElementById("noTranscript").style.display = "none";
-    document.getElementById("loader").style.display = "none";
-    currentData = null;
-  }
+  document.getElementById("hero").style.display            = "block";
+  document.getElementById("result").style.display          = "none";
+  document.getElementById("resultComments").style.display  = "none"; // ← add this
+  document.getElementById("noTranscript").style.display    = "none";
+  document.getElementById("loader").style.display          = "none";
+  currentData = null;
+}
 </script>
 </body>
 </html>
