@@ -75,132 +75,87 @@
       </p>
     </section>
 
-    <!-- INPUT SECTION -->
-    <div class="rs-input-section" id="inputSection">
-      <!-- SINGLE MODE -->
-      <div class="rs-single-mode" id="singleMode">
-        <div class="rs-input-card">
-          <div class="rs-input-header">
-            <span class="rs-input-label">Your Current Traits</span>
-            <span class="rs-char-count" id="charCount1">0 / 500</span>
-          </div>
-          <div style="position:relative;">
-          <textarea class="rs-textarea" id="traits1" maxlength="500"
-            placeholder="Describe yourself honestly — your personality, skills, habits, fears, values, how you handle stress, what drives you, your quirks...
+<!-- INPUT SECTION -->
+<div class="rs-input-section" id="inputSection">
 
-e.g. I'm introverted but can switch to social mode when needed. I overthink everything. I'm great at starting projects but struggle to finish them. I have a deep fear of failure but also fear of mediocrity. I work better at night. I'm drawn to creative work but ended up in a technical career..."
-          ></textarea>
-            <button class="rs-mic-btn" id="micBtn1" onclick="toggleVoiceInput('traits1', 'micBtn1', 'charCount1')" title="Speak your traits">
-    🎤
-  </button>
-</div>
-          <div class="rs-input-footer">
-            <input
-              type="text"
-              class="rs-name-input"
-              id="name1"
-              placeholder="Name this persona (optional)"
-            />
-            <button class="rs-analyze-btn" id="analyzeBtn1" onclick="analyze()">
-              Analyze →
-            </button>
-          </div>
+  <!-- SINGLE MODE -->
+  <div class="rs-single-mode" id="singleMode">
+    <div class="rs-input-card">
+      <div class="rs-input-header">
+        <span class="rs-input-label">Your Current Traits</span>
+        <span class="rs-char-count" id="charCount1">0 / 500</span>
+      </div>
+      <div class="rs-lang-row">
+        <span class="rs-input-label">Input Language</span>
+        <div class="rs-lang-toggle">
+          <button class="rs-lang-btn active" id="langEn" onclick="setLang('en-US')">English</button>
+          <button class="rs-lang-btn" id="langHi" onclick="setLang('hi-IN')">हिंदी</button>
+        </div>
+        <span class="rs-input-label" style="margin-left:auto">Output Language</span>
+        <div class="rs-lang-toggle">
+          <button class="rs-lang-btn active" id="outEn" onclick="setOutputLang('english')">English</button>
+          <button class="rs-lang-btn" id="outHinglish" onclick="setOutputLang('hinglish')">Hinglish</button>
+          <button class="rs-lang-btn" id="outHi" onclick="setOutputLang('hindi')">हिंदी</button>
         </div>
       </div>
+      <div style="position:relative;">
+        <textarea class="rs-textarea" id="traits1" maxlength="500"
+          placeholder="Describe yourself honestly — your personality, skills, habits, fears, values, how you handle stress, what drives you, your quirks...
 
-      <!-- COMPARE MODE -->
-      <div class="rs-compare-mode" id="compareMode" style="display:none">
-        <div class="rs-input-card">
-          <div class="rs-input-header">
-            <span class="rs-input-label">Persona A</span>
-            <span class="rs-char-count" id="charCountA">0 / 500</span>
-          </div>
-          <div style="position:relative;">
-          <textarea
-            class="rs-textarea"
-            id="traitsA"
-            maxlength="500"
-            placeholder="Describe Persona A's traits..."
-          ></textarea>
-            <button class="rs-mic-btn" id="micBtnA" onclick="toggleVoiceInput('traitsA', 'micBtnA', 'charCountA')" title="Speak traits">
-    🎤
-  </button>
-</div>
-          <div class="rs-input-footer">
-            <input
-              type="text"
-              class="rs-name-input"
-              id="nameA"
-              placeholder="Name (e.g. The Introvert)"
-            />
-          </div>
-        </div>
-        <div class="rs-input-card">
-          <div class="rs-input-header">
-            <span class="rs-input-label">Persona B</span>
-            <span class="rs-char-count" id="charCountB">0 / 500</span>
-          </div>
-          <div style="position:relative;">
-          <textarea
-            class="rs-textarea"
-            id="traitsB"
-            maxlength="500"
-            placeholder="Describe Persona B's traits..."
-          ></textarea>
-            <button class="rs-mic-btn" id="micBtnB" onclick="toggleVoiceInput('traitsB', 'micBtnB', 'charCountB')" title="Speak traits">
-    🎤
-  </button>
-</div>
-          <div class="rs-input-footer">
-            <input
-              type="text"
-              class="rs-name-input"
-              id="nameB"
-              placeholder="Name (e.g. The Extrovert)"
-            />
-          </div>
-        </div>
-        <div style="text-align:center; grid-column: 1 / -1;">
-          <button
-            class="rs-analyze-btn"
-            id="analyzeBtnCompare"
-            onclick="analyzeCompare()"
-          >
-            Compare Both →
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- LOADER -->
-    <div class="rs-loader" id="loader" style="display:none">
-      <div class="rs-loader-ring"></div>
-      <p class="rs-loader-text" id="loaderText">
-        Reverse-engineering your past...
-      </p>
-    </div>
-
-    <!-- RESULT — SINGLE -->
-    <div class="rs-result" id="resultSingle" style="display:none">
-      <div class="rs-result-inner" id="resultSingleInner"></div>
-      <div style="text-align:center; margin-top:2.5rem;">
-        <button class="rs-reset-btn" onclick="resetApp()">
-          ← Analyze Another
+e.g. I'm introverted but can switch to social mode when needed. I overthink everything. I'm great at starting projects but struggle to finish them. I have a deep fear of failure but also fear of mediocrity. I work better at night. I'm drawn to creative work but ended up in a technical career..."></textarea>
+        <button class="rs-mic-btn" id="micBtn1" onclick="toggleVoiceInput('traits1', 'micBtn1', 'charCount1')" title="Speak your traits">
+          🎤
         </button>
       </div>
-    </div>
-
-    <!-- RESULT — COMPARE -->
-    <div
-      class="rs-result rs-compare-result"
-      id="resultCompare"
-      style="display:none"
-    >
-      <div class="rs-compare-grid" id="compareGrid"></div>
-      <div style="text-align:center; margin-top:2.5rem;">
-        <button class="rs-reset-btn" onclick="resetApp()">← Start Over</button>
+      <div class="rs-input-footer">
+        <input type="text" class="rs-name-input" id="name1" placeholder="Name this persona (optional)">
+        <button class="rs-analyze-btn" id="analyzeBtn1" onclick="analyze()">Analyze →</button>
       </div>
     </div>
+  </div><!-- ✅ closes rs-single-mode -->
+
+  <!-- COMPARE MODE -->
+  <div class="rs-compare-mode" id="compareMode" style="display:none">
+    <div class="rs-input-card">
+      <div class="rs-input-header">
+        <span class="rs-input-label">Persona A</span>
+        <span class="rs-char-count" id="charCountA">0 / 500</span>
+      </div>
+      <div style="position:relative;">
+        <textarea class="rs-textarea" id="traitsA" maxlength="500"
+          placeholder="Describe Persona A's traits..."></textarea>
+        <button class="rs-mic-btn" id="micBtnA" onclick="toggleVoiceInput('traitsA', 'micBtnA', 'charCountA')" title="Speak traits">
+          🎤
+        </button>
+      </div>
+      <div class="rs-input-footer">
+        <input type="text" class="rs-name-input" id="nameA" placeholder="Name (e.g. The Introvert)">
+      </div>
+    </div>
+    <div class="rs-input-card">
+      <div class="rs-input-header">
+        <span class="rs-input-label">Persona B</span>
+        <span class="rs-char-count" id="charCountB">0 / 500</span>
+      </div>
+      <div style="position:relative;">
+        <textarea class="rs-textarea" id="traitsB" maxlength="500"
+          placeholder="Describe Persona B's traits..."></textarea>
+        <button class="rs-mic-btn" id="micBtnB" onclick="toggleVoiceInput('traitsB', 'micBtnB', 'charCountB')" title="Speak traits">
+          🎤
+        </button>
+      </div>
+      <div class="rs-input-footer">
+        <input type="text" class="rs-name-input" id="nameB" placeholder="Name (e.g. The Extrovert)">
+      </div>
+    </div>
+    <div style="text-align:center; grid-column: 1 / -1;">
+      <button class="rs-analyze-btn" id="analyzeBtnCompare" onclick="analyzeCompare()">
+        Compare Both →
+      </button>
+    </div>
+  </div><!-- ✅ closes rs-compare-mode -->
+
+</div><!-- ✅ closes rs-input-section -->
 
     <footer class="rs-footer">
       © 2026 ReverseSelf · Built by Prince · AI-generated — for exploration
@@ -1357,7 +1312,7 @@ function toggleVoiceInput(textareaId, btnId, counterId) {
 
   recognition.continuous     = true;
   recognition.interimResults = true;
-  recognition.lang           = "en-US";
+  recognition.lang           = voiceLang;
 
   const textarea = document.getElementById(textareaId);
   const counter  = document.getElementById(counterId);
@@ -1396,6 +1351,23 @@ function toggleVoiceInput(textareaId, btnId, counterId) {
   };
 
   recognition.start();
+}
+
+      // ── Language Settings ─────────────────────
+let voiceLang   = "en-US";
+let outputLang  = "english";
+
+function setLang(primary, secondary) {
+  voiceLang = primary;
+  document.getElementById("langEn").classList.toggle("active", primary === "en-US");
+  document.getElementById("langHi").classList.toggle("active", primary === "hi-IN");
+}
+
+function setOutputLang(lang) {
+  outputLang = lang;
+  document.getElementById("outEn").classList.toggle("active", lang === "english");
+  document.getElementById("outHinglish").classList.toggle("active", lang === "hinglish");
+  document.getElementById("outHi").classList.toggle("active", lang === "hindi");
 }
     </script>
     <!-- WHAT IF MODAL -->
