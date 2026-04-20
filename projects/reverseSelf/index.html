@@ -86,16 +86,15 @@
         <span class="rs-char-count" id="charCount1">0 / 500</span>
       </div>
       <div class="rs-lang-row">
-        <span class="rs-input-label">Input Language</span>
-        <div class="rs-lang-toggle">
-          <button class="rs-lang-btn active" id="langEn" onclick="setLang('en-US')">English</button>
-        </div>
-        <span class="rs-input-label" style="margin-left:auto">Output Language</span>
-        <div class="rs-lang-toggle">
-          <button class="rs-lang-btn active" id="outEn" onclick="setOutputLang('english')">English</button>
-          <button class="rs-lang-btn" id="outHinglish" onclick="setOutputLang('hinglish')">Hinglish</button>
-        </div>
-      </div>
+  <span class="rs-input-hint">💬 You can type or speak in English or Hinglish</span>
+  <div style="margin-left:auto">
+    <span class="rs-input-label">Output Language</span>
+    <div class="rs-lang-toggle" style="display:inline-flex; margin-left:0.5rem;">
+      <button class="rs-lang-btn active" id="outEn" onclick="setOutputLang('english')">English</button>
+      <button class="rs-lang-btn" id="outHinglish" onclick="setOutputLang('hinglish')">Hinglish</button>
+    </div>
+  </div>
+</div>
       <div style="position:relative;">
         <textarea class="rs-textarea" id="traits1" maxlength="500"
           placeholder="Describe yourself honestly — your personality, skills, habits, fears, values, how you handle stress, what drives you, your quirks...
@@ -1365,7 +1364,7 @@ function toggleVoiceInput(textareaId, btnId, counterId) {
 
   recognition.continuous     = true;
   recognition.interimResults = true;
-  recognition.lang           = voiceLang;
+  recognition.lang           = "hi-IN";
 
   const textarea = document.getElementById(textareaId);
   const counter  = document.getElementById(counterId);
@@ -1406,14 +1405,7 @@ function toggleVoiceInput(textareaId, btnId, counterId) {
 }
 
       // ── Language Settings ─────────────────────
-let voiceLang   = "en-US";
 let outputLang  = "english";
-
-function setLang(primary, secondary) {
-  voiceLang = primary;
-  document.getElementById("langEn").classList.toggle("active", primary === "en-US");
-  document.getElementById("langHi").classList.toggle("active", primary === "hi-IN");
-}
 
 function setOutputLang(lang) {
   outputLang = lang;
