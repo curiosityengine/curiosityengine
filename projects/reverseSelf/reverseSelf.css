@@ -1148,3 +1148,9 @@ a {
   font-size: 0.72rem; color: var(--muted);
   font-family: var(--font-body); flex: 1;
 }
+.rs-lang-row .rs-input-label {
+  font-size: 0.65rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  font-family: var(--font-mono); font-weight: 600;
+  white-space: nowrap;
+}
