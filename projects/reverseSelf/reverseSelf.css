@@ -424,8 +424,9 @@ a { text-decoration: none; color: inherit; }
 
 /* ── SHARE CARD ── */
 .rs-share-row {
-  display: flex; justify-content: center;
+  display: flex; justify-content: center; gap: 0.75rem;
   padding-top: 1rem; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 .rs-share-card-btn {
   font-size: 0.78rem; color: var(--accent);
