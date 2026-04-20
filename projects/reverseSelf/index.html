@@ -206,7 +206,7 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-    return data;
+    return { ...data, traits };
   }
 
   // ── Render persona card ───────────────────
@@ -237,12 +237,16 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
             </div>
             <p class="rs-timeline-desc">${event.description}</p>
             <div class="rs-confidence-wrap">
-              <span class="rs-confidence-label">Confidence</span>
-              <div class="rs-confidence-bar">
-                <div class="rs-confidence-fill" style="width:${event.confidence}%;background:${color}"></div>
-              </div>
-              <span class="rs-confidence-val">${event.confidence}%</span>
-            </div>
+  <span class="rs-confidence-label">Confidence</span>
+  <div class="rs-confidence-bar">
+    <div class="rs-confidence-fill" style="width:${event.confidence}%;background:${color}"></div>
+  </div>
+  <span class="rs-confidence-val">${event.confidence}%</span>
+</div>
+<button class="rs-whatif-btn"
+  onclick="openWhatIf('${event.event.replace(/'/g, "&#39;")}', '${(data.traits||'').replace(/'/g,"&#39;")}', this)">
+  ✦ What If?
+</button>
           </div>
         </div>
       `;
@@ -356,5 +360,23 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
     Chart.instances && Object.values(Chart.instances).forEach(c => c.destroy());
   }
 </script>
+  <!-- WHAT IF MODAL -->
+<div class="rs-modal-overlay" id="whatIfOverlay" onclick="closeWhatIf()"></div>
+<div class="rs-modal" id="whatIfModal">
+  <div class="rs-modal-header">
+    <span class="rs-modal-title">✦ What If?</span>
+    <button class="rs-modal-close" onclick="closeWhatIf()">✕</button>
+  </div>
+  <p class="rs-modal-event" id="whatIfEventLabel"></p>
+  <div class="rs-modal-input-wrap">
+    <label class="rs-modal-label">What if instead...</label>
+    <textarea class="rs-textarea" id="whatIfInput" rows="3"
+      placeholder="e.g. What if they had supportive parents instead of critical ones?&#10;What if they had chosen art school over engineering?"></textarea>
+  </div>
+  <button class="rs-analyze-btn" style="width:100%" onclick="submitWhatIf()">
+    Explore Divergence →
+  </button>
+  <div class="rs-whatif-result" id="whatIfResult" style="display:none"></div>
+</div>
 </body>
 </html>
