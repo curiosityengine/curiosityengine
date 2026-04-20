@@ -459,13 +459,21 @@ function renderComments(data) {
   } else {
     document.getElementById("cControversialCard").style.display = "none";
   }
-
-  // Common questions
-  document.getElementById("cQuestions").innerHTML =
-    (data.commonQuestions || []).map(q => `<li>${q}</li>`).join("");
-
-  // Memorable comment
-  document.getElementById("cMemorable").textContent = data.memorableComment || "";
+  // Common questions — hide if empty
+const questions = data.commonQuestions || [];
+if (questions.length > 0) {
+  document.getElementById("cQuestions").innerHTML = questions.map(q => `<li>${q}</li>`).join("");
+  document.getElementById("cQuestionsCard").style.display = "block";
+} else {
+  document.getElementById("cQuestionsCard").style.display = "none";
+}
+  // Memorable comment — hide if empty
+if (data.memorableComment) {
+  document.getElementById("cMemorable").textContent = data.memorableComment;
+  document.getElementById("cMemorableCard").style.display = "block";
+} else {
+  document.getElementById("cMemorableCard").style.display = "none";
+}
 
   // Top comments
   document.getElementById("cTopComments").innerHTML =
