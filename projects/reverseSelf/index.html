@@ -359,6 +359,109 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
     // Destroy existing charts to avoid canvas reuse issues
     Chart.instances && Object.values(Chart.instances).forEach(c => c.destroy());
   }
+
+  // ── What If ───────────────────────────────
+let currentWhatIfEvent  = "";
+let currentWhatIfTraits = "";
+
+function openWhatIf(event, traits, btn) {
+  currentWhatIfEvent  = event;
+  currentWhatIfTraits = traits;
+  document.getElementById("whatIfEventLabel").textContent = `Event: "${event}"`;
+  document.getElementById("whatIfInput").value = "";
+  document.getElementById("whatIfResult").style.display = "none";
+  document.getElementById("whatIfOverlay").classList.add("open");
+  document.getElementById("whatIfModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => document.getElementById("whatIfInput").focus(), 400);
+}
+
+function closeWhatIf() {
+  document.getElementById("whatIfOverlay").classList.remove("open");
+  document.getElementById("whatIfModal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+async function submitWhatIf() {
+  const change = document.getElementById("whatIfInput").value.trim();
+  if (!change || change.length < 10) {
+    document.getElementById("whatIfInput").focus();
+    return;
+  }
+
+  const btn = document.querySelector("#whatIfModal .rs-analyze-btn");
+  btn.textContent = "Exploring divergence...";
+  btn.disabled = true;
+
+  try {
+    const res  = await fetch(`${WORKER_URL}/api/whatIf`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        originalTraits: currentWhatIfTraits,
+        event: currentWhatIfEvent,
+        change,
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    const categoryColors = {
+      Childhood:"#06b6d4", Education:"#8b5cf6", Career:"#f59e0b",
+      Relationship:"#ec4899", Trauma:"#ef4444", Achievement:"#22c55e",
+      Travel:"#3b82f6", Identity:"#a78bfa",
+    };
+
+    const timelineHTML = (data.newTimeline || []).map((e, i) => {
+      const color = categoryColors[e.category] || "var(--accent)";
+      return `
+        <div class="rs-timeline-item" style="animation-delay:${i*0.07}s">
+          <div class="rs-timeline-left">
+            <div class="rs-timeline-age">${e.age}</div>
+            <div class="rs-timeline-line" style="border-color:${color}20"></div>
+          </div>
+          <div class="rs-timeline-content">
+            <div class="rs-timeline-header">
+              <span class="rs-timeline-event">${e.event}</span>
+              <span class="rs-category-badge" style="background:${color}15;color:${color};border-color:${color}30">${e.category}</span>
+            </div>
+            <p class="rs-timeline-desc">${e.description}</p>
+            <div class="rs-confidence-wrap">
+              <span class="rs-confidence-label">Confidence</span>
+              <div class="rs-confidence-bar">
+                <div class="rs-confidence-fill" style="width:${e.confidence}%;background:${color}"></div>
+              </div>
+              <span class="rs-confidence-val">${e.confidence}%</span>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+
+    document.getElementById("whatIfResult").innerHTML = `
+      <p class="rs-divergence-summary">${data.divergenceSummary}</p>
+      <div>
+        <span class="rs-modal-label">New Archetype</span>
+        <div class="rs-new-archetype">${data.newArchetype}</div>
+      </div>
+      <div class="rs-timeline">${timelineHTML}</div>
+      <div>
+        <span class="rs-modal-label">Key Difference</span>
+        <p class="rs-key-difference">${data.keyDifference}</p>
+      </div>
+    `;
+    document.getElementById("whatIfResult").style.display = "flex";
+
+  } catch {
+    alert("Something went wrong. Try again.");
+  } finally {
+    btn.textContent = "Explore Divergence →";
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeWhatIf();
+});
 </script>
   <!-- WHAT IF MODAL -->
 <div class="rs-modal-overlay" id="whatIfOverlay" onclick="closeWhatIf()"></div>
