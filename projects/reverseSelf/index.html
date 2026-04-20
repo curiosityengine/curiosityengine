@@ -247,9 +247,9 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
             const [dataA, dataB] = await Promise.all([
               fetchPersona(traitsA, nameA),
               fetchPersona(traitsB, nameB),
-              savePersona(dataA);
-              savePersona(dataB);
             ]);
+            savePersona(dataA);
+            savePersona(dataB);
             personaStore[dataA.personaName] = dataA;
             personaStore[dataB.personaName] = dataB;
             document.getElementById("loader").style.display         = "none";
