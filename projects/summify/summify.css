@@ -422,3 +422,16 @@ a { text-decoration: none; color: inherit; }
   background: rgba(255,59,59,0.05);
   transform: translateY(-1px);
 }
+
+/* ── LOVE DISLIKE GRID ── */
+#resultComments .sm-card + .sm-card { margin-top: 0; }
+
+.sm-love-dislike-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .sm-love-dislike-grid { grid-template-columns: 1fr; }
+}
