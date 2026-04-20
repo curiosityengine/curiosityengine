@@ -211,7 +211,7 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
           }
           showLoader("Reverse-engineering your past...");
           try {
-            const data = await fetchPersona(traits, name);
+            const data = await fetchPersona(traits, name, outputLang);
             personaStore[data.personaName] = data;
             savePersona(data);
             document.getElementById("loader").style.display        = "none";
@@ -255,16 +255,16 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 }
 
         // ── Fetch persona ─────────────────────────
-        async function fetchPersona(traits, personaName) {
-          const res  = await fetch(`${WORKER_URL}/api/reverseSelf`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ traits, personaName }),
-          });
-          const data = await res.json();
-          if (data.error) throw new Error(data.error);
-          return { ...data, traits };
-        }
+        async function fetchPersona(traits, personaName, outputLang = "english") {
+  const res = await fetch(`${WORKER_URL}/api/reverseSelf`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ traits, personaName, outputLang }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return { ...data, traits };
+}
 
         // ── Render persona card ───────────────────
         function renderPersonaCard(data, isCompare) {
