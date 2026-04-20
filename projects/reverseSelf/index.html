@@ -235,9 +235,9 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
   showLoader("Analysing both personas...");
   try {
     const [dataA, dataB] = await Promise.all([
-      fetchPersona(traitsA, nameA),
-      fetchPersona(traitsB, nameB),
-    ]);
+  fetchPersona(traitsA, nameA, outputLang),
+  fetchPersona(traitsB, nameB, outputLang),
+]);
     personaStore[dataA.personaName] = dataA;
     personaStore[dataB.personaName] = dataB;
     savePersona(dataA);
