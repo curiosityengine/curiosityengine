@@ -237,33 +237,33 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 
         // ── Analyze compare ───────────────────────
         async function analyzeCompare() {
-          const traitsA = document.getElementById("traitsA").value.trim();
-          const traitsB = document.getElementById("traitsB").value.trim();
-          const nameA   = document.getElementById("nameA").value.trim() || "Persona A";
-          const nameB   = document.getElementById("nameB").value.trim() || "Persona B";
-          if (traitsA.length < 20 || traitsB.length < 20) return;
+  const traitsA = document.getElementById("traitsA").value.trim();
+  const traitsB = document.getElementById("traitsB").value.trim();
+  const nameA   = document.getElementById("nameA").value.trim() || "Persona A";
+  const nameB   = document.getElementById("nameB").value.trim() || "Persona B";
+  if (traitsA.length < 20 || traitsB.length < 20) return;
 
-          showLoader("Analysing both personas...");
-          try {
-            const [dataA, dataB] = await Promise.all([
-              fetchPersona(traitsA, nameA),
-              fetchPersona(traitsB, nameB),
-            ]);
-            savePersona(dataA);
-            savePersona(dataB);
-            personaStore[dataA.personaName] = dataA;
-            personaStore[dataB.personaName] = dataB;
-            document.getElementById("loader").style.display         = "none";
-            document.getElementById("resultCompare").style.display  = "block";
-            document.getElementById("compareGrid").innerHTML =
-              renderPersonaCard(dataA, true) + renderPersonaCard(dataB, true);
-            renderRadar(dataA);
-            renderRadar(dataB);
-          } catch {
-            alert("Something went wrong. Please try again.");
-            resetApp();
-          }
-        }
+  showLoader("Analysing both personas...");
+  try {
+    const [dataA, dataB] = await Promise.all([
+      fetchPersona(traitsA, nameA),
+      fetchPersona(traitsB, nameB),
+    ]);
+    personaStore[dataA.personaName] = dataA;
+    personaStore[dataB.personaName] = dataB;
+    savePersona(dataA);
+    savePersona(dataB);
+    document.getElementById("loader").style.display        = "none";
+    document.getElementById("resultCompare").style.display = "block";
+    document.getElementById("compareGrid").innerHTML =
+      renderPersonaCard(dataA, true) + renderPersonaCard(dataB, true);
+    renderRadar(dataA);
+    renderRadar(dataB);
+  } catch {
+    alert("Something went wrong. Please try again.");
+    resetApp();
+  }
+}
 
         // ── Fetch persona ─────────────────────────
         async function fetchPersona(traits, personaName) {
