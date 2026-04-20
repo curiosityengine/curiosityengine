@@ -1107,26 +1107,37 @@ a {
   0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
   50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
 }
-/* ── LANGUAGE TOGGLE ── */
+/* ── LANGUAGE ROW ── */
 .rs-lang-row {
   display: flex; align-items: center; gap: 0.75rem;
   margin-bottom: 0.75rem; flex-wrap: wrap;
+}
+.rs-lang-row .rs-input-label {
+  color: var(--muted-light); font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-family: var(--font-mono); font-weight: 600;
 }
 .rs-lang-toggle {
   display: flex; gap: 0.3rem;
 }
 .rs-lang-btn {
-  font-size: 0.7rem; padding: 0.25rem 0.7rem;
-  background: transparent; border: 1px solid var(--border);
+  font-size: 0.72rem; padding: 0.25rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 999px; color: var(--muted-light);
   cursor: pointer; font-family: var(--font-body);
-  transition: all 0.15s;
+  transition: all 0.15s; line-height: 1.4;
 }
-.rs-lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+.rs-lang-btn:hover {
+  border-color: var(--accent); color: var(--accent);
+}
 .rs-lang-btn.active {
   background: var(--accent-dim);
   border-color: rgba(56,189,248,0.4);
   color: var(--accent);
+}
+.rs-mic-btn svg {
+  display: block;
 }
 .rs-mic-btn.listening svg rect,
 .rs-mic-btn.listening svg path,
