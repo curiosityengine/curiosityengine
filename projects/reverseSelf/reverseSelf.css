@@ -348,3 +348,76 @@ a { text-decoration: none; color: inherit; }
 .rs-radar-wrap {
   display: flex; justify-content: center;
 }
+
+/* ── WHAT IF ── */
+.rs-whatif-btn {
+  margin-top: 0.6rem; font-size: 0.68rem;
+  color: var(--accent); background: var(--accent-dim);
+  border: 1px solid rgba(0,212,255,0.2); border-radius: 6px;
+  padding: 0.25rem 0.65rem; cursor: pointer;
+  font-family: var(--font-mono); transition: all 0.15s;
+}
+.rs-whatif-btn:hover { background: var(--accent-glow); border-color: rgba(0,212,255,0.4); }
+
+.rs-modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.rs-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.rs-modal {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 201;
+  background: var(--card); border-top: 1px solid var(--border);
+  border-radius: 16px 16px 0 0; padding: 1.75rem;
+  max-width: 600px; margin: 0 auto;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column; gap: 1rem;
+  max-height: 85vh; overflow-y: auto;
+}
+.rs-modal.open { transform: translateY(0); }
+
+.rs-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.rs-modal-title {
+  font-family: var(--font-mono); font-size: 0.78rem;
+  color: var(--accent); letter-spacing: 0.1em;
+}
+.rs-modal-close {
+  background: none; border: none; color: var(--muted-light);
+  cursor: pointer; font-size: 0.9rem; transition: color 0.15s;
+}
+.rs-modal-close:hover { color: var(--text); }
+
+.rs-modal-event {
+  font-size: 0.82rem; color: var(--muted-light);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.6rem 0.85rem;
+}
+
+.rs-modal-label {
+  font-size: 0.68rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  font-family: var(--font-mono); display: block; margin-bottom: 0.4rem;
+}
+
+.rs-whatif-result {
+  border-top: 1px solid var(--border); padding-top: 1rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.rs-divergence-summary {
+  font-size: 0.85rem; color: var(--muted-light); line-height: 1.7;
+  background: var(--surface); border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0; padding: 0.85rem 1rem;
+}
+.rs-new-archetype {
+  font-family: var(--font-display); font-size: 1.1rem; font-weight: 800;
+  color: var(--accent);
+}
+.rs-key-difference {
+  font-size: 0.8rem; color: var(--muted-light); font-style: italic;
+  padding: 0.6rem 0.85rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px;
+}
