@@ -217,13 +217,26 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 
         // ── Toggle compare mode ───────────────────
         function toggleCompareMode() {
-          compareMode = !compareMode;
-          const btn = document.getElementById("modeToggle");
-          document.getElementById("singleMode").style.display  = compareMode ? "none"  : "block";
-          document.getElementById("compareMode").style.display = compareMode ? "grid"  : "none";
-          btn.textContent = compareMode ? "← Single Persona" : "⟷ Compare Two Personas";
-          btn.classList.toggle("active", compareMode);
-        }
+  compareMode = !compareMode;
+  const btn = document.getElementById("modeToggle");
+
+  // If on result screen, go back to input first
+  document.getElementById("hero").style.display         = "block";
+  document.getElementById("inputSection").style.display = "block";
+  document.getElementById("resultSingle").style.display  = "none";
+  document.getElementById("resultCompare").style.display = "none";
+  document.getElementById("loader").style.display        = "none";
+
+  // Then toggle modes
+  document.getElementById("singleMode").style.display  = compareMode ? "none" : "block";
+  document.getElementById("compareMode").style.display = compareMode ? "grid" : "none";
+  btn.textContent = compareMode ? "← Single Persona" : "⟷ Compare Two Personas";
+  btn.classList.toggle("active", compareMode);
+
+  // Stop any ongoing speech
+  if (speechSynthesis.speaking) speechSynthesis.cancel();
+  currentVoiceSafeId = null;
+}
 
         // ── Show loader ───────────────────────────
         function showLoader(text) {
