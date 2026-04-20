@@ -386,6 +386,17 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
                   <p class="rs-insight-text">${data.turningPoint || "—"}</p>
                 </div>
               </div>
+              ${data.brutalInsight ? `
+<div class="rs-brutal-wrap">
+  <span class="rs-brutal-label">⚡ Brutal Insight</span>
+  <p class="rs-brutal-text">${data.brutalInsight}</p>
+</div>` : ""}
+
+${data.contradiction ? `
+<div class="rs-contradiction-wrap">
+  <span class="rs-tags-label">Core Contradiction</span>
+  <p class="rs-contradiction-text">${data.contradiction}</p>
+</div>` : ""}
 
               <div class="rs-timeline-label">Timeline</div>
               <div class="rs-timeline">
