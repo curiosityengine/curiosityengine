@@ -46,7 +46,7 @@
 e.g. I'm introverted but can switch to social mode when needed. I overthink everything. I'm great at starting projects but struggle to finish them. I have a deep fear of failure but also fear of mediocrity. I work better at night. I'm drawn to creative work but ended up in a technical career..."></textarea>
       <div class="rs-input-footer">
         <input type="text" class="rs-name-input" id="name1" placeholder="Name this persona (optional)">
-        <button class="rs-analyze-btn" id="analyzeBtn1" onclick="analyze(1)">
+        <button class="rs-analyze-btn" id="analyzeBtn1" onclick="analyze()">
           Analyze →
         </button>
       </div>
@@ -77,7 +77,7 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
         <input type="text" class="rs-name-input" id="nameB" placeholder="Name (e.g. The Extrovert)">
       </div>
     </div>
-    <div style="text-align:center;">
+    <div style="text-align:center; grid-column: 1 / -1;">
       <button class="rs-analyze-btn" id="analyzeBtnCompare" onclick="analyzeCompare()">
         Compare Both →
       </button>
@@ -126,9 +126,9 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
       ct.style.color = ta.value.length > 450 ? "var(--accent)" : "var(--muted)";
     });
   }
-  setupCounter("traits1", "charCount1");
-  setupCounter("traitsA", "charCountA");
-  setupCounter("traitsB", "charCountB");
+  setupCounter("traits1",  "charCount1");
+  setupCounter("traitsA",  "charCountA");
+  setupCounter("traitsB",  "charCountB");
 
   // ── Toggle compare mode ───────────────────
   function toggleCompareMode() {
@@ -142,31 +142,30 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 
   // ── Show loader ───────────────────────────
   function showLoader(text) {
-    document.getElementById("hero").style.display         = "none";
-    document.getElementById("inputSection").style.display = "none";
-    document.getElementById("resultSingle").style.display = "none";
+    document.getElementById("hero").style.display          = "none";
+    document.getElementById("inputSection").style.display  = "none";
+    document.getElementById("resultSingle").style.display  = "none";
     document.getElementById("resultCompare").style.display = "none";
-    document.getElementById("loader").style.display       = "flex";
-    document.getElementById("loaderText").textContent     = text || "Reverse-engineering your past...";
+    document.getElementById("loader").style.display        = "flex";
+    document.getElementById("loaderText").textContent      = text || "Reverse-engineering your past...";
   }
 
   // ── Analyze single ────────────────────────
-  async function analyze(num) {
+  async function analyze() {
     const traits = document.getElementById("traits1").value.trim();
     const name   = document.getElementById("name1").value.trim() || "Unknown";
     if (traits.length < 20) {
       document.getElementById("traits1").focus();
       return;
     }
-
     showLoader("Reverse-engineering your past...");
-
     try {
       const data = await fetchPersona(traits, name);
-      document.getElementById("loader").style.display = "none";
-      document.getElementById("resultSingle").style.display = "block";
+      document.getElementById("loader").style.display        = "none";
+      document.getElementById("resultSingle").style.display  = "block";
       document.getElementById("resultSingleInner").innerHTML = renderPersonaCard(data, false);
-    } catch (err) {
+      renderRadar(data);
+    } catch {
       alert("Something went wrong. Please try again.");
       resetApp();
     }
@@ -178,21 +177,20 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
     const traitsB = document.getElementById("traitsB").value.trim();
     const nameA   = document.getElementById("nameA").value.trim() || "Persona A";
     const nameB   = document.getElementById("nameB").value.trim() || "Persona B";
-
     if (traitsA.length < 20 || traitsB.length < 20) return;
 
     showLoader("Analysing both personas...");
-
     try {
       const [dataA, dataB] = await Promise.all([
         fetchPersona(traitsA, nameA),
         fetchPersona(traitsB, nameB),
       ]);
-
-      document.getElementById("loader").style.display = "none";
-      document.getElementById("resultCompare").style.display = "block";
+      document.getElementById("loader").style.display         = "none";
+      document.getElementById("resultCompare").style.display  = "block";
       document.getElementById("compareGrid").innerHTML =
         renderPersonaCard(dataA, true) + renderPersonaCard(dataB, true);
+      renderRadar(dataA);
+      renderRadar(dataB);
     } catch {
       alert("Something went wrong. Please try again.");
       resetApp();
@@ -214,14 +212,14 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
   // ── Render persona card ───────────────────
   function renderPersonaCard(data, isCompare) {
     const categoryColors = {
-      Childhood:   "#06b6d4",
-      Education:   "#8b5cf6",
-      Career:      "#f59e0b",
-      Relationship:"#ec4899",
-      Trauma:      "#ef4444",
-      Achievement: "#22c55e",
-      Travel:      "#3b82f6",
-      Identity:    "#a78bfa",
+      Childhood:    "#06b6d4",
+      Education:    "#8b5cf6",
+      Career:       "#f59e0b",
+      Relationship: "#ec4899",
+      Trauma:       "#ef4444",
+      Achievement:  "#22c55e",
+      Travel:       "#3b82f6",
+      Identity:     "#a78bfa",
     };
 
     const timelineHTML = (data.timeline || []).map((event, i) => {
@@ -249,6 +247,8 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
         </div>
       `;
     }).join("");
+
+    const safeId = (data.personaName || "persona").replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
 
     return `
       <div class="rs-persona-card">
@@ -291,8 +291,58 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
         <div class="rs-timeline">
           ${timelineHTML}
         </div>
+
+        <div class="rs-scores-wrap">
+          <div class="rs-timeline-label" style="margin-bottom:1rem;">Persona Score Card</div>
+          <div class="rs-radar-wrap">
+            <canvas id="radar-${safeId}" width="280" height="280"></canvas>
+          </div>
+        </div>
+
       </div>
     `;
+  }
+
+  // ── Render radar chart ────────────────────
+  function renderRadar(data) {
+    const safeId   = (data.personaName || "persona").replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
+    const canvas   = document.getElementById(`radar-${safeId}`);
+    if (!canvas || !data.scores) return;
+
+    const labels = Object.keys(data.scores);
+    const values = Object.values(data.scores);
+
+    new Chart(canvas, {
+      type: "radar",
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: "rgba(0,212,255,0.08)",
+          borderColor: "rgba(0,212,255,0.6)",
+          borderWidth: 1.5,
+          pointBackgroundColor: "rgba(0,212,255,0.9)",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        }]
+      },
+      options: {
+        responsive: false,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { display: false },
+            grid: { color: "rgba(0,212,255,0.07)" },
+            angleLines: { color: "rgba(0,212,255,0.08)" },
+            pointLabels: {
+              color: "#7888aa",
+              font: { family: "DM Mono", size: 11 },
+            }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
   }
 
   // ── Reset ─────────────────────────────────
@@ -302,6 +352,8 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
     document.getElementById("resultSingle").style.display  = "none";
     document.getElementById("resultCompare").style.display = "none";
     document.getElementById("loader").style.display        = "none";
+    // Destroy existing charts to avoid canvas reuse issues
+    Chart.instances && Object.values(Chart.instances).forEach(c => c.destroy());
   }
 </script>
 </body>
