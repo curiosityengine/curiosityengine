@@ -20,17 +20,26 @@
   </head>
   <body>
     <nav class="rs-nav">
-      <a href="index.html" class="rs-logo">Reverse<span>Self</span></a>
-      <div class="rs-nav-right">
-        <button
-          class="rs-mode-toggle"
-          id="modeToggle"
-          onclick="toggleCompareMode()"
-        >
-          ⟷ Compare Two Personas
-        </button>
-      </div>
-    </nav>
+  <a href="../../index.html" class="rs-logo">Reverse<span>Self</span></a>
+  <div class="rs-nav-right">
+    <button class="rs-saved-btn" id="savedBtn" onclick="toggleSavedPanel()">
+      ◈ Saved <span class="rs-saved-count" id="savedCount"></span>
+    </button>
+    <button class="rs-mode-toggle" id="modeToggle" onclick="toggleCompareMode()">
+      ⟷ Compare Two Personas
+    </button>
+  </div>
+</nav>
+
+<!-- SAVED PANEL -->
+<div class="rs-saved-overlay" id="savedOverlay" onclick="toggleSavedPanel()"></div>
+<div class="rs-saved-panel" id="savedPanel">
+  <div class="rs-saved-header">
+    <span class="rs-saved-title">◈ Saved Personas</span>
+    <button class="rs-modal-close" onclick="toggleSavedPanel()">✕</button>
+  </div>
+  <div class="rs-saved-list" id="savedList"></div>
+</div>
 
     <!-- HERO -->
     <section class="rs-hero" id="hero">
