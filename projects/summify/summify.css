@@ -173,7 +173,8 @@ a { text-decoration: none; color: inherit; }
 .sm-video-card {
   display: flex; gap: 1.1rem; align-items: flex-start;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 14px; padding: 1.1rem; position: relative;
+  border-radius: 14px; padding: 1.1rem;
+  /* Remove position: relative */
 }
 .sm-thumbnail {
   width: 160px; flex-shrink: 0; border-radius: 9px; object-fit: cover;
@@ -203,10 +204,13 @@ a { text-decoration: none; color: inherit; }
 .sent-neu { background: rgba(107,114,128,0.1);color: #9ca3af; border: 1px solid rgba(107,114,128,0.2); }
 
 .sm-watch-btn {
-  position: absolute; top: 1rem; right: 1rem;
+  display: inline-block;
+  margin-top: 0.75rem;
   font-size: 0.72rem; padding: 0.35rem 0.8rem;
   background: var(--accent); color: white;
-  border-radius: 6px; font-weight: 600; transition: opacity 0.15s;
+  border-radius: 6px; font-weight: 600;
+  transition: opacity 0.15s;
+  /* Remove position: absolute, top, right */
 }
 .sm-watch-btn:hover { opacity: 0.85; }
 
