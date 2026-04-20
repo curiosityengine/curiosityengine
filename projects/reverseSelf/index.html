@@ -399,8 +399,6 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
   <button class="rs-share-card-btn" onclick="shareCard('${safeId}', '${data.archetype.replace(/'/g,"&#39;")}', '${data.personaName.replace(/'/g,"&#39;")}')">
     ↓ Download Persona Card
   </button>
-</div>
-<div class="rs-share-row" style="margin-top:0.5rem;">
   <button class="rs-share-card-btn" onclick="downloadPDF('${data.personaName.replace(/'/g,"&#39;")}')">
     ↓ Download PDF Report
   </button>
@@ -1025,18 +1023,6 @@ async function downloadPDF(personaName) {
   // Cyan accent bar left
   doc.setFillColor(0, 212, 255);
   doc.rect(0, 0, 3, 297, "F");
-
-  // Grid lines subtle
-  doc.setDrawColor(0, 212, 255);
-  doc.setLineWidth(0.1);
-  for (let gx = 0; gx < W; gx += 15) {
-    doc.setGState(new doc.GState({ opacity: 0.04 }));
-    doc.line(gx, 0, gx, 297);
-  }
-  for (let gy = 0; gy < 297; gy += 15) {
-    doc.line(0, gy, W, gy);
-  }
-  doc.setGState(new doc.GState({ opacity: 1 }));
 
   // Badge
   doc.setFillColor(0, 40, 55);
