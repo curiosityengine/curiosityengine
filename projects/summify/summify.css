@@ -392,3 +392,33 @@ a { text-decoration: none; color: inherit; }
 .sm-comment-text {
   font-size: 0.82rem; color: var(--muted-light); line-height: 1.55;
 }
+/* ── COMMENTS RESULT SPACING ── */
+#resultComments {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── SUMMARIZE ANOTHER BUTTON ── */
+.sm-reset-row {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.sm-reset-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--muted-light);
+  font-family: var(--font-body); font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.sm-reset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(255,59,59,0.05);
+  transform: translateY(-1px);
+}
