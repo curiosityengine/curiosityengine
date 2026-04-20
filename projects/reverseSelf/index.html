@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="reverseSelf.css" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
     <nav class="rs-nav">
@@ -397,6 +398,11 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 <div class="rs-share-row">
   <button class="rs-share-card-btn" onclick="shareCard('${safeId}', '${data.archetype.replace(/'/g,"&#39;")}', '${data.personaName.replace(/'/g,"&#39;")}')">
     ↓ Download Persona Card
+  </button>
+</div>
+<div class="rs-share-row" style="margin-top:0.5rem;">
+  <button class="rs-share-card-btn" onclick="downloadPDF('${data.personaName.replace(/'/g,"&#39;")}')">
+    ↓ Download PDF Report
   </button>
 </div>
             </div>
@@ -915,6 +921,383 @@ window.resetApp = function() {
   currentVoiceSafeId = null;
   _originalReset();
 };
+
+      // ── Download PDF Report ───────────────────
+async function downloadPDF(personaName) {
+  const data = personaStore[personaName];
+  if (!data) return;
+
+  const btn = document.querySelector(`[onclick="downloadPDF('${personaName}')"]`);
+  if (btn) { btn.textContent = "⏳ Generating..."; btn.disabled = true; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+
+  const W      = 210; // A4 width mm
+  const margin = 18;
+  const colW   = W - margin * 2;
+  let y        = 0;
+
+  // ── Helpers ────────────────────────────
+  function addPage() {
+    doc.addPage();
+    y = 20;
+    // Page header line
+    doc.setDrawColor(0, 212, 255);
+    doc.setLineWidth(0.3);
+    doc.line(margin, 14, W - margin, 14);
+    // Page footer
+    doc.setFontSize(7);
+    doc.setTextColor(80, 100, 130);
+    doc.text("ReverseSelf · princeai.eu.cc · AI-generated for exploration only", margin, 287);
+    doc.text(`Page ${doc.getNumberOfPages()}`, W - margin, 287, { align: "right" });
+  }
+
+  function checkY(needed = 10) {
+    if (y + needed > 272) addPage();
+  }
+
+  function sectionLabel(text) {
+    checkY(12);
+    doc.setFontSize(7);
+    doc.setTextColor(0, 180, 220);
+    doc.setFont("helvetica", "bold");
+    doc.text(text.toUpperCase(), margin, y);
+    y += 4;
+    doc.setDrawColor(0, 180, 220);
+    doc.setLineWidth(0.2);
+    doc.line(margin, y, margin + colW, y);
+    y += 5;
+  }
+
+  function bodyText(text, size = 9, color = [140, 160, 190]) {
+    doc.setFontSize(size);
+    doc.setTextColor(...color);
+    doc.setFont("helvetica", "normal");
+    const lines = doc.splitTextToSize(text, colW);
+    checkY(lines.length * (size * 0.45));
+    doc.text(lines, margin, y);
+    y += lines.length * (size * 0.45) + 2;
+  }
+
+  function boldText(text, size = 10, color = [220, 230, 245]) {
+    doc.setFontSize(size);
+    doc.setTextColor(...color);
+    doc.setFont("helvetica", "bold");
+    doc.text(text, margin, y);
+    y += size * 0.45 + 2;
+  }
+
+  function tag(text, x, tagY, type = "neutral") {
+    const colors = {
+      wound:    { bg: [80, 20, 20],   text: [248, 113, 113] },
+      strength: { bg: [15, 50, 25],   text: [74, 222, 128]  },
+      neutral:  { bg: [20, 30, 50],   text: [120, 140, 170] },
+      accent:   { bg: [0, 40, 55],    text: [0, 212, 255]   },
+    };
+    const c   = colors[type] || colors.neutral;
+    const w   = doc.getTextWidth(text) + 6;
+    doc.setFillColor(...c.bg);
+    doc.roundedRect(x, tagY - 4, w, 6, 1.5, 1.5, "F");
+    doc.setFontSize(7);
+    doc.setTextColor(...c.text);
+    doc.setFont("helvetica", "normal");
+    doc.text(text, x + 3, tagY);
+    return w + 3;
+  }
+
+  function confidenceBar(val, barY, color = [0, 180, 220]) {
+    const barW = colW * 0.4;
+    doc.setFillColor(25, 35, 55);
+    doc.roundedRect(margin, barY, barW, 2.5, 1, 1, "F");
+    doc.setFillColor(...color);
+    doc.roundedRect(margin, barY, barW * (val / 100), 2.5, 1, 1, "F");
+    doc.setFontSize(7);
+    doc.setTextColor(0, 180, 220);
+    doc.text(`${val}%`, margin + barW + 2, barY + 2);
+  }
+
+  // ── COVER PAGE ────────────────────────
+  // Dark background
+  doc.setFillColor(6, 9, 16);
+  doc.rect(0, 0, W, 297, "F");
+
+  // Cyan accent bar left
+  doc.setFillColor(0, 212, 255);
+  doc.rect(0, 0, 3, 297, "F");
+
+  // Grid lines subtle
+  doc.setDrawColor(0, 212, 255);
+  doc.setLineWidth(0.1);
+  for (let gx = 0; gx < W; gx += 15) {
+    doc.setGState(new doc.GState({ opacity: 0.04 }));
+    doc.line(gx, 0, gx, 297);
+  }
+  for (let gy = 0; gy < 297; gy += 15) {
+    doc.line(0, gy, W, gy);
+  }
+  doc.setGState(new doc.GState({ opacity: 1 }));
+
+  // Badge
+  doc.setFillColor(0, 40, 55);
+  doc.roundedRect(margin, 40, 80, 8, 2, 2, "F");
+  doc.setFontSize(7);
+  doc.setTextColor(0, 212, 255);
+  doc.setFont("helvetica", "bold");
+  doc.text("REVERSE PERSONA ENGINE", margin + 4, 45.5);
+
+  // Persona name
+  doc.setFontSize(9);
+  doc.setTextColor(0, 160, 190);
+  doc.setFont("helvetica", "normal");
+  doc.text((data.personaName || "UNKNOWN").toUpperCase(), margin, 75);
+
+  // Archetype
+  doc.setFontSize(28);
+  doc.setTextColor(220, 230, 245);
+  doc.setFont("helvetica", "bold");
+  const arcLines = doc.splitTextToSize(data.archetype || "", colW);
+  doc.text(arcLines, margin, 90);
+
+  // Divider
+  doc.setDrawColor(0, 212, 255);
+  doc.setLineWidth(0.3);
+  doc.line(margin, 118, W - margin, 118);
+
+  // Summary on cover
+  doc.setFontSize(10);
+  doc.setTextColor(120, 136, 170);
+  doc.setFont("helvetica", "normal");
+  const sumLines = doc.splitTextToSize(data.summary || "", colW);
+  doc.text(sumLines.slice(0, 5), margin, 126);
+
+  // Stats row
+  const stats = [
+    { label: "TIMELINE EVENTS", val: String(data.timeline?.length || 0) },
+    { label: "HISTORICAL MATCHES", val: String(data.historicalMatches?.length || 0) },
+    { label: "CONFIDENCE AVG", val: data.timeline?.length
+        ? Math.round(data.timeline.reduce((a, e) => a + e.confidence, 0) / data.timeline.length) + "%"
+        : "—" },
+  ];
+  stats.forEach((s, i) => {
+    const sx = margin + i * 60;
+    doc.setFontSize(18);
+    doc.setTextColor(0, 212, 255);
+    doc.setFont("helvetica", "bold");
+    doc.text(s.val, sx, 200);
+    doc.setFontSize(7);
+    doc.setTextColor(60, 80, 110);
+    doc.setFont("helvetica", "normal");
+    doc.text(s.label, sx, 206);
+  });
+
+  // Footer cover
+  doc.setDrawColor(0, 212, 255);
+  doc.setLineWidth(0.2);
+  doc.line(margin, 280, W - margin, 280);
+  doc.setFontSize(7);
+  doc.setTextColor(60, 80, 110);
+  doc.text("ReverseSelf · princeai.eu.cc", margin, 285);
+  doc.text(`Generated ${new Date().toLocaleDateString("en-GB", { day:"numeric", month:"long", year:"numeric" })}`, W - margin, 285, { align: "right" });
+
+  // ── PAGE 2: PROFILE ───────────────────
+  addPage();
+
+  sectionLabel("Core Profile");
+
+  // Two column: wounds / strengths
+  const colHalf = (colW - 6) / 2;
+  const col1x   = margin;
+  const col2x   = margin + colHalf + 6;
+
+  // Wounds label
+  doc.setFontSize(7); doc.setTextColor(80, 100, 130); doc.setFont("helvetica", "bold");
+  doc.text("CORE WOUNDS", col1x, y);
+  doc.text("CORE STRENGTHS", col2x, y);
+  y += 5;
+
+  const woundsY    = y;
+  let woundOffset  = 0;
+  (data.coreWounds || []).forEach(w => {
+    doc.setFillColor(60, 15, 15);
+    doc.roundedRect(col1x, woundsY + woundOffset - 3.5, colHalf, 6, 1.5, 1.5, "F");
+    doc.setFontSize(8); doc.setTextColor(248, 113, 113); doc.setFont("helvetica", "normal");
+    doc.text(w, col1x + 3, woundsY + woundOffset + 0.5);
+    woundOffset += 8;
+  });
+
+  let strengthOffset = 0;
+  (data.coreStrengths || []).forEach(s => {
+    doc.setFillColor(10, 40, 20);
+    doc.roundedRect(col2x, woundsY + strengthOffset - 3.5, colHalf, 6, 1.5, 1.5, "F");
+    doc.setFontSize(8); doc.setTextColor(74, 222, 128); doc.setFont("helvetica", "normal");
+    doc.text(s, col2x + 3, woundsY + strengthOffset + 0.5);
+    strengthOffset += 8;
+  });
+
+  y += Math.max(woundOffset, strengthOffset) + 6;
+
+  // Likely environment
+  sectionLabel("Likely Environment");
+  bodyText(data.likelyEnvironment || "—");
+  y += 2;
+
+  // Turning point
+  sectionLabel("Turning Point");
+  // Highlight box
+  checkY(16);
+  const tpLines = doc.splitTextToSize(data.turningPoint || "—", colW - 8);
+  doc.setFillColor(0, 30, 45);
+  doc.setDrawColor(0, 212, 255);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(margin, y - 3, colW, tpLines.length * 5 + 6, 2, 2, "FD");
+  doc.setFontSize(9); doc.setTextColor(140, 160, 190); doc.setFont("helvetica", "normal");
+  doc.text(tpLines, margin + 4, y + 2);
+  y += tpLines.length * 5 + 10;
+
+  // Score card
+  sectionLabel("Persona Score Card");
+  if (data.scores) {
+    Object.entries(data.scores).forEach(([key, val]) => {
+      checkY(10);
+      doc.setFontSize(8); doc.setTextColor(100, 120, 160); doc.setFont("helvetica", "normal");
+      doc.text(key, margin, y);
+      const barX = margin + 50;
+      const barW = colW - 55;
+      doc.setFillColor(20, 30, 50);
+      doc.roundedRect(barX, y - 3, barW, 4, 1, 1, "F");
+      doc.setFillColor(0, 180, 220);
+      doc.roundedRect(barX, y - 3, barW * (val / 100), 4, 1, 1, "F");
+      doc.setFontSize(7); doc.setTextColor(0, 212, 255);
+      doc.text(`${val}%`, barX + barW + 2, y);
+      y += 8;
+    });
+  }
+  y += 4;
+
+  // ── PAGE 3+: TIMELINE ─────────────────
+  addPage();
+  sectionLabel("Life Timeline");
+
+  const catColors = {
+    Childhood:    [6, 182, 212],
+    Education:    [139, 92, 246],
+    Career:       [245, 158, 11],
+    Relationship: [236, 72, 153],
+    Trauma:       [239, 68, 68],
+    Achievement:  [34, 197, 94],
+    Travel:       [59, 130, 246],
+    Identity:     [167, 139, 250],
+  };
+
+  (data.timeline || []).forEach((event, i) => {
+    checkY(28);
+    const color = catColors[event.category] || [0, 180, 220];
+
+    // Age badge
+    doc.setFillColor(0, 30, 45);
+    doc.roundedRect(margin, y - 3.5, 20, 6, 1.5, 1.5, "F");
+    doc.setFontSize(7); doc.setTextColor(...color); doc.setFont("helvetica", "bold");
+    doc.text(event.age, margin + 1.5, y + 0.5);
+
+    // Category badge
+    doc.setFillColor(...color.map(c => Math.min(c, 80)));
+    doc.roundedRect(margin + 23, y - 3.5, 28, 6, 1.5, 1.5, "F");
+    doc.setFontSize(6.5); doc.setTextColor(...color);
+    doc.text((event.category || "").toUpperCase(), margin + 25, y + 0.5);
+
+    y += 7;
+
+    // Event title
+    doc.setFontSize(9.5); doc.setTextColor(210, 220, 240); doc.setFont("helvetica", "bold");
+    doc.text(event.event || "", margin, y);
+    y += 5;
+
+    // Description
+    doc.setFontSize(8.5); doc.setTextColor(120, 140, 170); doc.setFont("helvetica", "normal");
+    const descLines = doc.splitTextToSize(event.description || "", colW);
+    doc.text(descLines, margin, y);
+    y += descLines.length * 4 + 3;
+
+    // Confidence bar
+    checkY(8);
+    doc.setFontSize(7); doc.setTextColor(70, 90, 120);
+    doc.text("Confidence", margin, y);
+    const bx = margin + 22;
+    const bw = 60;
+    doc.setFillColor(20, 30, 50);
+    doc.roundedRect(bx, y - 3, bw, 3, 1, 1, "F");
+    doc.setFillColor(...color);
+    doc.roundedRect(bx, y - 3, bw * (event.confidence / 100), 3, 1, 1, "F");
+    doc.setTextColor(...color);
+    doc.text(`${event.confidence}%`, bx + bw + 2, y);
+    y += 8;
+
+    // Separator
+    if (i < (data.timeline || []).length - 1) {
+      doc.setDrawColor(20, 32, 52);
+      doc.setLineWidth(0.2);
+      doc.line(margin, y, W - margin, y);
+      y += 5;
+    }
+  });
+
+  // ── HISTORICAL MATCHES ────────────────
+  checkY(20);
+  sectionLabel("Historical Figure Matches");
+
+  (data.historicalMatches || []).forEach((m, i) => {
+    checkY(22);
+    // Card bg
+    doc.setFillColor(12, 18, 30);
+    doc.roundedRect(margin, y - 3, colW, 20, 2, 2, "F");
+
+    // Name
+    doc.setFontSize(10); doc.setTextColor(210, 225, 245); doc.setFont("helvetica", "bold");
+    doc.text(m.name, margin + 3, y + 3);
+
+    // Match %
+    doc.setFontSize(8); doc.setTextColor(0, 212, 255); doc.setFont("helvetica", "bold");
+    doc.text(`${m.match}% match`, W - margin - 3, y + 3, { align: "right" });
+
+    // Era
+    doc.setFontSize(7); doc.setTextColor(60, 85, 120); doc.setFont("helvetica", "normal");
+    doc.text(m.era || "", margin + 3, y + 8);
+
+    // Reason
+    doc.setFontSize(8); doc.setTextColor(110, 130, 165);
+    const rLines = doc.splitTextToSize(m.reason || "", colW - 6);
+    doc.text(rLines[0], margin + 3, y + 14);
+
+    // Match bar
+    const mbx = margin + 3;
+    const mbw = colW - 6;
+    doc.setFillColor(20, 30, 50);
+    doc.roundedRect(mbx, y + 16, mbw, 2, 1, 1, "F");
+    doc.setFillColor(0, 150, 190);
+    doc.roundedRect(mbx, y + 16, mbw * (m.match / 100), 2, 1, 1, "F");
+
+    y += 26;
+  });
+
+  // ── FINAL FOOTER ─────────────────────
+  checkY(20);
+  y += 5;
+  doc.setDrawColor(0, 212, 255);
+  doc.setLineWidth(0.3);
+  doc.line(margin, y, W - margin, y);
+  y += 6;
+  doc.setFontSize(7.5); doc.setTextColor(60, 85, 120); doc.setFont("helvetica", "normal");
+  doc.text("This report was AI-generated by ReverseSelf for psychological exploration only.", margin, y);
+  y += 5;
+  doc.text("It does not constitute professional psychological or therapeutic advice.", margin, y);
+
+  // ── Save PDF ──────────────────────────
+  const filename = `${(data.personaName || "persona").replace(/\s+/g, "-")}-ReverseSelf-Report.pdf`;
+  doc.save(filename);
+
+  if (btn) { btn.textContent = "↓ Download PDF Report"; btn.disabled = false; }
+}
     </script>
     <!-- WHAT IF MODAL -->
     <div
