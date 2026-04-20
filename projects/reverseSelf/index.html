@@ -1,489 +1,560 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ReverseSelf — AI reverse-engineers your past from your present traits.">
-  <title>ReverseSelf — Reverse Persona Engine</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="reverseSelf.css">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-</head>
-<body>
-
-<nav class="rs-nav">
-  <a href="../../index.html" class="rs-logo">Reverse<span>Self</span></a>
-  <div class="rs-nav-right">
-    <button class="rs-mode-toggle" id="modeToggle" onclick="toggleCompareMode()">
-      ⟷ Compare Two Personas
-    </button>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="rs-hero" id="hero">
-  <div class="rs-hero-badge">Reverse Persona Engine</div>
-  <h1>Who were you<br><em>before</em> you were you?</h1>
-  <p class="rs-hero-sub">Describe your current personality, skills, and habits. AI reverse-engineers your most plausible past — the experiences, environments, and turning points that shaped who you are today.</p>
-</section>
-
-<!-- INPUT SECTION -->
-<div class="rs-input-section" id="inputSection">
-
-  <!-- SINGLE MODE -->
-  <div class="rs-single-mode" id="singleMode">
-    <div class="rs-input-card">
-      <div class="rs-input-header">
-        <span class="rs-input-label">Your Current Traits</span>
-        <span class="rs-char-count" id="charCount1">0 / 500</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ReverseSelf — AI reverse-engineers your past from your present traits."
+    />
+    <title>ReverseSelf — Reverse Persona Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="reverseSelf.css" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <nav class="rs-nav">
+      <a href="../../index.html" class="rs-logo">Reverse<span>Self</span></a>
+      <div class="rs-nav-right">
+        <button
+          class="rs-mode-toggle"
+          id="modeToggle"
+          onclick="toggleCompareMode()"
+        >
+          ⟷ Compare Two Personas
+        </button>
       </div>
-      <textarea class="rs-textarea" id="traits1" maxlength="500"
-        placeholder="Describe yourself honestly — your personality, skills, habits, fears, values, how you handle stress, what drives you, your quirks...
+    </nav>
 
-e.g. I'm introverted but can switch to social mode when needed. I overthink everything. I'm great at starting projects but struggle to finish them. I have a deep fear of failure but also fear of mediocrity. I work better at night. I'm drawn to creative work but ended up in a technical career..."></textarea>
-      <div class="rs-input-footer">
-        <input type="text" class="rs-name-input" id="name1" placeholder="Name this persona (optional)">
-        <button class="rs-analyze-btn" id="analyzeBtn1" onclick="analyze()">
-          Analyze →
+    <!-- HERO -->
+    <section class="rs-hero" id="hero">
+      <div class="rs-hero-badge">Reverse Persona Engine</div>
+      <h1>Who were you<br /><em>before</em> you were you?</h1>
+      <p class="rs-hero-sub">
+        Describe your current personality, skills, and habits. AI
+        reverse-engineers your most plausible past — the experiences,
+        environments, and turning points that shaped who you are today.
+      </p>
+    </section>
+
+    <!-- INPUT SECTION -->
+    <div class="rs-input-section" id="inputSection">
+      <!-- SINGLE MODE -->
+      <div class="rs-single-mode" id="singleMode">
+        <div class="rs-input-card">
+          <div class="rs-input-header">
+            <span class="rs-input-label">Your Current Traits</span>
+            <span class="rs-char-count" id="charCount1">0 / 500</span>
+          </div>
+          <textarea
+            class="rs-textarea"
+            id="traits1"
+            maxlength="500"
+            placeholder="Describe yourself honestly — your personality, skills, habits, fears, values, how you handle stress, what drives you, your quirks...
+
+e.g. I'm introverted but can switch to social mode when needed. I overthink everything. I'm great at starting projects but struggle to finish them. I have a deep fear of failure but also fear of mediocrity. I work better at night. I'm drawn to creative work but ended up in a technical career..."
+          ></textarea>
+          <div class="rs-input-footer">
+            <input
+              type="text"
+              class="rs-name-input"
+              id="name1"
+              placeholder="Name this persona (optional)"
+            />
+            <button class="rs-analyze-btn" id="analyzeBtn1" onclick="analyze()">
+              Analyze →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARE MODE -->
+      <div class="rs-compare-mode" id="compareMode" style="display:none">
+        <div class="rs-input-card">
+          <div class="rs-input-header">
+            <span class="rs-input-label">Persona A</span>
+            <span class="rs-char-count" id="charCountA">0 / 500</span>
+          </div>
+          <textarea
+            class="rs-textarea"
+            id="traitsA"
+            maxlength="500"
+            placeholder="Describe Persona A's traits..."
+          ></textarea>
+          <div class="rs-input-footer">
+            <input
+              type="text"
+              class="rs-name-input"
+              id="nameA"
+              placeholder="Name (e.g. The Introvert)"
+            />
+          </div>
+        </div>
+        <div class="rs-input-card">
+          <div class="rs-input-header">
+            <span class="rs-input-label">Persona B</span>
+            <span class="rs-char-count" id="charCountB">0 / 500</span>
+          </div>
+          <textarea
+            class="rs-textarea"
+            id="traitsB"
+            maxlength="500"
+            placeholder="Describe Persona B's traits..."
+          ></textarea>
+          <div class="rs-input-footer">
+            <input
+              type="text"
+              class="rs-name-input"
+              id="nameB"
+              placeholder="Name (e.g. The Extrovert)"
+            />
+          </div>
+        </div>
+        <div style="text-align:center; grid-column: 1 / -1;">
+          <button
+            class="rs-analyze-btn"
+            id="analyzeBtnCompare"
+            onclick="analyzeCompare()"
+          >
+            Compare Both →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOADER -->
+    <div class="rs-loader" id="loader" style="display:none">
+      <div class="rs-loader-ring"></div>
+      <p class="rs-loader-text" id="loaderText">
+        Reverse-engineering your past...
+      </p>
+    </div>
+
+    <!-- RESULT — SINGLE -->
+    <div class="rs-result" id="resultSingle" style="display:none">
+      <div class="rs-result-inner" id="resultSingleInner"></div>
+      <div style="text-align:center; margin-top:2.5rem;">
+        <button class="rs-reset-btn" onclick="resetApp()">
+          ← Analyze Another
         </button>
       </div>
     </div>
-  </div>
 
-  <!-- COMPARE MODE -->
-  <div class="rs-compare-mode" id="compareMode" style="display:none">
-    <div class="rs-input-card">
-      <div class="rs-input-header">
-        <span class="rs-input-label">Persona A</span>
-        <span class="rs-char-count" id="charCountA">0 / 500</span>
-      </div>
-      <textarea class="rs-textarea" id="traitsA" maxlength="500"
-        placeholder="Describe Persona A's traits..."></textarea>
-      <div class="rs-input-footer">
-        <input type="text" class="rs-name-input" id="nameA" placeholder="Name (e.g. The Introvert)">
+    <!-- RESULT — COMPARE -->
+    <div
+      class="rs-result rs-compare-result"
+      id="resultCompare"
+      style="display:none"
+    >
+      <div class="rs-compare-grid" id="compareGrid"></div>
+      <div style="text-align:center; margin-top:2.5rem;">
+        <button class="rs-reset-btn" onclick="resetApp()">← Start Over</button>
       </div>
     </div>
-    <div class="rs-input-card">
-      <div class="rs-input-header">
-        <span class="rs-input-label">Persona B</span>
-        <span class="rs-char-count" id="charCountB">0 / 500</span>
-      </div>
-      <textarea class="rs-textarea" id="traitsB" maxlength="500"
-        placeholder="Describe Persona B's traits..."></textarea>
-      <div class="rs-input-footer">
-        <input type="text" class="rs-name-input" id="nameB" placeholder="Name (e.g. The Extrovert)">
-      </div>
-    </div>
-    <div style="text-align:center; grid-column: 1 / -1;">
-      <button class="rs-analyze-btn" id="analyzeBtnCompare" onclick="analyzeCompare()">
-        Compare Both →
-      </button>
-    </div>
-  </div>
 
-</div>
+    <footer class="rs-footer">
+      © 2026 ReverseSelf · Built by Prince · AI-generated — for exploration
+      only
+    </footer>
 
-<!-- LOADER -->
-<div class="rs-loader" id="loader" style="display:none">
-  <div class="rs-loader-ring"></div>
-  <p class="rs-loader-text" id="loaderText">Reverse-engineering your past...</p>
-</div>
+    <script>
+        const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
+        const personaStore = {};
+        let compareMode = false;
 
-<!-- RESULT — SINGLE -->
-<div class="rs-result" id="resultSingle" style="display:none">
-  <div class="rs-result-inner" id="resultSingleInner"></div>
-  <div style="text-align:center; margin-top:2.5rem;">
-    <button class="rs-reset-btn" onclick="resetApp()">← Analyze Another</button>
-  </div>
-</div>
+        // ── Char counters ─────────────────────────
+        function setupCounter(textareaId, counterId) {
+          const ta = document.getElementById(textareaId);
+          const ct = document.getElementById(counterId);
+          if (!ta || !ct) return;
+          ta.addEventListener("input", () => {
+            ct.textContent = `${ta.value.length} / 500`;
+            ct.style.color = ta.value.length > 450 ? "var(--accent)" : "var(--muted)";
+          });
+        }
+        setupCounter("traits1",  "charCount1");
+        setupCounter("traitsA",  "charCountA");
+        setupCounter("traitsB",  "charCountB");
 
-<!-- RESULT — COMPARE -->
-<div class="rs-result rs-compare-result" id="resultCompare" style="display:none">
-  <div class="rs-compare-grid" id="compareGrid"></div>
-  <div style="text-align:center; margin-top:2.5rem;">
-    <button class="rs-reset-btn" onclick="resetApp()">← Start Over</button>
-  </div>
-</div>
+        // ── Toggle compare mode ───────────────────
+        function toggleCompareMode() {
+          compareMode = !compareMode;
+          const btn = document.getElementById("modeToggle");
+          document.getElementById("singleMode").style.display  = compareMode ? "none"  : "block";
+          document.getElementById("compareMode").style.display = compareMode ? "grid"  : "none";
+          btn.textContent = compareMode ? "← Single Persona" : "⟷ Compare Two Personas";
+          btn.classList.toggle("active", compareMode);
+        }
 
-<footer class="rs-footer">
-  © 2026 ReverseSelf · Built by Prince · AI-generated — for exploration only
-</footer>
+        // ── Show loader ───────────────────────────
+        function showLoader(text) {
+          document.getElementById("hero").style.display          = "none";
+          document.getElementById("inputSection").style.display  = "none";
+          document.getElementById("resultSingle").style.display  = "none";
+          document.getElementById("resultCompare").style.display = "none";
+          document.getElementById("loader").style.display        = "flex";
+          document.getElementById("loaderText").textContent      = text || "Reverse-engineering your past...";
+        }
 
-<script>
-  const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
-  const personaStore = {};
-  let compareMode = false;
-
-  // ── Char counters ─────────────────────────
-  function setupCounter(textareaId, counterId) {
-    const ta = document.getElementById(textareaId);
-    const ct = document.getElementById(counterId);
-    if (!ta || !ct) return;
-    ta.addEventListener("input", () => {
-      ct.textContent = `${ta.value.length} / 500`;
-      ct.style.color = ta.value.length > 450 ? "var(--accent)" : "var(--muted)";
-    });
-  }
-  setupCounter("traits1",  "charCount1");
-  setupCounter("traitsA",  "charCountA");
-  setupCounter("traitsB",  "charCountB");
-
-  // ── Toggle compare mode ───────────────────
-  function toggleCompareMode() {
-    compareMode = !compareMode;
-    const btn = document.getElementById("modeToggle");
-    document.getElementById("singleMode").style.display  = compareMode ? "none"  : "block";
-    document.getElementById("compareMode").style.display = compareMode ? "grid"  : "none";
-    btn.textContent = compareMode ? "← Single Persona" : "⟷ Compare Two Personas";
-    btn.classList.toggle("active", compareMode);
-  }
-
-  // ── Show loader ───────────────────────────
-  function showLoader(text) {
-    document.getElementById("hero").style.display          = "none";
-    document.getElementById("inputSection").style.display  = "none";
-    document.getElementById("resultSingle").style.display  = "none";
-    document.getElementById("resultCompare").style.display = "none";
-    document.getElementById("loader").style.display        = "flex";
-    document.getElementById("loaderText").textContent      = text || "Reverse-engineering your past...";
-  }
-
-  // ── Analyze single ────────────────────────
-  async function analyze() {
-    const traits = document.getElementById("traits1").value.trim();
-    const name   = document.getElementById("name1").value.trim() || "Unknown";
-    if (traits.length < 20) {
-      document.getElementById("traits1").focus();
-      return;
-    }
-    showLoader("Reverse-engineering your past...");
-    try {
-      const data = await fetchPersona(traits, name);
-      personaStore[data.personaName] = data; // ← add this line
-      document.getElementById("loader").style.display        = "none";
-      document.getElementById("resultSingle").style.display  = "block";
-      document.getElementById("resultSingleInner").innerHTML = renderPersonaCard(data, false);
-      renderRadar(data);
-    } catch {
-      alert("Something went wrong. Please try again.");
-      resetApp();
-    }
-  }
-
-  // ── Analyze compare ───────────────────────
-  async function analyzeCompare() {
-    const traitsA = document.getElementById("traitsA").value.trim();
-    const traitsB = document.getElementById("traitsB").value.trim();
-    const nameA   = document.getElementById("nameA").value.trim() || "Persona A";
-    const nameB   = document.getElementById("nameB").value.trim() || "Persona B";
-    if (traitsA.length < 20 || traitsB.length < 20) return;
-
-    showLoader("Analysing both personas...");
-    try {
-      const [dataA, dataB] = await Promise.all([
-        fetchPersona(traitsA, nameA),
-        fetchPersona(traitsB, nameB),
-      ]);
-      personaStore[dataA.personaName] = dataA;
-      personaStore[dataB.personaName] = dataB;
-      document.getElementById("loader").style.display         = "none";
-      document.getElementById("resultCompare").style.display  = "block";
-      document.getElementById("compareGrid").innerHTML =
-        renderPersonaCard(dataA, true) + renderPersonaCard(dataB, true);
-      renderRadar(dataA);
-      renderRadar(dataB);
-    } catch {
-      alert("Something went wrong. Please try again.");
-      resetApp();
-    }
-  }
-
-  // ── Fetch persona ─────────────────────────
-  async function fetchPersona(traits, personaName) {
-    const res  = await fetch(`${WORKER_URL}/api/reverseSelf`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ traits, personaName }),
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    return { ...data, traits };
-  }
-
-  // ── Render persona card ───────────────────
-  function renderPersonaCard(data, isCompare) {
-    const categoryColors = {
-      Childhood:    "#06b6d4",
-      Education:    "#8b5cf6",
-      Career:       "#f59e0b",
-      Relationship: "#ec4899",
-      Trauma:       "#ef4444",
-      Achievement:  "#22c55e",
-      Travel:       "#3b82f6",
-      Identity:     "#a78bfa",
-    };
-
-    const timelineHTML = (data.timeline || []).map((event, i) => {
-      const color = categoryColors[event.category] || "var(--accent)";
-      return `
-        <div class="rs-timeline-item" style="animation-delay:${i * 0.08}s">
-          <div class="rs-timeline-left">
-            <div class="rs-timeline-age">${event.age}</div>
-            <div class="rs-timeline-line" style="border-color:${color}20"></div>
-          </div>
-          <div class="rs-timeline-content">
-            <div class="rs-timeline-header">
-              <span class="rs-timeline-event">${event.event}</span>
-              <span class="rs-category-badge" style="background:${color}15;color:${color};border-color:${color}30">${event.category}</span>
-            </div>
-            <p class="rs-timeline-desc">${event.description}</p>
-            <div class="rs-confidence-wrap">
-  <span class="rs-confidence-label">Confidence</span>
-  <div class="rs-confidence-bar">
-    <div class="rs-confidence-fill" style="width:${event.confidence}%;background:${color}"></div>
-  </div>
-  <span class="rs-confidence-val">${event.confidence}%</span>
-</div>
-<button class="rs-whatif-btn"
-  onclick="openWhatIf('${event.event.replace(/'/g,"&#39;").replace(/"/g,"&quot;")}', '${data.personaName}')">
-  ✦ What If?
-</button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    const safeId = (data.personaName || "persona").replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
-
-    return `
-      <div class="rs-persona-card">
-        <div class="rs-persona-header">
-          <div>
-            <div class="rs-persona-name">${data.personaName}</div>
-            <div class="rs-archetype">${data.archetype}</div>
-          </div>
-        </div>
-
-        <p class="rs-summary">${data.summary}</p>
-
-        <div class="rs-tags-row">
-          <div class="rs-tags-group">
-            <span class="rs-tags-label">Core Wounds</span>
-            <div class="rs-tags">
-              ${(data.coreWounds || []).map(w => `<span class="rs-tag wound">${w}</span>`).join("")}
-            </div>
-          </div>
-          <div class="rs-tags-group">
-            <span class="rs-tags-label">Core Strengths</span>
-            <div class="rs-tags">
-              ${(data.coreStrengths || []).map(s => `<span class="rs-tag strength">${s}</span>`).join("")}
-            </div>
-          </div>
-        </div>
-
-        <div class="rs-insight-row">
-          <div class="rs-insight-card">
-            <span class="rs-insight-label">Likely Environment</span>
-            <p class="rs-insight-text">${data.likelyEnvironment || "—"}</p>
-          </div>
-          <div class="rs-insight-card turning">
-            <span class="rs-insight-label">Turning Point</span>
-            <p class="rs-insight-text">${data.turningPoint || "—"}</p>
-          </div>
-        </div>
-
-        <div class="rs-timeline-label">Timeline</div>
-        <div class="rs-timeline">
-          ${timelineHTML}
-        </div>
-
-        <div class="rs-scores-wrap">
-          <div class="rs-timeline-label" style="margin-bottom:1rem;">Persona Score Card</div>
-          <div class="rs-radar-wrap">
-            <canvas id="radar-${safeId}" width="280" height="280"></canvas>
-          </div>
-        </div>
-
-      </div>
-    `;
-  }
-
-  // ── Render radar chart ────────────────────
-  function renderRadar(data) {
-    const safeId   = (data.personaName || "persona").replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
-    const canvas   = document.getElementById(`radar-${safeId}`);
-    if (!canvas || !data.scores) return;
-
-    const labels = Object.keys(data.scores);
-    const values = Object.values(data.scores);
-
-    new Chart(canvas, {
-      type: "radar",
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          backgroundColor: "rgba(0,212,255,0.08)",
-          borderColor: "rgba(0,212,255,0.6)",
-          borderWidth: 1.5,
-          pointBackgroundColor: "rgba(0,212,255,0.9)",
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        }]
-      },
-      options: {
-        responsive: false,
-        scales: {
-          r: {
-            min: 0, max: 100,
-            ticks: { display: false },
-            grid: { color: "rgba(0,212,255,0.07)" },
-            angleLines: { color: "rgba(0,212,255,0.08)" },
-            pointLabels: {
-              color: "#7888aa",
-              font: { family: "DM Mono", size: 11 },
-            }
+        // ── Analyze single ────────────────────────
+        async function analyze() {
+          const traits = document.getElementById("traits1").value.trim();
+          const name   = document.getElementById("name1").value.trim() || "Unknown";
+          if (traits.length < 20) {
+            document.getElementById("traits1").focus();
+            return;
           }
-        },
-        plugins: { legend: { display: false } }
-      }
-    });
-  }
+          showLoader("Reverse-engineering your past...");
+          try {
+            const data = await fetchPersona(traits, name);
+            personaStore[data.personaName] = data; // ← add this line
+            document.getElementById("loader").style.display        = "none";
+            document.getElementById("resultSingle").style.display  = "block";
+            document.getElementById("resultSingleInner").innerHTML = renderPersonaCard(data, false);
+            renderRadar(data);
+          } catch {
+            alert("Something went wrong. Please try again.");
+            resetApp();
+          }
+        }
 
-  // ── Reset ─────────────────────────────────
-  function resetApp() {
-    document.getElementById("hero").style.display          = "block";
-    document.getElementById("inputSection").style.display  = "block";
-    document.getElementById("resultSingle").style.display  = "none";
-    document.getElementById("resultCompare").style.display = "none";
-    document.getElementById("loader").style.display        = "none";
-    // Destroy existing charts to avoid canvas reuse issues
-    Chart.instances && Object.values(Chart.instances).forEach(c => c.destroy());
-  }
+        // ── Analyze compare ───────────────────────
+        async function analyzeCompare() {
+          const traitsA = document.getElementById("traitsA").value.trim();
+          const traitsB = document.getElementById("traitsB").value.trim();
+          const nameA   = document.getElementById("nameA").value.trim() || "Persona A";
+          const nameB   = document.getElementById("nameB").value.trim() || "Persona B";
+          if (traitsA.length < 20 || traitsB.length < 20) return;
 
-  // ── What If ───────────────────────────────
-let currentWhatIfEvent  = "";
-let currentWhatIfTraits = "";
+          showLoader("Analysing both personas...");
+          try {
+            const [dataA, dataB] = await Promise.all([
+              fetchPersona(traitsA, nameA),
+              fetchPersona(traitsB, nameB),
+            ]);
+            personaStore[dataA.personaName] = dataA;
+            personaStore[dataB.personaName] = dataB;
+            document.getElementById("loader").style.display         = "none";
+            document.getElementById("resultCompare").style.display  = "block";
+            document.getElementById("compareGrid").innerHTML =
+              renderPersonaCard(dataA, true) + renderPersonaCard(dataB, true);
+            renderRadar(dataA);
+            renderRadar(dataB);
+          } catch {
+            alert("Something went wrong. Please try again.");
+            resetApp();
+          }
+        }
 
-function openWhatIf(event, personaName) {
-  currentWhatIfEvent  = event;
-  currentWhatIfTraits = personaStore[personaName]?.traits || "";
-  document.getElementById("whatIfEventLabel").textContent = `Event: "${event}"`;
-  document.getElementById("whatIfInput").value = "";
-  document.getElementById("whatIfResult").style.display = "none";
-  document.getElementById("whatIfOverlay").classList.add("open");
-  document.getElementById("whatIfModal").classList.add("open");
-  document.body.style.overflow = "hidden";
-  setTimeout(() => document.getElementById("whatIfInput").focus(), 400);
-}
+        // ── Fetch persona ─────────────────────────
+        async function fetchPersona(traits, personaName) {
+          const res  = await fetch(`${WORKER_URL}/api/reverseSelf`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ traits, personaName }),
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+          return { ...data, traits };
+        }
 
-function closeWhatIf() {
-  document.getElementById("whatIfOverlay").classList.remove("open");
-  document.getElementById("whatIfModal").classList.remove("open");
-  document.body.style.overflow = "";
-}
+        // ── Render persona card ───────────────────
+        function renderPersonaCard(data, isCompare) {
+          const categoryColors = {
+            Childhood:    "#06b6d4",
+            Education:    "#8b5cf6",
+            Career:       "#f59e0b",
+            Relationship: "#ec4899",
+            Trauma:       "#ef4444",
+            Achievement:  "#22c55e",
+            Travel:       "#3b82f6",
+            Identity:     "#a78bfa",
+          };
 
-async function submitWhatIf() {
-  const change = document.getElementById("whatIfInput").value.trim();
-  if (!change || change.length < 10) {
-    document.getElementById("whatIfInput").focus();
-    return;
-  }
-
-  const btn = document.querySelector("#whatIfModal .rs-analyze-btn");
-  btn.textContent = "Exploring divergence...";
-  btn.disabled = true;
-
-  try {
-    const res  = await fetch(`${WORKER_URL}/api/whatIf`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        originalTraits: currentWhatIfTraits,
-        event: currentWhatIfEvent,
-        change,
-      }),
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-
-    const categoryColors = {
-      Childhood:"#06b6d4", Education:"#8b5cf6", Career:"#f59e0b",
-      Relationship:"#ec4899", Trauma:"#ef4444", Achievement:"#22c55e",
-      Travel:"#3b82f6", Identity:"#a78bfa",
-    };
-
-    const timelineHTML = (data.newTimeline || []).map((e, i) => {
-      const color = categoryColors[e.category] || "var(--accent)";
-      return `
-        <div class="rs-timeline-item" style="animation-delay:${i*0.07}s">
-          <div class="rs-timeline-left">
-            <div class="rs-timeline-age">${e.age}</div>
-            <div class="rs-timeline-line" style="border-color:${color}20"></div>
-          </div>
-          <div class="rs-timeline-content">
-            <div class="rs-timeline-header">
-              <span class="rs-timeline-event">${e.event}</span>
-              <span class="rs-category-badge" style="background:${color}15;color:${color};border-color:${color}30">${e.category}</span>
-            </div>
-            <p class="rs-timeline-desc">${e.description}</p>
-            <div class="rs-confidence-wrap">
-              <span class="rs-confidence-label">Confidence</span>
-              <div class="rs-confidence-bar">
-                <div class="rs-confidence-fill" style="width:${e.confidence}%;background:${color}"></div>
+          const timelineHTML = (data.timeline || []).map((event, i) => {
+            const color = categoryColors[event.category] || "var(--accent)";
+            return `
+              <div class="rs-timeline-item" style="animation-delay:${i * 0.08}s">
+                <div class="rs-timeline-left">
+                  <div class="rs-timeline-age">${event.age}</div>
+                  <div class="rs-timeline-line" style="border-color:${color}20"></div>
+                </div>
+                <div class="rs-timeline-content">
+                  <div class="rs-timeline-header">
+                    <span class="rs-timeline-event">${event.event}</span>
+                    <span class="rs-category-badge" style="background:${color}15;color:${color};border-color:${color}30">${event.category}</span>
+                  </div>
+                  <p class="rs-timeline-desc">${event.description}</p>
+                  <div class="rs-confidence-wrap">
+        <span class="rs-confidence-label">Confidence</span>
+        <div class="rs-confidence-bar">
+          <div class="rs-confidence-fill" style="width:${event.confidence}%;background:${color}"></div>
+        </div>
+        <span class="rs-confidence-val">${event.confidence}%</span>
+      </div>
+      <button class="rs-whatif-btn"
+        onclick="openWhatIf('${event.event.replace(/'/g,"&#39;").replace(/"/g,"&quot;")}', '${data.personaName}')">
+        ✦ What If?
+      </button>
+                </div>
               </div>
-              <span class="rs-confidence-val">${e.confidence}%</span>
-            </div>
-          </div>
-        </div>`;
-    }).join("");
+            `;
+          }).join("");
 
-    document.getElementById("whatIfResult").innerHTML = `
-      <p class="rs-divergence-summary">${data.divergenceSummary}</p>
-      <div>
-        <span class="rs-modal-label">New Archetype</span>
-        <div class="rs-new-archetype">${data.newArchetype}</div>
-      </div>
-      <div class="rs-timeline">${timelineHTML}</div>
-      <div>
-        <span class="rs-modal-label">Key Difference</span>
-        <p class="rs-key-difference">${data.keyDifference}</p>
-      </div>
-    `;
-    document.getElementById("whatIfResult").style.display = "flex";
+          const safeId = (data.personaName || "persona").replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
 
-  } catch {
-    alert("Something went wrong. Try again.");
-  } finally {
-    btn.textContent = "Explore Divergence →";
-    btn.disabled = false;
-  }
-}
+          return `
+            <div class="rs-persona-card">
+              <div class="rs-persona-header">
+                <div>
+                  <div class="rs-persona-name">${data.personaName}</div>
+                  <div class="rs-archetype">${data.archetype}</div>
+                </div>
+              </div>
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeWhatIf();
-});
-</script>
-  <!-- WHAT IF MODAL -->
-<div class="rs-modal-overlay" id="whatIfOverlay" onclick="closeWhatIf()"></div>
-<div class="rs-modal" id="whatIfModal">
-  <div class="rs-modal-header">
-    <span class="rs-modal-title">✦ What If?</span>
-    <button class="rs-modal-close" onclick="closeWhatIf()">✕</button>
-  </div>
-  <p class="rs-modal-event" id="whatIfEventLabel"></p>
-  <div class="rs-modal-input-wrap">
-    <label class="rs-modal-label">What if instead...</label>
-    <textarea class="rs-textarea" id="whatIfInput" rows="3"
-      placeholder="e.g. What if they had supportive parents instead of critical ones?&#10;What if they had chosen art school over engineering?"></textarea>
-  </div>
-  <button class="rs-analyze-btn" style="width:100%" onclick="submitWhatIf()">
-    Explore Divergence →
+              <p class="rs-summary">${data.summary}</p>
+
+              <div class="rs-tags-row">
+                <div class="rs-tags-group">
+                  <span class="rs-tags-label">Core Wounds</span>
+                  <div class="rs-tags">
+                    ${(data.coreWounds || []).map(w => `<span class="rs-tag wound">${w}</span>`).join("")}
+                  </div>
+                </div>
+                <div class="rs-tags-group">
+                  <span class="rs-tags-label">Core Strengths</span>
+                  <div class="rs-tags">
+                    ${(data.coreStrengths || []).map(s => `<span class="rs-tag strength">${s}</span>`).join("")}
+                  </div>
+                </div>
+              </div>
+
+              <div class="rs-insight-row">
+                <div class="rs-insight-card">
+                  <span class="rs-insight-label">Likely Environment</span>
+                  <p class="rs-insight-text">${data.likelyEnvironment || "—"}</p>
+                </div>
+                <div class="rs-insight-card turning">
+                  <span class="rs-insight-label">Turning Point</span>
+                  <p class="rs-insight-text">${data.turningPoint || "—"}</p>
+                </div>
+              </div>
+
+              <div class="rs-timeline-label">Timeline</div>
+              <div class="rs-timeline">
+                ${timelineHTML}
+              </div>
+
+              <div class="rs-scores-wrap">
+                <div class="rs-timeline-label" style="margin-bottom:1rem;">Persona Score Card</div>
+                <div class="rs-radar-wrap">
+                  <canvas id="radar-${safeId}" width="280" height="280"></canvas>
+                </div>
+              </div>
+<div class="rs-share-row">
+  <button class="rs-share-card-btn" onclick="shareCard('${safeId}', '${data.archetype.replace(/'/g,"&#39;")}', '${data.personaName.replace(/'/g,"&#39;")}')">
+    ↓ Download Persona Card
   </button>
-  <div class="rs-whatif-result" id="whatIfResult" style="display:none"></div>
 </div>
-</body>
+            </div>
+          `;
+        }
+
+        // ── Render radar chart ────────────────────
+        function renderRadar(data) {
+          const safeId   = (data.personaName || "persona").replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
+          const canvas   = document.getElementById(`radar-${safeId}`);
+          if (!canvas || !data.scores) return;
+
+          const labels = Object.keys(data.scores);
+          const values = Object.values(data.scores);
+
+          new Chart(canvas, {
+            type: "radar",
+            data: {
+              labels,
+              datasets: [{
+                data: values,
+                backgroundColor: "rgba(0,212,255,0.08)",
+                borderColor: "rgba(0,212,255,0.6)",
+                borderWidth: 1.5,
+                pointBackgroundColor: "rgba(0,212,255,0.9)",
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              }]
+            },
+            options: {
+              responsive: false,
+              scales: {
+                r: {
+                  min: 0, max: 100,
+                  ticks: { display: false },
+                  grid: { color: "rgba(0,212,255,0.07)" },
+                  angleLines: { color: "rgba(0,212,255,0.08)" },
+                  pointLabels: {
+                    color: "#7888aa",
+                    font: { family: "DM Mono", size: 11 },
+                  }
+                }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+
+        // ── Reset ─────────────────────────────────
+        function resetApp() {
+          document.getElementById("hero").style.display          = "block";
+          document.getElementById("inputSection").style.display  = "block";
+          document.getElementById("resultSingle").style.display  = "none";
+          document.getElementById("resultCompare").style.display = "none";
+          document.getElementById("loader").style.display        = "none";
+          // Destroy existing charts to avoid canvas reuse issues
+          Chart.instances && Object.values(Chart.instances).forEach(c => c.destroy());
+        }
+
+        // ── What If ───────────────────────────────
+      let currentWhatIfEvent  = "";
+      let currentWhatIfTraits = "";
+
+      function openWhatIf(event, personaName) {
+        currentWhatIfEvent  = event;
+        currentWhatIfTraits = personaStore[personaName]?.traits || "";
+        document.getElementById("whatIfEventLabel").textContent = `Event: "${event}"`;
+        document.getElementById("whatIfInput").value = "";
+        document.getElementById("whatIfResult").style.display = "none";
+        document.getElementById("whatIfOverlay").classList.add("open");
+        document.getElementById("whatIfModal").classList.add("open");
+        document.body.style.overflow = "hidden";
+        setTimeout(() => document.getElementById("whatIfInput").focus(), 400);
+      }
+
+      function closeWhatIf() {
+        document.getElementById("whatIfOverlay").classList.remove("open");
+        document.getElementById("whatIfModal").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      async function submitWhatIf() {
+        const change = document.getElementById("whatIfInput").value.trim();
+        if (!change || change.length < 10) {
+          document.getElementById("whatIfInput").focus();
+          return;
+        }
+
+        const btn = document.querySelector("#whatIfModal .rs-analyze-btn");
+        btn.textContent = "Exploring divergence...";
+        btn.disabled = true;
+
+        try {
+          const res  = await fetch(`${WORKER_URL}/api/whatIf`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              originalTraits: currentWhatIfTraits,
+              event: currentWhatIfEvent,
+              change,
+            }),
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+
+          const categoryColors = {
+            Childhood:"#06b6d4", Education:"#8b5cf6", Career:"#f59e0b",
+            Relationship:"#ec4899", Trauma:"#ef4444", Achievement:"#22c55e",
+            Travel:"#3b82f6", Identity:"#a78bfa",
+          };
+
+          const timelineHTML = (data.newTimeline || []).map((e, i) => {
+            const color = categoryColors[e.category] || "var(--accent)";
+            return `
+              <div class="rs-timeline-item" style="animation-delay:${i*0.07}s">
+                <div class="rs-timeline-left">
+                  <div class="rs-timeline-age">${e.age}</div>
+                  <div class="rs-timeline-line" style="border-color:${color}20"></div>
+                </div>
+                <div class="rs-timeline-content">
+                  <div class="rs-timeline-header">
+                    <span class="rs-timeline-event">${e.event}</span>
+                    <span class="rs-category-badge" style="background:${color}15;color:${color};border-color:${color}30">${e.category}</span>
+                  </div>
+                  <p class="rs-timeline-desc">${e.description}</p>
+                  <div class="rs-confidence-wrap">
+                    <span class="rs-confidence-label">Confidence</span>
+                    <div class="rs-confidence-bar">
+                      <div class="rs-confidence-fill" style="width:${e.confidence}%;background:${color}"></div>
+                    </div>
+                    <span class="rs-confidence-val">${e.confidence}%</span>
+                  </div>
+                </div>
+              </div>`;
+          }).join("");
+
+          document.getElementById("whatIfResult").innerHTML = `
+            <p class="rs-divergence-summary">${data.divergenceSummary}</p>
+            <div>
+              <span class="rs-modal-label">New Archetype</span>
+              <div class="rs-new-archetype">${data.newArchetype}</div>
+            </div>
+            <div class="rs-timeline">${timelineHTML}</div>
+            <div>
+              <span class="rs-modal-label">Key Difference</span>
+              <p class="rs-key-difference">${data.keyDifference}</p>
+            </div>
+          `;
+          document.getElementById("whatIfResult").style.display = "flex";
+
+        } catch {
+          alert("Something went wrong. Try again.");
+        } finally {
+          btn.textContent = "Explore Divergence →";
+          btn.disabled = false;
+        }
+      }
+
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") closeWhatIf();
+      });
+    </script>
+    <!-- WHAT IF MODAL -->
+    <div
+      class="rs-modal-overlay"
+      id="whatIfOverlay"
+      onclick="closeWhatIf()"
+    ></div>
+    <div class="rs-modal" id="whatIfModal">
+      <div class="rs-modal-header">
+        <span class="rs-modal-title">✦ What If?</span>
+        <button class="rs-modal-close" onclick="closeWhatIf()">✕</button>
+      </div>
+      <p class="rs-modal-event" id="whatIfEventLabel"></p>
+      <div class="rs-modal-input-wrap">
+        <label class="rs-modal-label">What if instead...</label>
+        <textarea
+          class="rs-textarea"
+          id="whatIfInput"
+          rows="3"
+          placeholder="e.g. What if they had supportive parents instead of critical ones?&#10;What if they had chosen art school over engineering?"
+        ></textarea>
+      </div>
+      <button
+        class="rs-analyze-btn"
+        style="width:100%"
+        onclick="submitWhatIf()"
+      >
+        Explore Divergence →
+      </button>
+      <div
+        class="rs-whatif-result"
+        id="whatIfResult"
+        style="display:none"
+      ></div>
+    </div>
+  </body>
 </html>
