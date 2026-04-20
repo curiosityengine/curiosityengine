@@ -672,32 +672,34 @@ function shareCard(safeId, archetype, personaName) {
     });
   }
 
-  // Wounds & Strengths (right side)
-  ctx.fillStyle = "#3a4560";
-  ctx.font      = "11px DM Mono, monospace";
-  ctx.fillText("CORE WOUNDS", 600, 100);
-  ctx.fillStyle = "#f87171";
-  ctx.font      = "13px DM Sans, sans-serif";
-  (data.coreWounds || []).slice(0, 2).forEach((w, i) => {
-    ctx.fillText(`• ${w}`, 600, 122 + i * 22);
-  });
+  // Wounds & Strengths (right side) — max width 185px to stay within canvas
+ctx.fillStyle = "#3a4560";
+ctx.font      = "11px DM Mono, monospace";
+ctx.fillText("CORE WOUNDS", 600, 100);
+ctx.fillStyle = "#f87171";
+ctx.font      = "13px DM Sans, sans-serif";
+(data.coreWounds || []).slice(0, 2).forEach((w, i) => {
+  const truncated = w.length > 22 ? w.slice(0, 22) + "…" : w;
+  ctx.fillText(`• ${truncated}`, 600, 122 + i * 22);
+});
 
-  ctx.fillStyle = "#3a4560";
-  ctx.font      = "11px DM Mono, monospace";
-  ctx.fillText("CORE STRENGTHS", 600, 210);
-  ctx.fillStyle = "#4ade80";
-  ctx.font      = "13px DM Sans, sans-serif";
-  (data.coreStrengths || []).slice(0, 3).forEach((s, i) => {
-    ctx.fillText(`• ${s}`, 600, 232 + i * 22);
-  });
+ctx.fillStyle = "#3a4560";
+ctx.font      = "11px DM Mono, monospace";
+ctx.fillText("CORE STRENGTHS", 600, 210);
+ctx.fillStyle = "#4ade80";
+ctx.font      = "13px DM Sans, sans-serif";
+(data.coreStrengths || []).slice(0, 3).forEach((s, i) => {
+  const truncated = s.length > 22 ? s.slice(0, 22) + "…" : s;
+  ctx.fillText(`• ${truncated}`, 600, 232 + i * 22);
+});
 
-  // Turning point
-  ctx.fillStyle = "#3a4560";
-  ctx.font      = "11px DM Mono, monospace";
-  ctx.fillText("TURNING POINT", 600, 330);
-  ctx.fillStyle = "#7888aa";
-  ctx.font      = "12px DM Sans, sans-serif";
-  wrapText(ctx, data.turningPoint || "", 600, 350, 160, 18, 3);
+// Turning point
+ctx.fillStyle = "#3a4560";
+ctx.font      = "11px DM Mono, monospace";
+ctx.fillText("TURNING POINT", 600, 330);
+ctx.fillStyle = "#7888aa";
+ctx.font      = "12px DM Sans, sans-serif";
+wrapText(ctx, data.turningPoint || "", 600, 350, 175, 17, 3);
 
   // Footer
   ctx.fillStyle = "rgba(0,212,255,0.3)";
