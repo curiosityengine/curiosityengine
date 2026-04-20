@@ -717,6 +717,90 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
   }
   ctx.fillText(line, x, y);
 }
+
+      // ── Save & Revisit ────────────────────────
+const STORAGE_KEY = "rs_saved_personas";
+
+function getSaved() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
+
+function savePersona(data) {
+  const saved = getSaved();
+  // Don't duplicate
+  const exists = saved.findIndex(p => p.personaName === data.personaName);
+  const entry  = { ...data, savedAt: new Date().toISOString() };
+  if (exists >= 0) saved[exists] = entry;
+  else saved.unshift(entry);
+  // Keep max 10
+  if (saved.length > 10) saved.pop();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  updateSavedCount();
+}
+
+function updateSavedCount() {
+  const saved = getSaved();
+  const count = document.getElementById("savedCount");
+  count.textContent = saved.length > 0 ? saved.length : "";
+  count.style.display = saved.length > 0 ? "inline" : "none";
+}
+
+function toggleSavedPanel() {
+  const overlay = document.getElementById("savedOverlay");
+  const panel   = document.getElementById("savedPanel");
+  const isOpen  = panel.classList.contains("open");
+  if (!isOpen) renderSavedList();
+  overlay.classList.toggle("open", !isOpen);
+  panel.classList.toggle("open", !isOpen);
+}
+
+function renderSavedList() {
+  const saved = getSaved();
+  const list  = document.getElementById("savedList");
+
+  if (!saved.length) {
+    list.innerHTML = `<div class="rs-saved-empty">No saved personas yet.<br>Analyze a persona to save it.</div>`;
+    return;
+  }
+
+  list.innerHTML = saved.map((p, i) => `
+    <div class="rs-saved-item">
+      <div class="rs-saved-item-name">${p.personaName}</div>
+      <div class="rs-saved-item-archetype">${p.archetype}</div>
+      <div class="rs-saved-item-date">${new Date(p.savedAt).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })}</div>
+      <div class="rs-saved-item-actions">
+        <button class="rs-saved-load" onclick="loadSaved(${i})">Load →</button>
+        <button class="rs-saved-delete" onclick="deleteSaved(${i})">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function loadSaved(index) {
+  const saved = getSaved();
+  const data  = saved[index];
+  if (!data) return;
+
+  personaStore[data.personaName] = data;
+  toggleSavedPanel();
+
+  document.getElementById("hero").style.display          = "none";
+  document.getElementById("inputSection").style.display  = "none";
+  document.getElementById("resultSingle").style.display  = "block";
+  document.getElementById("resultSingleInner").innerHTML = renderPersonaCard(data, false);
+  renderRadar(data);
+}
+
+function deleteSaved(index) {
+  const saved = getSaved();
+  saved.splice(index, 1);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  updateSavedCount();
+  renderSavedList();
+}
+
+// Init saved count on load
+updateSavedCount();
     </script>
     <!-- WHAT IF MODAL -->
     <div
