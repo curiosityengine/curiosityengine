@@ -87,3 +87,35 @@ document.querySelectorAll(".example-chip").forEach(chip => {
     calculate(chip.dataset.query);
   });
 });
+
+let currentRequestId = 0;
+
+async function calculate(input) {
+  const key = input.toLowerCase().trim();
+  if (cache.has(key)) {
+    setResult(cache.get(key), "pop");
+    return;
+  }
+  setResult("·  ·  ·", "loading");
+
+  const requestId = ++currentRequestId; // ← increment for each request
+
+  try {
+    const res = await fetch(`${WORKER_URL}/api/calculate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: key }),
+    });
+    const data = await res.json();
+
+    if (requestId !== currentRequestId) return; // ← ignore stale responses
+
+    const answer = (data.answer ?? "?").toString().trim();
+    cacheSet(key, answer);
+    setResult(answer, "pop");
+  } catch (err) {
+    console.error(err);
+    if (requestId !== currentRequestId) return;
+    setResult("!", "error");
+  }
+}
