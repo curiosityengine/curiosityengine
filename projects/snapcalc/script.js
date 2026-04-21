@@ -47,7 +47,7 @@ async function calculate(input) {
     const data = await res.json();
 
     // 🔥 CHANGED HERE (important)
-    const answer = (data.result ?? "?").toString().trim();
+    const answer = (data.answer ?? "?").toString().trim();
 
     cacheSet(key, answer);
     setResult(answer, "pop");
