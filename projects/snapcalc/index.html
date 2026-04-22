@@ -9,44 +9,146 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="snapcalc.css">
   <title>SnapCalc — AI Calculator | Natural Language Math & Unit Converter</title>
-<meta name="description" content="SnapCalc is a free AI-powered calculator that understands plain English, Hinglish and natural language. Convert units, calculate percentages, and solve math instantly.">
-<meta name="keywords" content="AI calculator, natural language calculator, Hinglish calculator, unit converter AI, online calculator, instant calculator">
-<link rel="canonical" href="https://princeai.eu.cc/projects/snapcalc/">
- 
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://princeai.eu.cc/projects/snapcalc/">
-<meta property="og:title" content="SnapCalc — AI Calculator that Understands Plain English">
-<meta property="og:description" content="Type anything — math, unit conversions, Hinglish queries — and get instant answers. No steps, no explanations, just results.">
-<meta property="og:image" content="https://princeai.eu.cc/og-image.svg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SnapCalc — AI Calculator that Understands Plain English">
-<meta name="twitter:description" content="Type anything — math, unit conversions, Hinglish queries — and get instant answers.">
-<meta name="twitter:image" content="https://princeai.eu.cc/og-image.svg">
- 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "SnapCalc",
-  "url": "https://princeai.eu.cc/projects/snapcalc/",
-  "description": "AI-powered calculator that understands plain English, Hinglish and natural language queries",
-  "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-}
-</script>
+  <meta name="description" content="SnapCalc is a free AI-powered calculator that understands plain English, Hinglish and natural language. Convert units, calculate percentages, and solve math instantly.">
+  <meta name="keywords" content="AI calculator, natural language calculator, Hinglish calculator, unit converter AI, online calculator, instant calculator">
+  <link rel="canonical" href="https://princeai.eu.cc/projects/snapcalc/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://princeai.eu.cc/projects/snapcalc/">
+  <meta property="og:title" content="SnapCalc — AI Calculator that Understands Plain English">
+  <meta property="og:description" content="Type anything — math, unit conversions, Hinglish queries — and get instant answers. No steps, no explanations, just results.">
+  <meta property="og:image" content="https://princeai.eu.cc/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SnapCalc — AI Calculator that Understands Plain English">
+  <meta name="twitter:description" content="Type anything — math, unit conversions, Hinglish queries — and get instant answers.">
+  <meta name="twitter:image" content="https://princeai.eu.cc/og-image.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SnapCalc",
+    "url": "https://princeai.eu.cc/projects/snapcalc/",
+    "description": "AI-powered calculator that understands plain English, Hinglish and natural language queries",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <style>
+    /* ── VARIATIONS ── */
+    #variationsWrap {
+      display: none;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .var-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.85rem;
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      border-radius: 999px;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .var-btn:hover { border-color: #d4f700; color: #d4f700; }
+    .var-btn.active { border-color: #d4f700; color: #d4f700; background: rgba(212,247,0,0.08); }
+
+    /* ── HISTORY ── */
+    #historyPanel {
+      display: none;
+      margin-top: 1.5rem;
+      width: 100%;
+      max-width: 560px;
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .history-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .history-clear {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: #333;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .history-clear:hover { color: #d4f700; }
+    #historyList { display: flex; flex-direction: column; gap: 0.35rem; }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .history-item:hover { border-color: #2a2a2a; }
+    .history-input {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: #444;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+    .history-answer {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: #d4f700;
+      flex-shrink: 0;
+    }
+
+    /* ── EXAMPLE CHIPS ── */
+    .examples-wrap {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    .example-chip {
+      font-size: 0.72rem;
+      padding: 0.3rem 0.75rem;
+      background: transparent;
+      border: 1px solid #1e1e1e;
+      border-radius: 999px;
+      color: #444;
+      cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      transition: all 0.15s;
+    }
+    .example-chip:hover { border-color: #d4f700; color: #d4f700; }
+
+    /* ── COPIED STATE ── */
+    .copied { color: #22c55e !important; font-size: 1rem !important; }
+  </style>
 </head>
 <body>
-
   <!-- Corner labels -->
   <div class="corner tl">SNAP<br>CALC</div>
-  <div class="corner tr">v2.0<br>AI</div>
+  <div class="corner tr">v3.0<br>AI</div>
   <div class="corner bl">FREE<br>FOREVER</div>
   <div class="corner br">GROQ<br>POWERED</div>
 
   <div class="wrapper">
     <div class="badge">instant calculator</div>
-
     <h1>Snap<span>Calc</span></h1>
     <p class="subtitle">type anything · get the answer · no fluff</p>
 
@@ -54,27 +156,42 @@
       <input
         id="inputBox"
         type="text"
-        placeholder="1 pound me mein kitna kg hota hai..."
+        placeholder="1 pound mein kitna kg hota hai..."
         autocomplete="off"
         spellcheck="false"
         autofocus
       />
     </div>
 
-    <p class="hint">press enter or just stop typing</p>
+    <p class="hint">press enter or just stop typing · click answer to copy</p>
 
-<div class="examples-wrap">
-  <button class="example-chip" data-query="15% of 8400">15% of 8400</button>
-  <button class="example-chip" data-query="37 celsius to fahrenheit">37°C to °F</button>
-  <button class="example-chip" data-query="1 cr ka 5%">1 cr ka 5%</button>
-  <button class="example-chip" data-query="sqrt of 144">√144</button>
-  <button class="example-chip" data-query="barah guna paanch">barah × paanch</button>
-  <button class="example-chip" data-query="EMI for 10 lakh at 8% for 5 years">EMI calc</button>
-</div>
+    <!-- Example chips -->
+    <div class="examples-wrap">
+      <button class="example-chip" data-query="15% of 8400">15% of 8400</button>
+      <button class="example-chip" data-query="37 celsius to fahrenheit">37°C to °F</button>
+      <button class="example-chip" data-query="1 cr ka 5%">1 cr ka 5%</button>
+      <button class="example-chip" data-query="sqrt of 144">√144</button>
+      <button class="example-chip" data-query="barah guna paanch">barah × paanch</button>
+      <button class="example-chip" data-query="EMI for 10 lakh at 8% for 5 years">EMI calc</button>
+    </div>
 
+    <!-- Result -->
     <div class="result-wrap">
       <div id="result" class="idle">_</div>
     </div>
+
+    <!-- One-tap variations -->
+    <div id="variationsWrap"></div>
+
+    <!-- History -->
+    <div id="historyPanel">
+      <div class="history-header">
+        <span class="history-label">Recent</span>
+        <button class="history-clear" onclick="clearHistory()">clear</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+
   </div>
 
   <script src="script.js"></script>
