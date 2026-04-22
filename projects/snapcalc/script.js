@@ -112,6 +112,7 @@ function hideVariations() {
 
 // ── Request ID (prevent stale responses) ──
 let currentRequestId = 0;
+let currentExplanation = "";
 let debounceTimer    = null;
 
 // ── Input handler ─────────────────────────
@@ -166,10 +167,24 @@ async function calculate(input) {
     if (requestId !== currentRequestId) return; // stale
 
     const answer = (data.answer ?? "?").toString().trim();
-    cacheSet(key, answer);
-    setResult(answer, "pop");
-    showVariations(key, answer);
-    addToHistory(input, answer);
+currentExplanation = data.explanation || "";
+// In cacheSet — store object
+cacheSet(key, { answer, explanation: currentExplanation });
+// When reading from cache
+if (cache.has(key)) {
+  const cached = cache.get(key);
+  const ans = typeof cached === "object" ? cached.answer : cached;
+  const exp = typeof cached === "object" ? cached.explanation : "";
+  currentExplanation = exp;
+  setResult(ans, "pop");
+  showVariations(key, ans);
+  return;
+}
+setResult(answer, "pop");
+showVariations(key, answer);
+addToHistory(input, answer);
+// Hide explanation when new result comes in
+hideExplanation();
 
   } catch (err) {
     console.error(err);
@@ -183,7 +198,23 @@ function setResult(value, state) {
   resultDiv.className = state;
   resultDiv.textContent = value;
 }
+function hideExplanation() {
+  const box = document.getElementById("explanationBox");
+  const btn = document.getElementById("explainBtn");
+  if (box) box.style.display = "none";
+  if (btn) btn.classList.remove("active");
+}
 
+function toggleExplanation() {
+  const box = document.getElementById("explanationBox");
+  const btn = document.getElementById("explainBtn");
+  if (!box || !btn) return;
+  if (!currentExplanation) return;
+  const isOpen = box.style.display === "block";
+  box.style.display = isOpen ? "none" : "block";
+  box.textContent   = currentExplanation;
+  btn.classList.toggle("active", !isOpen);
+}
 // ── Click to copy ─────────────────────────
 resultDiv.addEventListener("click", () => {
   const val = resultDiv.textContent;
