@@ -195,10 +195,12 @@ async function calculate(input) {
     hideExplanation();
 
   } catch (err) {
-    console.error(err);
-    if (requestId !== currentRequestId) return;
-    setResult("!", "error");
-  }
+  console.error(err);
+  if (requestId !== currentRequestId) return;
+  setResult("!", "error");
+  // Clear any stale cache for this key
+  cache.delete(key);
+}
 }
 
 // ── Set result ────────────────────────────
