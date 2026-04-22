@@ -122,11 +122,13 @@ inputBox.addEventListener("input", () => {
   if (!val) {
     setResult("_", "idle");
     hideVariations();
+    hideExplanation(); // ← add this
     return;
   }
   setResult("·  ·  ·", "loading");
   hideVariations();
-  debounceTimer = setTimeout(() => calculate(val), 200); // ← instant mode
+  hideExplanation(); // ← add this
+  debounceTimer = setTimeout(() => calculate(val), 200);
 });
 
 inputBox.addEventListener("keydown", (e) => {
