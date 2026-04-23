@@ -141,11 +141,6 @@
   </style>
 </head>
 <body>
-  <!-- Corner labels -->
-  <div class="corner tl">SNAP<br>CALC</div>
-  <div class="corner tr">v3.0<br>AI</div>
-  <div class="corner bl">FREE<br>FOREVER</div>
-  <div class="corner br">GROQ<br>POWERED</div>
 
   <div class="wrapper">
     <div class="badge">instant calculator</div>
@@ -197,8 +192,23 @@
       </div>
       <div id="historyList"></div>
     </div>
+ <!-- History -->
+      <div id="historyPanel">
+        <div class="history-header">
+          <span class="history-label">Recent</span>
+          <button class="history-clear" onclick="clearHistory()">clear</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+     <!-- Footer -->
+      <footer class="app-footer">
+        <span class="footer-item">SNAP CALC</span>
+        <span class="footer-item">v3.0 AI</span>
+        <span class="footer-item">FREE FOREVER</span>
+        <span class="footer-item">GROQ POWERED</span>
+      </footer>
 
-  </div>
+    </div>
 
   <script src="script.js"></script>
 </body>
