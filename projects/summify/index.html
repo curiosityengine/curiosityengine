@@ -541,7 +541,33 @@ if (data.sourceNote === "metadata") {
     } else {
       document.getElementById("quoteCard").style.display = "none";
     }
-
+// Insights (detailed only)                                                                                                                                          
+      if (isDetailed && data.insights && data.insights.length > 0) {                                                                                                       
+        const insightsCard = document.createElement("div");                                                                                                                
+        insightsCard.className = "sm-card";                                                                                                                                
+        insightsCard.innerHTML = `                                                                                                                                         
+          <div class="sm-card-header">                                                                                                                                     
+            <span class="sm-card-label">💡 Key Insights</span>                                                                                                             
+          </div>                                                                                                                                                           
+          <ul class="sm-key-points">                                                                                                                                       
+            ${data.insights.map(i => `<li>${i}</li>`).join("")}                                                                                                            
+          </ul>                                                                                                                                                            
+        `;                                                                                                                                                                 
+        document.getElementById("result").appendChild(insightsCard);                                                                                                       
+      }                                                                                                                                                                    
+   
+      // Audience Takeaway (detailed only)                                                                                                                                 
+      if (isDetailed && data.audienceTakeaway) {                                                                                                                         
+        const takeawayCard = document.createElement("div");                                                                                                                
+        takeawayCard.className = "sm-card";                                                                                                                                
+        takeawayCard.innerHTML = `                                                                                                                                         
+          <div class="sm-card-header">                                                                                                                                     
+            <span class="sm-card-label">🎯 Key Takeaway</span>                                                                                                             
+          </div>                                                                                                                                                           
+          <p class="sm-summary-text" style="font-weight: 500; color: var(--text);">${data.audienceTakeaway}</p>                                                            
+        `;                                                                                                                                                                 
+        document.getElementById("result").appendChild(takeawayCard);                                                                                                       
+      }
     document.getElementById("result").style.display = "block";
   }
 
