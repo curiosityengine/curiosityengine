@@ -370,6 +370,12 @@
           <p class="br-sum-text">${escHtml(data.summary)}</p>
         </div>` : ""}
 
+${data.myTake ? `
+        <div class="br-sum-section br-my-take">
+          <p class="br-sum-label">✦ My Take</p>
+          <p class="br-sum-text">${escHtml(data.myTake)}</p>
+        </div>` : ""}
+        
         ${keyPoints.length ? `
         <div class="br-sum-section">
           <p class="br-sum-label">Key Takeaways</p>
