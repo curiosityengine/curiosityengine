@@ -1,623 +1,595 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="summify.css">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <title>Summify — YouTube Video Summarizer | AI Summary of Any Video</title>
-<meta name="description" content="Summify is a free AI-powered YouTube video summarizer. Paste any YouTube URL and get instant summary, key points, topics, sentiment, and memorable quotes in seconds.">
-<meta name="keywords" content="YouTube video summarizer, AI YouTube summary, summarize YouTube video, YouTube video summary tool, video summary AI, YouTube TL;DR">
-<link rel="canonical" href="https://princeai.eu.cc/projects/summify/">
- 
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://princeai.eu.cc/projects/summify/">
-<meta property="og:title" content="Summify — AI Summary of Any YouTube Video">
-<meta property="og:description" content="Paste any YouTube URL and get instant AI summary, key points, topics, and sentiment. Free YouTube video summarizer.">
-<meta property="og:image" content="https://princeai.eu.cc/og-image.svg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Summify — AI Summary of Any YouTube Video">
-<meta name="twitter:description" content="Paste any YouTube URL. Get instant summary, key points, and sentiment. Free and instant.">
-<meta name="twitter:image" content="https://princeai.eu.cc/og-image.svg">
- 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Summify",
-  "url": "https://princeai.eu.cc/projects/summify/",
-  "description": "Free AI-powered YouTube video summarizer that generates summaries, key points, and sentiment analysis",
-  "applicationCategory": "UtilitiesApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-}
-</script>
-</head>
-<body>
+ <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=DM+Ser
+  if+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="summify.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Summify — YouTube Video Summarizer | AI Summary of Any Video</title>
+  <meta name="description" content="Summify is a free AI-powered YouTube video summarizer. Paste any YouTube URL and get
+   instant summary, key points, topics, and sentiment in seconds.">
+  <meta name="keywords" content="YouTube video summarizer, AI YouTube summary, summarize YouTube video, YouTube video
+  summary tool, video summary AI, YouTube TL;DR">
+  <link rel="canonical" href="https://princeai.eu.cc/projects/summify/">
 
-<nav class="sm-nav">
-  <a href="index.html" class="sm-logo">Sum<span>mify</span></a>
-  <span class="sm-tagline">YouTube · Summarized</span>
-</nav>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://princeai.eu.cc/projects/summify/">
+  <meta property="og:title" content="Summify — AI Summary of Any YouTube Video">
+  <meta property="og:description" content="Paste any YouTube URL and get instant AI summary, key points, topics, and
+  sentiment. Free YouTube video summarizer.">
+  <meta property="og:image" content="https://princeai.eu.cc/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Summify — AI Summary of Any YouTube Video">
+  <meta name="twitter:description" content="Paste any YouTube URL. Get instant summary, key points, and sentiment. Free
+  and instant.">
+  <meta name="twitter:image" content="https://princeai.eu.cc/og-image.svg">
 
-<!-- HERO -->
-<section class="sm-hero" id="hero">
-  <div class="sm-hero-badge">Powered by Groq AI</div>
-  <h1>Any video.<br><em>Instant summary.</em></h1>
-  <p class="sm-hero-sub">Paste a YouTube URL and get a smart summary, key points, topics, and sentiment — in seconds.</p>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Summify",
+    "url": "https://princeai.eu.cc/projects/summify/",
+    "description": "Free AI-powered YouTube video summarizer that generates summaries, key points, and sentiment
+  analysis",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  </head>
+  <body>
 
-  <div class="sm-input-wrap">
-    <div class="sm-input-box">
-      <span class="sm-yt-icon">▶</span>
-      <input type="text" id="urlInput" class="sm-url-input"
-        placeholder="Paste YouTube URL here...">
-      <button class="sm-clear-url" id="clearUrl" onclick="clearInput()" style="display:none">✕</button>
-    </div>
-
-    <div class="sm-mode-row">
-      <span class="sm-mode-label">Summary type</span>
-      <div class="sm-modes">
-  <button class="sm-mode active" data-mode="quick">⚡ Quick</button>
-  <button class="sm-mode" data-mode="detailed">📋 Detailed</button>
-  <button class="sm-mode" data-mode="comments">💬 Comments</button>
-</div>
-      <button class="sm-submit" id="submitBtn" onclick="summarize()">Summarize →</button>
-    </div>
-  </div>
-
-  <!-- Example videos -->
-  <div class="sm-examples">
-    <span class="sm-examples-label">Try an example:</span>
-    <button class="sm-example-chip" onclick="setExample('https://www.youtube.com/watch?v=aircAruvnKk')">3Blue1Brown</button>
-    <button class="sm-example-chip" onclick="setExample('https://www.youtube.com/watch?v=ukzFI9rgwfU')">Lex Fridman</button>
-    <button class="sm-example-chip" onclick="setExample('https://www.youtube.com/watch?v=PeMlggyqz0Y')">TED Talk</button>
-  </div>
-</section>
-
-<!-- LOADER -->
-<div class="sm-loader" id="loader" style="display:none">
-  <div class="sm-loader-dots">
-    <div class="sm-dot"></div>
-    <div class="sm-dot"></div>
-    <div class="sm-dot"></div>
-  </div>
-  <p class="sm-loader-text" id="loaderText">Fetching transcript...</p>
-</div>
-
-<!-- RESULT -->
-<main class="sm-result" id="result" style="display:none">
-
-  <!-- VIDEO CARD -->
-  <div class="sm-video-card">
-    <img class="sm-thumbnail" id="thumbnail" src="" alt="">
-    <div class="sm-video-info">
-      <h2 class="sm-video-title" id="videoTitle"></h2>
-      <div class="sm-video-meta">
-        <span id="videoChannel"></span>
-        <span class="sm-meta-dot">·</span>
-        <span id="videoDuration"></span>
-      </div>
-      <div class="sm-video-badges">
-        <span class="sm-sentiment-badge" id="sentimentBadge"></span>
-        <span class="sm-readtime-badge" id="readTimeBadge"></span>
+  <nav class="sm-nav">
+    <a href="index.html" class="sm-logo">Sum<span>mify</span></a>
+    <div class="sm-nav-right">
+      <span class="sm-tagline">YouTube · Summarized</span>
+      <div class="sm-app-toggle">
+        <button class="sm-toggle-btn active" data-app="video">📺 Video</button>
+        <button class="sm-toggle-btn" data-app="comments">💬 Comments</button>
       </div>
     </div>
-    <a class="sm-watch-btn" id="watchBtn" href="#" target="_blank" rel="noopener noreferrer">
-      ▶ Watch
-    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="sm-hero" id="hero">
+    <div class="sm-hero-badge">Powered by Groq AI</div>
+    <h1>Any video.<br><em>Instant summary.</em></h1>
+    <p class="sm-hero-sub">Paste a YouTube URL and get a smart summary, key points, topics, and sentiment — in
+  seconds.</p>
+
+    <div class="sm-input-wrap">
+      <div class="sm-input-box">
+        <span class="sm-yt-icon">▶</span>
+        <input type="text" id="urlInput" class="sm-url-input"
+          placeholder="Paste YouTube URL here...">
+        <button class="sm-clear-url" id="clearUrl" onclick="clearInput()" style="display:none">✕</button>
+      </div>
+
+      <div class="sm-mode-row">
+        <span class="sm-mode-label">Summary type</span>
+        <div class="sm-modes">
+    <button class="sm-mode active" data-mode="quick">⚡ Quick</button>
+    <button class="sm-mode" data-mode="detailed">📋 Detailed</button>
+    <button class="sm-mode" data-mode="comments">💬 Comments</button>
   </div>
-
-  <!-- TOPICS -->
-  <div class="sm-topics" id="topicsRow"></div>
-
-  <!-- SUMMARY -->
-  <div class="sm-card">
-    <div class="sm-card-header">
-  <span class="sm-card-label">Summary</span>
-</div>
-    <p class="sm-summary-text" id="summaryText"></p>
-  </div>
-
-  <!-- KEY POINTS -->
-  <div class="sm-card" id="keyPointsCard">
-    <div class="sm-card-header">
-      <span class="sm-card-label">Key Points</span>
-    </div>
-    <ul class="sm-key-points" id="keyPoints"></ul>
-  </div>
-
-  <!-- QUOTE (detailed only) -->
-  <div class="sm-quote-card" id="quoteCard" style="display:none">
-    <span class="sm-quote-mark">"</span>
-    <p class="sm-quote-text" id="quoteText"></p>
-  </div>
-
-  <!-- ACTIONS -->
-  <div class="sm-reset-row">
-    <button class="sm-reset-btn" onclick="resetApp()">← Summarize Another</button>
-    <button class="sm-action-btn accent" onclick="copySummary()">Copy Summary</button>
-  </div>
-
-</main>
-<!-- RESULT — COMMENTS -->
-<div class="sm-result" id="resultComments" style="display:none">
-
-  <!-- VIDEO CARD (reuse same structure) -->
-  <div class="sm-video-card">
-    <img class="sm-thumbnail" id="cThumbnail" src="" alt="">
-    <div class="sm-video-info">
-      <h2 class="sm-video-title" id="cVideoTitle"></h2>
-      <div class="sm-video-meta">
-        <span id="cVideoChannel"></span>
-        <span class="sm-meta-dot">·</span>
-        <span id="cVideoDuration"></span>
-        <span class="sm-meta-dot">·</span>
-        <span id="cCommentCount" style="color:var(--muted-light)"></span>
+        <button class="sm-submit" id="submitBtn" onclick="summarize()">Summarize →</button>
       </div>
     </div>
-    <a class="sm-watch-btn" id="cWatchBtn" href="#" target="_blank" rel="noopener noreferrer">
-      ▶ Watch
-    </a>
-  </div>
 
-  <!-- SENTIMENT OVERVIEW -->
-  <div class="sm-card">
-    <div class="sm-card-header">
-      <span class="sm-card-label">Audience Sentiment</span>
-      <span class="sm-sentiment-badge" id="cOverallSentiment"></span>
+    <!-- Example videos -->
+    <div class="sm-examples">
+      <span class="sm-examples-label">Try an example:</span>
+      <button class="sm-example-chip"
+  onclick="setExample('https://www.youtube.com/watch?v=aircAruvnKk')">3Blue1Brown</button>
+      <button class="sm-example-chip" onclick="setExample('https://www.youtube.com/watch?v=ukzFI9rgwfU')">Lex
+  Fridman</button>
+      <button class="sm-example-chip" onclick="setExample('https://www.youtube.com/watch?v=PeMlggyqz0Y')">TED
+  Talk</button>
     </div>
-    <p class="sm-summary-text" id="cOneLiner" style="margin-bottom:1rem;"></p>
+  </section>
 
-    <!-- Support/Oppose/Neutral bars -->
-    <div class="sm-sentiment-bars" id="cSentimentBars"></div>
+  <!-- LOADER -->
+  <div class="sm-loader" id="loader" style="display:none">
+    <div class="sm-loader-dots">
+      <div class="sm-dot"></div>
+      <div class="sm-dot"></div>
+      <div class="sm-dot"></div>
+    </div>
+    <p class="sm-loader-text" id="loaderText">Fetching transcript...</p>
   </div>
 
-  <!-- WHAT PEOPLE LOVE / DISLIKE -->
-  <div class="sm-love-dislike-grid">
+  <!-- RESULT -->
+  <main class="sm-result" id="result" style="display:none">
+
+    <!-- VIDEO CARD -->
+    <div class="sm-video-card">
+      <img class="sm-thumbnail" id="thumbnail" src="" alt="">
+      <div class="sm-video-info">
+        <h2 class="sm-video-title" id="videoTitle"></h2>
+        <div class="sm-video-meta">
+          <span id="videoChannel"></span>
+          <span class="sm-meta-dot">·</span>
+          <span id="videoDuration"></span>
+        </div>
+        <div class="sm-video-badges">
+          <span class="sm-sentiment-badge" id="sentimentBadge"></span>
+          <span class="sm-readtime-badge" id="readTimeBadge"></span>
+        </div>
+      </div>
+      <a class="sm-watch-btn" id="watchBtn" href="#" target="_blank" rel="noopener noreferrer">
+        ▶ Watch
+      </a>
+    </div>
+
+    <!-- TOPICS -->
+    <div class="sm-topics" id="topicsRow"></div>
+
+    <!-- SUMMARY -->
     <div class="sm-card">
       <div class="sm-card-header">
-        <span class="sm-card-label">👍 What people love</span>
-      </div>
-      <ul class="sm-key-points" id="cLove"></ul>
+    <span class="sm-card-label">Summary</span>
+  </div>
+      <p class="sm-summary-text" id="summaryText"></p>
     </div>
+
+    <!-- KEY POINTS -->
+    <div class="sm-card" id="keyPointsCard">
+      <div class="sm-card-header">
+        <span class="sm-card-label">Key Points</span>
+      </div>
+      <ul class="sm-key-points" id="keyPoints"></ul>
+    </div>
+
+    <!-- QUOTE (detailed only) -->
+    <div class="sm-quote-card" id="quoteCard" style="display:none">
+      <span class="sm-quote-mark">"</span>
+      <p class="sm-quote-text" id="quoteText"></p>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="sm-reset-row">
+      <button class="sm-reset-btn" onclick="resetApp()">← Summarize Another</button>
+      <button class="sm-action-btn accent" onclick="copySummary()">Copy Summary</button>
+    </div>
+
+  </main>
+  <!-- RESULT — COMMENTS -->
+  <div class="sm-result" id="resultComments" style="display:none">
+
+    <!-- VIDEO CARD (reuse same structure) -->
+    <div class="sm-video-card">
+      <img class="sm-thumbnail" id="cThumbnail" src="" alt="">
+      <div class="sm-video-info">
+        <h2 class="sm-video-title" id="cVideoTitle"></h2>
+        <div class="sm-video-meta">
+          <span id="cVideoChannel"></span>
+          <span class="sm-meta-dot">·</span>
+          <span id="cVideoDuration"></span>
+          <span class="sm-meta-dot">·</span>
+          <span id="cCommentCount" style="color:var(--muted-light)"></span>
+        </div>
+      </div>
+      <a class="sm-watch-btn" id="cWatchBtn" href="#" target="_blank" rel="noopener noreferrer">
+        ▶ Watch
+      </a>
+    </div>
+
+    <!-- SENTIMENT OVERVIEW -->
     <div class="sm-card">
       <div class="sm-card-header">
-        <span class="sm-card-label">👎 What people dislike</span>
+        <span class="sm-card-label">Audience Sentiment</span>
+        <span class="sm-sentiment-badge" id="cOverallSentiment"></span>
       </div>
-      <ul class="sm-key-points" id="cDislike"></ul>
+      <p class="sm-summary-text" id="cOneLiner" style="margin-bottom:1rem;"></p>
+
+      <!-- Support/Oppose/Neutral bars -->
+      <div class="sm-sentiment-bars" id="cSentimentBars"></div>
+    </div>
+
+    <!-- WHAT PEOPLE LOVE / DISLIKE -->
+    <div class="sm-love-dislike-grid">
+      <div class="sm-card">
+        <div class="sm-card-header">
+          <span class="sm-card-label">👍 What people love</span>
+        </div>
+        <ul class="sm-key-points" id="cLove"></ul>
+      </div>
+      <div class="sm-card">
+        <div class="sm-card-header">
+          <span class="sm-card-label">👎 What people dislike</span>
+        </div>
+        <ul class="sm-key-points" id="cDislike"></ul>
+      </div>
+    </div>
+
+    <!-- MAIN THEMES -->
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <span class="sm-card-label">Main Themes</span>
+      </div>
+      <div id="cThemes"></div>
+    </div>
+
+    <!-- CONTROVERSIAL POINT -->
+    <div class="sm-card" id="cControversialCard" style="display:none">
+      <div class="sm-card-header">
+        <span class="sm-card-label">🔥 Most Controversial Point</span>
+      </div>
+      <p class="sm-summary-text" id="cControversial"></p>
+    </div>
+
+    <!-- COMMON QUESTIONS -->
+    <div class="sm-card" id="cQuestionsCard">
+      <div class="sm-card-header">
+        <span class="sm-card-label">❓ Common Questions</span>
+      </div>
+      <ul class="sm-key-points" id="cQuestions"></ul>
+    </div>
+
+    <!-- MEMORABLE COMMENT -->
+    <div class="sm-quote-card" id="cMemorableCard">
+      <span class="sm-quote-mark">"</span>
+      <p class="sm-quote-text" id="cMemorable"></p>
+    </div>
+
+    <!-- TOP COMMENTS -->
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <span class="sm-card-label">Top Comments</span>
+      </div>
+      <div id="cTopComments"></div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="sm-reset-row">
+      <button class="sm-reset-btn" onclick="resetApp()">← Summarize Another</button>
     </div>
   </div>
-
-  <!-- MAIN THEMES -->
-  <div class="sm-card">
-    <div class="sm-card-header">
-      <span class="sm-card-label">Main Themes</span>
+  <!-- NO TRANSCRIPT -->
+  <div class="sm-no-transcript" id="noTranscript" style="display:none">
+    <div class="sm-nt-icon">⚠</div>
+    <h3>No captions available</h3>
+    <p>This video doesn't have captions enabled — a YouTube requirement for summarization.</p>
+    <div class="sm-nt-video" id="ntVideoInfo"></div>
+    <div class="sm-nt-tips">
+      <p class="sm-nt-tips-label">Summify works best with:</p>
+      <div class="sm-nt-chips">
+        <span>TED Talks</span>
+        <span>Lex Fridman</span>
+        <span>Veritasium</span>
+        <span>BBC News</span>
+        <span>Khan Academy</span>
+        <span>Kurzgesagt</span>
+      </div>
+      <p style="font-size:0.72rem; color:var(--muted); margin-top:0.75rem; line-height:1.6;">
+        This is a YouTube infrastructure limitation — captions must be enabled by the creator or auto-generated by
+  YouTube for the video's primary language.
+      </p>
     </div>
-    <div id="cThemes"></div>
+    <button class="sm-action-btn" style="margin-top:1.5rem" onclick="resetApp()">← Try Another Video</button>
   </div>
 
-  <!-- CONTROVERSIAL POINT -->
-  <div class="sm-card" id="cControversialCard" style="display:none">
-    <div class="sm-card-header">
-      <span class="sm-card-label">🔥 Most Controversial Point</span>
-    </div>
-    <p class="sm-summary-text" id="cControversial"></p>
-  </div>
+  <footer class="sm-footer">
+    © 2026 Summify · Built by Prince · Powered by Groq
+  </footer>
 
-  <!-- COMMON QUESTIONS -->
-  <div class="sm-card" id="cQuestionsCard">
-    <div class="sm-card-header">
-      <span class="sm-card-label">❓ Common Questions</span>
-    </div>
-    <ul class="sm-key-points" id="cQuestions"></ul>
-  </div>
+  <script>
+    const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
+    let activeMode = "quick";
+    let currentApp = 'video';
+    let currentData = null;
 
-  <!-- MEMORABLE COMMENT -->
-  <div class="sm-quote-card" id="cMemorableCard">
-    <span class="sm-quote-mark">"</span>
-    <p class="sm-quote-text" id="cMemorable"></p>
-  </div>
-
-  <!-- TOP COMMENTS -->
-  <div class="sm-card">
-    <div class="sm-card-header">
-      <span class="sm-card-label">Top Comments</span>
-    </div>
-    <div id="cTopComments"></div>
-  </div>
-
-  <!-- ACTIONS -->
-  <div class="sm-reset-row">
-    <button class="sm-reset-btn" onclick="resetApp()">← Summarize Another</button>
-  </div>
-</div>
-<!-- NO TRANSCRIPT -->
-<div class="sm-no-transcript" id="noTranscript" style="display:none">
-  <div class="sm-nt-icon">⚠</div>
-  <h3>No captions available</h3>
-  <p>This video doesn't have captions enabled — a YouTube requirement for summarization.</p>
-  <div class="sm-nt-video" id="ntVideoInfo"></div>
-  <div class="sm-nt-tips">
-    <p class="sm-nt-tips-label">Summify works best with:</p>
-    <div class="sm-nt-chips">
-      <span>TED Talks</span>
-      <span>Lex Fridman</span>
-      <span>Veritasium</span>
-      <span>BBC News</span>
-      <span>Khan Academy</span>
-      <span>Kurzgesagt</span>
-    </div>
-    <p style="font-size:0.72rem; color:var(--muted); margin-top:0.75rem; line-height:1.6;">
-      This is a YouTube infrastructure limitation — captions must be enabled by the creator or auto-generated by YouTube for the video's primary language.
-    </p>
-  </div>
-  <button class="sm-action-btn" style="margin-top:1.5rem" onclick="resetApp()">← Try Another Video</button>
-</div>
-
-<footer class="sm-footer">
-  © 2026 Summify · Built by Prince · Powered by Groq
-</footer>
-
-<script>
-  const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
-  let activeMode = "quick";
-  let currentData = null;
-
-  // ── Mode buttons ──────────────────────────
-  document.querySelectorAll(".sm-mode").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".sm-mode").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      activeMode = btn.dataset.mode;
-    });
-  });
-
-  // ── URL input ─────────────────────────────
-  document.getElementById("urlInput").addEventListener("input", function() {
-    document.getElementById("clearUrl").style.display = this.value ? "block" : "none";
-  });
-
-  document.getElementById("urlInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") summarize();
-  });
-
-  function clearInput() {
-    document.getElementById("urlInput").value = "";
-    document.getElementById("clearUrl").style.display = "none";
-    document.getElementById("urlInput").focus();
-  }
-
-  function setExample(url) {
-    document.getElementById("urlInput").value = url;
-    document.getElementById("clearUrl").style.display = "block";
-    document.getElementById("urlInput").focus();
-  }
-
-  // ── Summarize ─────────────────────────────
-  async function summarize() {
-    if (activeMode === "comments") { analyzeComments(); return; }
-    const videoUrl = document.getElementById("urlInput").value.trim();
-    if (!videoUrl) {
-      document.getElementById("urlInput").focus();
-      return;
-    }
-
-    // Hide everything, show loader
-    document.getElementById("hero").style.display = "none";
-    document.getElementById("result").style.display = "none";
-    document.getElementById("noTranscript").style.display = "none";
-    document.getElementById("loader").style.display = "flex";
-
-    // Animate loader text
-    const loaderTexts = [
-      "Fetching video info...",
-      "Extracting transcript...",
-      "Analysing with Groq AI...",
-      "Generating summary...",
-    ];
-    let li = 0;
-    const loaderInterval = setInterval(() => {
-      li = (li + 1) % loaderTexts.length;
-      document.getElementById("loaderText").textContent = loaderTexts[li];
-    }, 1500);
-
-    try {
-      const res  = await fetch(`${WORKER_URL}/api/summify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoUrl, mode: activeMode }),
+    // ── Mode buttons ──────────────────────────
+    document.querySelectorAll(".sm-mode").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sm-mode").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeMode = btn.dataset.mode;
       });
-      const data = await res.json();
+    });
 
-      clearInterval(loaderInterval);
-      document.getElementById("loader").style.display = "none";
+    // Toggle functionality
+    document.querySelectorAll('.sm-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchApp(btn.dataset.app));
+    });
 
-      if (data.error === "No transcript available") {
-        showNoTranscript(data);
-        return;
+    function switchApp(app) {
+      currentApp = app;
+
+      // Update toggle UI
+      document.querySelectorAll('.sm-toggle-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.sm-toggle-btn[data-app="${app}"]`).classList.add('active');
+
+      // Show/hide mode buttons based on app
+      const modeRow = document.querySelector('.sm-mode-row');
+      if (app === 'video') {
+        modeRow.style.display = 'flex';
+        document.getElementById('submitBtn').textContent = 'Summarize →';
+      } else {
+        modeRow.style.display = 'none';
+        document.getElementById('submitBtn').textContent = 'Analyze Comments →';
       }
 
-      if (data.error) {
-        alert(data.error);
-        resetApp();
-        return;
-      }
-
-      currentData = data;
-      renderResult(data);
-
-    } catch (err) {
-      clearInterval(loaderInterval);
-      document.getElementById("loader").style.display = "none";
-      alert("Something went wrong. Please try again.");
+      // Reset app
       resetApp();
     }
-  }
-  // ── Analyze Comments ──────────────────────
-async function analyzeComments() {
-  const videoUrl = document.getElementById("urlInput").value.trim();
-  if (!videoUrl) { document.getElementById("urlInput").focus(); return; }
 
-  document.getElementById("hero").style.display         = "none";
-  document.getElementById("result").style.display       = "none";
-  document.getElementById("resultComments").style.display = "none";
-  document.getElementById("noTranscript").style.display = "none";
-  document.getElementById("loader").style.display       = "flex";
-
-  const loaderTexts = ["Fetching video info...", "Loading comments...", "Analysing audience sentiment...", "Building insights..."];
-  let li = 0;
-  const loaderInterval = setInterval(() => {
-    li = (li + 1) % loaderTexts.length;
-    document.getElementById("loaderText").textContent = loaderTexts[li];
-  }, 1500);
-
-  try {
-    const res  = await fetch(`${WORKER_URL}/api/summify-comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ videoUrl }),
+    // ── URL input ─────────────────────────────
+    document.getElementById("urlInput").addEventListener("input", function() {
+      document.getElementById("clearUrl").style.display = this.value ? "block" : "none";
     });
-    const data = await res.json();
 
-    clearInterval(loaderInterval);
-    document.getElementById("loader").style.display = "none";
+    document.getElementById("urlInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") summarize();
+    });
 
-    if (data.error) { alert(data.error); resetApp(); return; }
-
-    renderComments(data);
-  } catch {
-    clearInterval(loaderInterval);
-    document.getElementById("loader").style.display = "none";
-    alert("Something went wrong. Please try again.");
-    resetApp();
-  }
-}
-
-function renderComments(data) {
-  // Video card
-  document.getElementById("cThumbnail").src      = data.thumbnail;
-  document.getElementById("cVideoTitle").textContent  = data.title;
-  document.getElementById("cVideoChannel").textContent = data.channel;
-  document.getElementById("cVideoDuration").textContent = data.duration;
-  document.getElementById("cCommentCount").textContent = Number(data.commentCount).toLocaleString() + " comments";
-  document.getElementById("cWatchBtn").href = `https://youtube.com/watch?v=${data.videoId}`;
-
-  // Overall sentiment badge
-  const sentBadge = document.getElementById("cOverallSentiment");
-  sentBadge.textContent = data.overallSentiment;
-  const sentClass = data.overallSentiment?.toLowerCase().includes("positive") ? "sent-pos"
-    : data.overallSentiment?.toLowerCase().includes("negative") ? "sent-neg"
-    : data.overallSentiment?.toLowerCase().includes("divided") ? "sent-mix"
-    : "sent-neu";
-  sentBadge.className = `sm-sentiment-badge ${sentClass}`;
-
-  // One liner
-  document.getElementById("cOneLiner").textContent = data.oneLiner || "";
-
-  // Sentiment bars
-  document.getElementById("cSentimentBars").innerHTML = [
-    { label: "👍 Support", val: data.supportPercent || 0, color: "#22c55e" },
-    { label: "👎 Oppose",  val: data.opposePercent  || 0, color: "#ef4444" },
-    { label: "😐 Neutral", val: data.neutralPercent || 0, color: "#6b7280" },
-  ].map(b => `
-    <div class="sm-sent-bar-row">
-      <span class="sm-sent-bar-label">${b.label}</span>
-      <div class="sm-sent-bar-track">
-        <div class="sm-sent-bar-fill" style="width:${b.val}%;background:${b.color}"></div>
-      </div>
-      <span class="sm-sent-bar-val">${b.val}%</span>
-    </div>
-  `).join("");
-
-  // What people love
-  document.getElementById("cLove").innerHTML =
-    (data.whatPeopleLove || []).map(p => `<li>${p}</li>`).join("") || "<li>No specific praise found</li>";
-
-  // What people dislike
-  document.getElementById("cDislike").innerHTML =
-    (data.whatPeopleDislike || []).map(p => `<li>${p}</li>`).join("") || "<li>No specific criticism found</li>";
-
-  // Main themes
-  document.getElementById("cThemes").innerHTML =
-    (data.mainThemes || []).map(t => `
-      <div class="sm-theme-item">
-        <span class="sm-theme-badge sm-theme-${(t.sentiment||"neutral").toLowerCase()}">${t.sentiment}</span>
-        <div>
-          <div class="sm-theme-title">${t.theme}</div>
-          <div class="sm-theme-desc">${t.description}</div>
-        </div>
-      </div>
-    `).join("");
-
-  // Controversial point
-  if (data.controversialPoint) {
-    document.getElementById("cControversial").textContent = data.controversialPoint;
-    document.getElementById("cControversialCard").style.display = "block";
-  } else {
-    document.getElementById("cControversialCard").style.display = "none";
-  }
-  // Common questions — hide if empty
-const questions = data.commonQuestions || [];
-if (questions.length > 0) {
-  document.getElementById("cQuestions").innerHTML = questions.map(q => `<li>${q}</li>`).join("");
-  document.getElementById("cQuestionsCard").style.display = "block";
-} else {
-  document.getElementById("cQuestionsCard").style.display = "none";
-}
-  // Memorable comment — hide if empty
-if (data.memorableComment) {
-  document.getElementById("cMemorable").textContent = data.memorableComment;
-  document.getElementById("cMemorableCard").style.display = "block";
-} else {
-  document.getElementById("cMemorableCard").style.display = "none";
-}
-
-  // Top comments
-  document.getElementById("cTopComments").innerHTML =
-    (data.topComments || []).map(c => `
-      <div class="sm-comment-item">
-        <div class="sm-comment-meta">
-          <span>${c.author}</span>
-          <span class="sm-comment-likes">👍 ${c.likes.toLocaleString()}</span>
-        </div>
-        <p class="sm-comment-text">${c.text}</p>
-      </div>
-    `).join("");
-
-  document.getElementById("resultComments").style.display = "block";
-}
-
-  // ── Render result ─────────────────────────
-  function renderResult(data) {
-    document.getElementById("thumbnail").src = data.thumbnail;
-    document.getElementById("videoTitle").textContent = data.title;
-    document.getElementById("videoChannel").textContent = data.channel;
-    document.getElementById("videoDuration").textContent = data.duration;
-    document.getElementById("watchBtn").href = `https://youtube.com/watch?v=${data.videoId}`;
-
-    // Sentiment badge
-    const sentMap = {
-      "Positive": { cls: "sent-pos", label: "😊 Positive" },
-      "Negative": { cls: "sent-neg", label: "😔 Negative" },
-      "Mixed":    { cls: "sent-mix", label: "🤔 Mixed" },
-      "Neutral":  { cls: "sent-neu", label: "😐 Neutral" },
-    };
-    const sent = sentMap[data.sentiment] || sentMap["Neutral"];
-    const sentBadge = document.getElementById("sentimentBadge");
-    sentBadge.textContent = sent.label;
-    sentBadge.className = `sm-sentiment-badge ${sent.cls}`;
-
-    document.getElementById("readTimeBadge").textContent = `📖 ${data.readTime}`;
-
-    // Topics
-    const topicsRow = document.getElementById("topicsRow");
-    topicsRow.innerHTML = data.topics?.map(t => `<span class="sm-topic">${t}</span>`).join("") || "";
-
-    // Show metadata notice if no transcript
-const existingNotice = document.getElementById("metaNotice");
-if (existingNotice) existingNotice.remove();
-if (data.sourceNote === "metadata") {
-  const notice = document.createElement("div");
-  notice.id = "metaNotice";
-  notice.style.cssText = "font-size:0.72rem;color:var(--muted);padding:0.5rem 0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;";
-  notice.textContent = "⚠ No transcript found — summary based on video title and description.";
-  document.getElementById("result").insertBefore(notice, document.getElementById("topicsRow"));
-}
-
-    // Summary
-    document.getElementById("summaryText").textContent = data.summary;
-
-    // Key points
-    const kp = document.getElementById("keyPoints");
-    kp.innerHTML = data.keyPoints?.map(p => `<li>${p}</li>`).join("") || "";
-
-    // Quote (detailed mode)
-    if (data.quote && activeMode === "detailed") {
-      document.getElementById("quoteText").textContent = data.quote;
-      document.getElementById("quoteCard").style.display = "block";
-    } else {
-      document.getElementById("quoteCard").style.display = "none";
+    function clearInput() {
+      document.getElementById("urlInput").value = "";
+      document.getElementById("clearUrl").style.display = "none";
+      document.getElementById("urlInput").focus();
     }
-// Insights (detailed only)                                                                                                                                          
-      if (isDetailed && data.insights && data.insights.length > 0) {                                                                                                       
-        const insightsCard = document.createElement("div");                                                                                                                
-        insightsCard.className = "sm-card";                                                                                                                                
-        insightsCard.innerHTML = `                                                                                                                                         
-          <div class="sm-card-header">                                                                                                                                     
-            <span class="sm-card-label">💡 Key Insights</span>                                                                                                             
-          </div>                                                                                                                                                           
-          <ul class="sm-key-points">                                                                                                                                       
-            ${data.insights.map(i => `<li>${i}</li>`).join("")}                                                                                                            
-          </ul>                                                                                                                                                            
-        `;                                                                                                                                                                 
-        document.getElementById("result").appendChild(insightsCard);                                                                                                       
-      }                                                                                                                                                                    
-   
-      // Audience Takeaway (detailed only)                                                                                                                                 
-      if (isDetailed && data.audienceTakeaway) {                                                                                                                         
-        const takeawayCard = document.createElement("div");                                                                                                                
-        takeawayCard.className = "sm-card";                                                                                                                                
-        takeawayCard.innerHTML = `                                                                                                                                         
-          <div class="sm-card-header">                                                                                                                                     
-            <span class="sm-card-label">🎯 Key Takeaway</span>                                                                                                             
-          </div>                                                                                                                                                           
-          <p class="sm-summary-text" style="font-weight: 500; color: var(--text);">${data.audienceTakeaway}</p>                                                            
-        `;                                                                                                                                                                 
-        document.getElementById("result").appendChild(takeawayCard);                                                                                                       
+
+    function setExample(url) {
+      document.getElementById("urlInput").value = url;
+      document.getElementById("clearUrl").style.display = "block";
+      document.getElementById("urlInput").focus();
+    }
+
+    // ── Summarize ─────────────────────────────
+    async function summarize() {
+      const videoUrl = document.getElementById("urlInput").value.trim();
+      if (!videoUrl) {
+        document.getElementById("urlInput").focus();
+        return;
       }
-    document.getElementById("result").style.display = "block";
-  }
 
-  // ── No transcript ─────────────────────────
-  function showNoTranscript(data) {
-    if (data.title) {
-      document.getElementById("ntVideoInfo").innerHTML = `
-        <img src="${data.thumbnail}" style="width:100%;border-radius:8px;margin-bottom:0.75rem;">
-        <strong>${data.title}</strong><br>
-        <span style="font-size:0.8rem;color:var(--muted-light)">${data.channel}</span>
-      `;
+      // Hide everything, show loader
+      document.getElementById("hero").style.display = "none";
+      document.getElementById("result").style.display = "none";
+      document.getElementById("resultComments").style.display = "none";
+      document.getElementById("noTranscript").style.display = "none";
+      document.getElementById("loader").style.display = "flex";
+
+      // Loader texts based on app
+      const loaderTexts = currentApp === 'video'
+        ? ["Fetching video info...", "Extracting transcript...", "Analysing with Groq AI...", "Generating summary..."]
+        : ["Fetching video info...", "Loading comments...", "Analysing audience sentiment...", "Building insights..."];
+
+      let li = 0;
+      const loaderInterval = setInterval(() => {
+        li = (li + 1) % loaderTexts.length;
+        document.getElementById("loaderText").textContent = loaderTexts[li];
+      }, 1500);
+
+      try {
+        const endpoint = currentApp === 'video' ? '/api/summify' : '/api/summify-comments';
+        const body = currentApp === 'video'
+          ? { videoUrl, mode: activeMode }
+          : { videoUrl };
+
+        const res = await fetch(`${WORKER_URL}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+
+        clearInterval(loaderInterval);
+        document.getElementById("loader").style.display = "none";
+
+        if (data.error === "No transcript available") {
+          showNoTranscript(data);
+          return;
+        }
+
+        if (data.error) {
+          alert(data.error);
+          resetApp();
+          return;
+        }
+
+        currentData = data;
+        if (currentApp === 'video') {
+          renderResult(data);
+        } else {
+          renderComments(data);
+        }
+
+      } catch (err) {
+        clearInterval(loaderInterval);
+        document.getElementById("loader").style.display = "none";
+        alert("Something went wrong. Please try again.");
+        resetApp();
+      }
     }
-    document.getElementById("noTranscript").style.display = "flex";
-  }
 
-  // ── Copy summary ──────────────────────────
-  function copySummary() {
-    if (!currentData) return;
-    const text = [
-      currentData.title,
-      "",
-      "SUMMARY",
-      currentData.summary,
-      "",
-      "KEY POINTS",
-      ...(currentData.keyPoints?.map(p => `• ${p}`) || []),
-      "",
-      `Sentiment: ${currentData.sentiment}`,
-      `Topics: ${currentData.topics?.join(", ")}`,
-    ].join("\n");
+    // ── Render comments ───────────────────────
+    function renderComments(data) {
+      document.getElementById("cThumbnail").src      = data.thumbnail;
+      document.getElementById("cVideoTitle").textContent  = data.title;
+      document.getElementById("cVideoChannel").textContent = data.channel;
+      document.getElementById("cVideoDuration").textContent = data.duration;
+      document.getElementById("cCommentCount").textContent = Number(data.commentCount).toLocaleString() + " comments";
+      document.getElementById("cWatchBtn").href = `https://youtube.com/watch?v=${data.videoId}`;
 
-    navigator.clipboard.writeText(text).then(() => {
-      const btns = document.querySelectorAll(".sm-copy-btn, .sm-action-btn.accent");
-      btns.forEach(btn => {
-        const orig = btn.textContent;
-        btn.textContent = "✓ Copied!";
-        setTimeout(() => btn.textContent = orig, 2000);
+      const sentBadge = document.getElementById("cOverallSentiment");
+      sentBadge.textContent = data.overallSentiment;
+      const sentClass = data.overallSentiment?.toLowerCase().includes("positive") ? "sent-pos"
+        : data.overallSentiment?.toLowerCase().includes("negative") ? "sent-neg"
+        : data.overallSentiment?.toLowerCase().includes("divided") ? "sent-mix"
+        : "sent-neu";
+      sentBadge.className = `sm-sentiment-badge ${sentClass}`;
+
+      document.getElementById("cOneLiner").textContent = data.oneLiner || "";
+
+      document.getElementById("cSentimentBars").innerHTML = [
+        { label: "👍 Support", val: data.supportPercent || 0, color: "#22c55e" },
+        { label: "👎 Oppose",  val: data.opposePercent  || 0, color: "#ef4444" },
+        { label: "😐 Neutral", val: data.neutralPercent || 0, color: "#6b7280" },
+      ].map(b => `
+        <div class="sm-sent-bar-row">
+          <span class="sm-sent-bar-label">${b.label}</span>
+          <div class="sm-sent-bar-track">
+            <div class="sm-sent-bar-fill" style="width:${b.val}%;background:${b.color}"></div>
+          </div>
+          <span class="sm-sent-bar-val">${b.val}%</span>
+        </div>
+      `).join("");
+
+      document.getElementById("cLove").innerHTML =
+        (data.whatPeopleLove || []).map(p => `<li>${p}</li>`).join("") || "<li>No specific praise found</li>";
+
+      document.getElementById("cDislike").innerHTML =
+        (data.whatPeopleDislike || []).map(p => `<li>${p}</li>`).join("") || "<li>No specific criticism found</li>";
+
+      document.getElementById("cThemes").innerHTML =
+        (data.mainThemes || []).map(t => `
+          <div class="sm-theme-item">
+            <span class="sm-theme-badge sm-theme-${(t.sentiment||"neutral").toLowerCase()}">${t.sentiment}</span>
+            <div>
+              <div class="sm-theme-title">${t.theme}</div>
+              <div class="sm-theme-desc">${t.description}</div>
+            </div>
+          </div>
+        `).join("");
+
+      if (data.controversialPoint) {
+        document.getElementById("cControversial").textContent = data.controversialPoint;
+        document.getElementById("cControversialCard").style.display = "block";
+      } else {
+        document.getElementById("cControversialCard").style.display = "none";
+      }
+      const questions = data.commonQuestions || [];
+      if (questions.length > 0) {
+        document.getElementById("cQuestions").innerHTML = questions.map(q => `<li>${q}</li>`).join("");
+        document.getElementById("cQuestionsCard").style.display = "block";
+      } else {
+        document.getElementById("cQuestionsCard").style.display = "none";
+      }
+      if (data.memorableComment) {
+        document.getElementById("cMemorable").textContent = data.memorableComment;
+        document.getElementById("cMemorableCard").style.display = "block";
+      } else {
+        document.getElementById("cMemorableCard").style.display = "none";
+      }
+
+      document.getElementById("cTopComments").innerHTML =
+        (data.topComments || []).map(c => `
+          <div class="sm-comment-item">
+            <div class="sm-comment-meta">
+              <span>${c.author}</span>
+              <span class="sm-comment-likes">👍 ${c.likes.toLocaleString()}</span>
+            </div>
+            <p class="sm-comment-text">${c.text}</p>
+          </div>
+        `).join("");
+
+      document.getElementById("resultComments").style.display = "block";
+    }
+
+    // ── Render result ─────────────────────────
+    function renderResult(data) {
+      document.getElementById("thumbnail").src = data.thumbnail;
+      document.getElementById("videoTitle").textContent = data.title;
+      document.getElementById("videoChannel").textContent = data.channel;
+      document.getElementById("videoDuration").textContent = data.duration;
+      document.getElementById("watchBtn").href = `https://youtube.com/watch?v=${data.videoId}`;
+
+      const sentMap = {
+        "Positive": { cls: "sent-pos", label: "😊 Positive" },
+        "Negative": { cls: "sent-neg", label: "😔 Negative" },
+        "Mixed":    { cls: "sent-mix", label: "🤔 Mixed" },
+        "Neutral":  { cls: "sent-neu", label: "😐 Neutral" },
+      };
+      const sent = sentMap[data.sentiment] || sentMap["Neutral"];
+      const sentBadge = document.getElementById("sentimentBadge");
+      sentBadge.textContent = sent.label;
+      sentBadge.className = `sm-sentiment-badge ${sent.cls}`;
+
+      document.getElementById("readTimeBadge").textContent = `📖 ${data.readTime}`;
+
+      const topicsRow = document.getElementById("topicsRow");
+      topicsRow.innerHTML = data.topics?.map(t => `<span class="sm-topic">${t}</span>`).join("") || "";
+
+      const existingNotice = document.getElementById("metaNotice");
+      if (existingNotice) existingNotice.remove();
+      if (data.sourceNote === "metadata") {
+        const notice = document.createElement("div");
+        notice.id = "metaNotice";
+        notice.style.cssText = "font-size:0.72rem;color:var(--muted);padding:0.5rem
+  0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;";
+        notice.textContent = "⚠ No transcript found — summary based on video title and description.";
+        document.getElementById("result").insertBefore(notice, document.getElementById("topicsRow"));
+      }
+
+      document.getElementById("summaryText").textContent = data.summary;
+
+      const kp = document.getElementById("keyPoints");
+      kp.innerHTML = data.keyPoints?.map(p => `<li>${p}</li>`).join("") || "";
+
+      if (data.quote && activeMode === "detailed") {
+        document.getElementById("quoteText").textContent = data.quote;
+        document.getElementById("quoteCard").style.display = "block";
+      } else {
+        document.getElementById("quoteCard").style.display = "none";
+      }
+
+      document.getElementById("result").style.display = "block";
+    }
+
+    // ── No transcript ─────────────────────────
+    function showNoTranscript(data) {
+      if (data.title) {
+        document.getElementById("ntVideoInfo").innerHTML = `
+          <img src="${data.thumbnail}" style="width:100%;border-radius:8px;margin-bottom:0.75rem;">
+          <strong>${data.title}</strong><br>
+          <span style="font-size:0.8rem;color:var(--muted-light)">${data.channel}</span>
+        `;
+      }
+      document.getElementById("noTranscript").style.display = "flex";
+    }
+
+    // ── Copy summary ──────────────────────────
+    function copySummary() {
+      if (!currentData) return;
+      const text = [
+        currentData.title,
+        "",
+        "SUMMARY",
+        currentData.summary,
+        "",
+        "KEY POINTS",
+        ...(currentData.keyPoints?.map(p => `• ${p}`) || []),
+        "",
+        `Sentiment: ${currentData.sentiment}`,
+        `Topics: ${currentData.topics?.join(", ")}`,
+      ].join("\n");
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btns = document.querySelectorAll(".sm-copy-btn, .sm-action-btn.accent");
+        btns.forEach(btn => {
+          const orig = btn.textContent;
+          btn.textContent = "✓ Copied!";
+          setTimeout(() => btn.textContent = orig, 2000);
+        });
       });
-    });
-  }
+    }
 
-  // ── Reset ─────────────────────────────────
-  function resetApp() {
-  document.getElementById("hero").style.display            = "block";
-  document.getElementById("result").style.display          = "none";
-  document.getElementById("resultComments").style.display  = "none"; // ← add this
-  document.getElementById("noTranscript").style.display    = "none";
-  document.getElementById("loader").style.display          = "none";
-  currentData = null;
-}
-</script>
-</body>
-</html>
+    // ── Reset ─────────────────────────────────
+    function resetApp() {
+      document.getElementById("hero").style.display = "block";
+      document.getElementById("result").style.display = "none";
+      document.getElementById("resultComments").style.display = "none";
+      document.getElementById("noTranscript").style.display = "none";
+      document.getElementById("loader").style.display = "none";
+      currentData = null;
+    }
+  </script>
+
+  </body>
+  </html>
