@@ -16,6 +16,8 @@ function safeParse(key, fallback) {
 const state = {
   apiKey: localStorage.getItem('lingo_api_key') || '',
   userName: localStorage.getItem('lingo_name') || '',
+  voiceRssKey: localStorage.getItem('lingo_voicerss_key') || '01125406ac2a402f9c4220776c91e310',
+  ttsVoice: localStorage.getItem('lingo_tts_voice') || 'en-us',
   savedWords: safeParse('lingo_saved_words', []),
   stats: safeParse('lingo_stats', { words: 0, messages: 0, grammar: 0, streak: 0, lastDate: '' }),
   chatMode: 'beginner',
@@ -77,6 +79,8 @@ apiKeyInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.g
 document.getElementById('openSettings').addEventListener('click', () => {
   document.getElementById('settingsApiKey').value = state.apiKey;
   document.getElementById('settingsName').value = state.userName;
+  document.getElementById('settingsVoiceRssKey').value = state.voiceRssKey;
+  document.getElementById('settingsVoice').value = state.ttsVoice;
   document.getElementById('settingsModal').classList.remove('hidden');
 });
 document.getElementById('closeSettings').addEventListener('click', () => {
@@ -85,9 +89,14 @@ document.getElementById('closeSettings').addEventListener('click', () => {
 document.getElementById('saveSettings').addEventListener('click', () => {
   const key = document.getElementById('settingsApiKey').value.trim();
   const name = document.getElementById('settingsName').value.trim();
+  const voiceRssKey = document.getElementById('settingsVoiceRssKey').value.trim();
+  const voice = document.getElementById('settingsVoice').value;
   if (key) { state.apiKey = key; localStorage.setItem('lingo_api_key', key); }
   state.userName = name;
   localStorage.setItem('lingo_name', name);
+  if (voiceRssKey) { state.voiceRssKey = voiceRssKey; localStorage.setItem('lingo_voicerss_key', voiceRssKey); }
+  state.ttsVoice = voice;
+  localStorage.setItem('lingo_tts_voice', voice);
   document.getElementById('settingsModal').classList.add('hidden');
   updateGreeting();
 });
@@ -270,34 +279,56 @@ function renderSavedWords() {
 }
 
 // ── Text to Speech ─────────────────────────────────────
-function speak(text, lang = 'en-US') {
+let currentAudio = null;
+
+async function speak(text) {
+  if (state.voiceRssKey) {
+    await speakVoiceRSS(text);
+  } else {
+    speakBrowser(text);
+  }
+}
+
+async function speakVoiceRSS(text) {
+  // Stop any currently playing audio
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+
+  const params = new URLSearchParams({
+    key: state.voiceRssKey,
+    src: text,
+    hl:  state.ttsVoice,   // e.g. "en-us"
+    r:   '-2',              // slightly slower — better for learners
+    c:   'mp3',
+    f:   '44khz_16bit_stereo',
+  });
+
+  const url = `https://api.voicerss.org/?${params}`;
+  try {
+    currentAudio = new Audio(url);
+    await currentAudio.play();
+  } catch (e) {
+    console.warn('VoiceRSS failed, falling back to browser TTS:', e);
+    speakBrowser(text);
+  }
+}
+
+function speakBrowser(text) {
   if (!('speechSynthesis' in window)) return;
-
-  // Chrome bug: speechSynthesis can get stuck in paused state — resume first
   window.speechSynthesis.cancel();
-
   const doSpeak = () => {
     const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = lang;
+    utt.lang = 'en-US';
     utt.rate = 0.85;
-
-    // Pick the best available English voice
     const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v => v.lang === lang && v.localService)
+    const preferred = voices.find(v => v.lang === 'en-US' && v.localService)
       || voices.find(v => v.lang.startsWith('en'))
       || voices[0];
     if (preferred) utt.voice = preferred;
-
     window.speechSynthesis.speak(utt);
   };
-
-  // Voices may not be ready yet (Chrome async load)
   const voices = window.speechSynthesis.getVoices();
-  if (voices.length) {
-    doSpeak();
-  } else {
-    window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
-  }
+  if (voices.length) doSpeak();
+  else window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
 }
 
 // ── Chat ───────────────────────────────────────────────
