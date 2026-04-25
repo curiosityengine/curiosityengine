@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lingo — English from Hindi, AI-powered</title>
+  <meta name="description" content="AI-powered English learning app for Hindi speakers. Learn vocabulary, practice conversation, and master grammar with AI explanations in Hindi." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- API Key Modal -->
+  <div id="apiModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-icon">🔑</div>
+      <h2>Groq API Key चाहिए</h2>
+      <p>AI features के लिए अपनी free Groq API key डालें।<br/>
+        <a href="https://console.groq.com" target="_blank">console.groq.com</a> पर free में बनाएं।
+      </p>
+      <input type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off" />
+      <button class="btn-primary" id="saveApiKey">शुरू करें →</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Settings</h2>
+      <label>Groq API Key</label>
+      <input type="password" id="settingsApiKey" placeholder="gsk_..." />
+      <label style="margin-top:12px">Display Name</label>
+      <input type="text" id="settingsName" placeholder="आपका नाम" />
+      <div class="modal-actions">
+        <button class="btn-secondary" id="closeSettings">Cancel</button>
+        <button class="btn-primary" id="saveSettings">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <img src="favicon.svg" width="32" height="32" alt="Lingo" />
+        <span>Lingo</span>
+      </div>
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="tab-btn" data-tab="vocab">Vocabulary</button>
+        <button class="tab-btn" data-tab="chat">Practice</button>
+        <button class="tab-btn" data-tab="grammar">Grammar</button>
+      </nav>
+      <button class="icon-btn" id="openSettings" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab-section active">
+      <div class="dashboard-hero">
+        <div>
+          <h1 id="greetingText">नमस्ते! 👋</h1>
+          <p class="subtitle">आज कुछ नया सीखते हैं</p>
+        </div>
+        <div class="streak-badge">
+          <span class="streak-fire">🔥</span>
+          <span id="streakCount">0</span>
+          <span class="streak-label">day streak</span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="statWords">0</div>
+          <div class="stat-label">Words Learned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statMessages">0</div>
+          <div class="stat-label">Conversations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statGrammar">0</div>
+          <div class="stat-label">Grammar Topics</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statStreak">0</div>
+          <div class="stat-label">Best Streak</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h2>Quick Start</h2>
+        <div class="action-cards">
+          <button class="action-card" data-goto="vocab">
+            <span class="action-icon">📚</span>
+            <span class="action-title">Word of the Day</span>
+            <span class="action-desc">नया शब्द सीखें</span>
+          </button>
+          <button class="action-card" data-goto="chat">
+            <span class="action-icon">💬</span>
+            <span class="action-title">Practice Chat</span>
+            <span class="action-desc">AI से बात करें</span>
+          </button>
+          <button class="action-card" data-goto="grammar">
+            <span class="action-icon">📖</span>
+            <span class="action-title">Grammar Lesson</span>
+            <span class="action-desc">Grammar सीखें</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="recent-words-section" id="recentWordsSection">
+        <h2>Recently Learned</h2>
+        <div id="recentWordsList" class="word-chips"></div>
+      </div>
+    </section>
+
+    <!-- VOCABULARY -->
+    <section id="tab-vocab" class="tab-section">
+      <div class="section-header">
+        <h2>Vocabulary</h2>
+        <p>Hindi शब्द डालें, AI English सिखाएगा</p>
+      </div>
+
+      <div class="vocab-input-row">
+        <input type="text" id="hindiWordInput" placeholder="हिंदी शब्द लिखें... (जैसे: खुशी)" />
+        <button class="btn-primary" id="learnWordBtn">
+          <span id="learnBtnText">सीखें →</span>
+          <span id="learnBtnLoader" class="loader hidden"></span>
+        </button>
+      </div>
+
+      <div id="vocabCard" class="vocab-card hidden">
+        <div class="vocab-card-header">
+          <div class="hindi-word" id="vcHindi"></div>
+          <button class="speak-btn" id="speakWordBtn" title="Pronunciation सुनें">🔊</button>
+        </div>
+        <div class="english-word" id="vcEnglish"></div>
+        <div class="pronunciation" id="vcPronun"></div>
+        <div class="divider"></div>
+        <div class="meaning-section">
+          <div class="meaning-label">Meaning (Hindi में)</div>
+          <div class="meaning-text" id="vcMeaning"></div>
+        </div>
+        <div class="examples-section">
+          <div class="meaning-label">Examples</div>
+          <div id="vcExamples" class="examples-list"></div>
+        </div>
+        <div class="synonyms-section" id="vcSynonymSection">
+          <div class="meaning-label">Synonyms</div>
+          <div id="vcSynonyms" class="word-chips"></div>
+        </div>
+        <div class="vocab-actions">
+          <button class="btn-secondary" id="saveWordBtn">💾 Save Word</button>
+          <button class="btn-primary" id="tryAnotherBtn">Try Another →</button>
+        </div>
+      </div>
+
+      <div id="savedWords" class="saved-section">
+        <h3>Saved Words <span id="savedCount" class="badge">0</span></h3>
+        <div id="savedWordsList" class="saved-words-grid"></div>
+      </div>
+    </section>
+
+    <!-- CHAT PRACTICE -->
+    <section id="tab-chat" class="tab-section">
+      <div class="section-header">
+        <h2>Conversation Practice</h2>
+        <p>AI के साथ English में बात करें — गलतियाँ सुधारेगा</p>
+      </div>
+
+      <div class="chat-modes">
+        <button class="mode-btn active" data-mode="beginner">🌱 Beginner</button>
+        <button class="mode-btn" data-mode="intermediate">⚡ Intermediate</button>
+        <button class="mode-btn" data-mode="advanced">🚀 Advanced</button>
+      </div>
+
+      <div class="chat-container">
+        <div id="chatMessages" class="chat-messages">
+          <div class="chat-message ai-message">
+            <div class="message-bubble">
+              Hello! Main aapka English practice partner hoon. 😊<br/>
+              Aap mujhse kisi bhi topic par English mein baat kar sakte hain — main aapki galtiyan sudharta rahunga aur Hindi mein explain karta rahunga.<br/><br/>
+              <strong>Start karein:</strong> Apne baare mein kuch batayein!
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Type in English ya Hinglish..." />
+          <button class="icon-btn speak-input-btn" id="voiceInputBtn" title="Voice input">🎤</button>
+          <button class="btn-primary" id="sendChatBtn">Send</button>
+        </div>
+        <div id="voiceStatus" class="voice-status hidden">🎤 Listening...</div>
+      </div>
+
+      <div class="chat-suggestions">
+        <div class="suggestions-label">Topic ideas:</div>
+        <div class="suggestion-chips" id="suggestionChips">
+          <button class="chip">My daily routine</button>
+          <button class="chip">My hobbies</button>
+          <button class="chip">My job or studies</button>
+          <button class="chip">Describe my city</button>
+          <button class="chip">My favourite food</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRAMMAR -->
+    <section id="tab-grammar" class="tab-section">
+      <div class="section-header">
+        <h2>Grammar Lessons</h2>
+        <p>Hindi में समझाई गई English grammar</p>
+      </div>
+
+      <div class="grammar-topics" id="grammarTopics">
+        <button class="grammar-topic-btn" data-topic="tenses">⏰ Tenses (काल)</button>
+        <button class="grammar-topic-btn" data-topic="articles">📌 Articles (a, an, the)</button>
+        <button class="grammar-topic-btn" data-topic="prepositions">🔗 Prepositions</button>
+        <button class="grammar-topic-btn" data-topic="modal-verbs">💡 Modal Verbs (can, should, must)</button>
+        <button class="grammar-topic-btn" data-topic="pronouns">👤 Pronouns</button>
+        <button class="grammar-topic-btn" data-topic="sentence-structure">🏗️ Sentence Structure</button>
+        <button class="grammar-topic-btn" data-topic="question-formation">❓ Questions बनाना</button>
+        <button class="grammar-topic-btn" data-topic="conjunctions">🔀 Conjunctions (and, but, because)</button>
+        <button class="grammar-topic-btn" data-topic="passive-voice">🔄 Passive Voice</button>
+        <button class="grammar-topic-btn" data-topic="conditionals">🎯 Conditionals (if sentences)</button>
+      </div>
+
+      <div id="grammarLesson" class="grammar-lesson hidden">
+        <div class="lesson-header">
+          <button class="back-btn" id="backToTopics">← Topics</button>
+          <h3 id="lessonTitle"></h3>
+        </div>
+        <div id="lessonLoader" class="lesson-loader">
+          <div class="loader"></div>
+          <span>Lesson तैयार हो रही है...</span>
+        </div>
+        <div id="lessonContent" class="lesson-content hidden"></div>
+        <div id="lessonQuiz" class="lesson-quiz hidden">
+          <h4>Quick Quiz 🧠</h4>
+          <div id="quizQuestions"></div>
+          <button class="btn-primary" id="checkQuizBtn">Check Answers</button>
+          <div id="quizResult" class="quiz-result hidden"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
