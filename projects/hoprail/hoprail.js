@@ -460,7 +460,7 @@ Rules:
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "openai/gpt-oss-120b",
+      model: "llama-3.3-70b-versatile",
       temperature: 0,
       max_tokens: 2000,
       messages: [
