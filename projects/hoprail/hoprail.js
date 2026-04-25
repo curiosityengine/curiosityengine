@@ -460,9 +460,9 @@ Rules:
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       temperature: 0,
-      max_tokens: 4000,
+      max_tokens: 2000,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
