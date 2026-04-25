@@ -50,6 +50,7 @@ function loadHistory(index) {
   if (!h) return;
   inputBox.value = h.input;
   currentExplanation = "";
+  lastQuery = h.input;
   hideExplanation();
   setResult(h.answer, "pop");
   showVariations(h.input, h.answer);
@@ -82,6 +83,7 @@ function showVariations(input, answer) {
 
 function applyVariation(value, label) {
   setResult(value, "pop");
+  showVariations(lastQuery, value);
   document.querySelectorAll(".var-btn").forEach(b => {
     if (b.textContent === label) {
       b.classList.add("active");
@@ -111,19 +113,42 @@ function hideExplanation() {
   if (btn) btn.classList.remove("active");
 }
 
-function toggleExplanation() {
+async function toggleExplanation() {
   const box = document.getElementById("explanationBox");
   const btn = document.getElementById("explainBtn");
-  if (!box || !btn || !currentExplanation) return;
+  if (!box || !btn) return;
   const isOpen = box.style.display === "block";
-  box.style.display = isOpen ? "none" : "block";
+  if (isOpen) {
+    box.style.display = "none";
+    btn.classList.remove("active");
+    return;
+  }
+  if (!currentExplanation) {
+    const query = lastQuery || inputBox.value.trim();
+    if (!query) return;
+    const prevText = btn.textContent;
+    btn.textContent = "fetching...";
+    try {
+      const res = await fetch(`${WORKER_URL}/api/calculate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: query }),
+      });
+      const data = await res.json();
+      currentExplanation = data.explanation || "";
+    } catch {}
+    btn.textContent = prevText;
+    if (!currentExplanation) return;
+  }
+  box.style.display = "block";
   box.textContent   = currentExplanation;
-  btn.classList.toggle("active", !isOpen);
+  btn.classList.add("active");
 }
 
 // ── Request ID ─────────────────────────────
 let currentRequestId = 0;
 let debounceTimer    = null;
+let lastQuery        = "";
 
 // ── Input handler ─────────────────────────
 inputBox.addEventListener("input", () => {
@@ -165,6 +190,7 @@ async function calculate(input) {
     const ans = typeof cached === "object" ? cached.answer : cached;
     const exp = typeof cached === "object" ? cached.explanation : "";
     currentExplanation = exp;
+    lastQuery = input;
     setResult(ans, "pop");
     showVariations(key, ans);
     return;
@@ -185,6 +211,7 @@ async function calculate(input) {
 
     const answer      = (data.answer ?? "?").toString().trim();
     currentExplanation = data.explanation || "";
+    lastQuery = input;
 
     if (answer !== "?" && answer !== "!" && answer !== "_") {
   cacheSet(key, { answer, explanation: currentExplanation });
