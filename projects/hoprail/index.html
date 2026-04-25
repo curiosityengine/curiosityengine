@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="hoprail.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>HopRail — AI Indian Railways Route Planner | Find Hop Routes</title>
+  <meta name="description" content="HopRail uses AI to plan Indian Railways journeys between poorly connected stations. Find the best hop routes via major junctions when no direct train exists.">
+  <meta name="keywords" content="Indian Railways route planner, hop route train, no direct train India, IRCTC alternate route, train journey planner India">
+  <link rel="canonical" href="https://princeai.eu.cc/projects/hoprail/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://princeai.eu.cc/projects/hoprail/">
+  <meta property="og:title" content="HopRail — AI Route Planner for Indian Railways">
+  <meta property="og:description" content="Find the best hop routes when no direct train runs. AI-powered journey planning via major railway junctions.">
+  <meta property="og:image" content="https://princeai.eu.cc/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HopRail — AI Route Planner for Indian Railways">
+  <meta name="twitter:description" content="Plan journeys via hop stations when direct trains are rare or non-existent.">
+  <meta name="twitter:image" content="https://princeai.eu.cc/og-image.svg">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "HopRail",
+    "url": "https://princeai.eu.cc/projects/hoprail/",
+    "description": "AI-powered Indian Railways route planner for poorly connected station pairs. Suggests hop routes via major junctions.",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="hr-nav">
+  <a href="index.html" class="hr-logo">Hop<span>Rail</span></a>
+  <div class="hr-nav-right">
+    <button class="hr-key-btn" onclick="openKeyModal()">
+      <span class="hr-key-dot" id="keyDot"></span>
+      Groq API Key
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hr-hero" id="hero">
+  <div class="hr-hero-badge">AI-Powered Route Planning</div>
+  <h1>Find your way<br><em>between any stations</em></h1>
+  <p class="hr-hero-sub">No direct train? No problem. HopRail maps the best hop routes via major junctions — so you always have a path.</p>
+
+  <div class="hr-form-wrap">
+    <div class="hr-station-pair">
+      <div class="hr-station-inputs">
+        <!-- From -->
+        <div class="hr-input-row" style="position:relative">
+          <span class="hr-node hr-node-from"></span>
+          <input
+            type="text"
+            id="fromInput"
+            class="hr-station-input"
+            placeholder="From — e.g. Raipur Junction"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button class="hr-clear-input" id="clearFrom" title="Clear">✕</button>
+          <div class="hr-autocomplete" id="fromList"></div>
+        </div>
+        <!-- To -->
+        <div class="hr-input-row" style="position:relative">
+          <span class="hr-node hr-node-to"></span>
+          <input
+            type="text"
+            id="toInput"
+            class="hr-station-input"
+            placeholder="To — e.g. Gaya Junction"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button class="hr-clear-input" id="clearTo" title="Clear">✕</button>
+          <div class="hr-autocomplete" id="toList"></div>
+        </div>
+      </div>
+
+      <!-- Swap -->
+      <div class="hr-swap-col">
+        <button class="hr-swap-btn" onclick="swapStations()" title="Swap stations">⇅</button>
+      </div>
+    </div>
+
+    <button class="hr-find-btn" onclick="findRoutes()">Find Routes →</button>
+  </div>
+
+  <div class="hr-examples">
+    <span class="hr-ex-label">Try:</span>
+    <button class="hr-ex-chip" onclick="setExample('Raipur Junction','Gaya Junction')">Raipur → Gaya</button>
+    <button class="hr-ex-chip" onclick="setExample('Jagdalpur Junction','Patna Junction')">Jagdalpur → Patna</button>
+    <button class="hr-ex-chip" onclick="setExample('Silchar Junction','New Delhi Junction')">Silchar → Delhi</button>
+    <button class="hr-ex-chip" onclick="setExample('Dimapur Junction','Mumbai CSMT')">Dimapur → Mumbai</button>
+  </div>
+</section>
+
+<!-- LOADER -->
+<div class="hr-loader" id="loader" style="display:none">
+  <div class="hr-loader-dots">
+    <div class="hr-dot"></div>
+    <div class="hr-dot"></div>
+    <div class="hr-dot"></div>
+  </div>
+  <p class="hr-loader-step" id="loaderStepText">Checking direct train connections…</p>
+  <div class="hr-loader-progress">
+    <div class="hr-loader-bar" id="loaderBar"></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<main class="hr-main" id="resultsMain">
+
+  <div class="hr-results-header">
+    <div>
+      <div class="hr-results-route">
+        <span id="resultFrom"></span>
+        <span class="hr-arrow">→</span>
+        <span id="resultTo"></span>
+      </div>
+      <p class="hr-results-sub">AI route analysis · Powered by Groq</p>
+    </div>
+    <button class="hr-new-search" onclick="resetSearch()">← New Search</button>
+  </div>
+
+  <!-- Direct trains -->
+  <div class="hr-direct-section" id="directSection"></div>
+
+  <!-- Hop routes -->
+  <div class="hr-hop-section" id="hopSection" style="display:none">
+    <p class="hr-section-label" id="hopSectionLabel">Recommended Hop Routes</p>
+    <div class="hr-routes-list" id="routesList"></div>
+  </div>
+
+  <!-- Insight -->
+  <div class="hr-insight" id="insightBox" style="display:none">
+    <span class="hr-insight-icon">✦</span>
+    <p class="hr-insight-text" id="insightText"></p>
+  </div>
+
+</main>
+
+<!-- EMPTY / ERROR -->
+<div class="hr-empty" id="emptyState" style="display:none">
+  <div class="hr-empty-icon">◎</div>
+  <h3 class="hr-empty-title">Couldn't plan this route</h3>
+  <p class="hr-empty-sub" id="emptyMsg">Something went wrong. Please check your API key and try again.</p>
+  <button class="hr-new-search" style="margin-top:1.5rem" onclick="resetSearch()">← Try again</button>
+</div>
+
+<!-- API KEY MODAL -->
+<div class="hr-modal-overlay" id="keyModal">
+  <div class="hr-modal">
+    <div class="hr-modal-title">Groq API Key</div>
+    <p class="hr-modal-sub">
+      HopRail uses the Groq AI API for route analysis. Get a free key at
+      <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a>
+      — it's free and instant to set up.
+    </p>
+    <div class="hr-key-input-wrap">
+      <input
+        type="password"
+        id="keyInput"
+        class="hr-key-input"
+        placeholder="gsk_…"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <button class="hr-key-save-btn" onclick="saveApiKey()">Save</button>
+    </div>
+    <p class="hr-modal-note">Your key is stored only in your browser's localStorage and never sent anywhere except Groq's API.</p>
+    <button class="hr-modal-close" onclick="closeKeyModal()">Dismiss</button>
+  </div>
+</div>
+
+<footer class="hr-footer">
+  © 2026 HopRail · Built by Prince · Powered by Groq AI
+  <span style="opacity:0.6">Route data is AI-generated — always verify on IRCTC before booking.</span>
+</footer>
+
+<script src="hoprail.js"></script>
+</body>
+</html>
