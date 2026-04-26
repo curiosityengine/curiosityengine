@@ -76,7 +76,8 @@ a { text-decoration: none; color: inherit; }
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--muted);
 }
-.hr-key-dot.set { background: var(--green); }
+.hr-key-dot.set  { background: var(--green); }
+.hr-key-dot.full { background: var(--accent); }
 
 /* ── HERO ── */
 .hr-hero {
@@ -559,6 +560,21 @@ a { text-decoration: none; color: inherit; }
 }
 .hr-key-save-btn:hover { opacity: 0.88; }
 
+.hr-modal-section-label {
+  font-size: 0.78rem; font-weight: 600; color: var(--text);
+  margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.hr-modal-badge {
+  font-size: 0.58rem; padding: 0.15rem 0.5rem; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+}
+.hr-modal-required { background: rgba(255,215,0,0.12); color: var(--accent); border: 1px solid rgba(255,215,0,0.25); }
+.hr-modal-optional { background: rgba(255,255,255,0.05); color: var(--muted-light); border: 1px solid var(--border); }
+
+.hr-modal-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-top: 1.25rem;
+}
 .hr-modal-note {
   font-size: 0.7rem; color: var(--muted); line-height: 1.55;
 }
