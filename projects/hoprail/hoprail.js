@@ -181,14 +181,14 @@ const STATIONS = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let fromStation  = null;
-let toStation    = null;
-let loaderTimer  = null;
-let loaderStep   = 0;
-let verifiedByApi = false; // true when RapidAPI was used for direct train data
+let fromStation   = null;
+let toStation     = null;
+let loaderTimer   = null;
+let loaderStep    = 0;
+let verifiedByApi = false;
 
 const LOADER_STEPS = [
-  "Checking direct train connections…",
+  "Fetching live train data…",
   "Identifying major junctions nearby…",
   "Mapping hop routes via key corridors…",
   "Analysing reliability and wait risk…",
@@ -211,7 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("fromInput").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("toInput").focus(); });
   document.getElementById("toInput").addEventListener("keydown",   e => { if (e.key === "Enter") findRoutes(); });
 
-  // Clear buttons
   document.getElementById("clearFrom").addEventListener("click", () => clearStation("from"));
   document.getElementById("clearTo").addEventListener("click",   () => clearStation("to"));
 
@@ -338,8 +337,8 @@ function setExample(fromName, toName) {
 }
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
-function getApiKey()      { return localStorage.getItem("hoprail_groq_key")   || ""; }
-function getRapidApiKey() { return localStorage.getItem("hoprail_rapid_key")  || ""; }
+function getApiKey()      { return localStorage.getItem("hoprail_groq_key")  || ""; }
+function getRapidApiKey() { return localStorage.getItem("hoprail_rapid_key") || ""; }
 
 function saveApiKey() {
   const groq  = document.getElementById("keyInput").value.trim();
@@ -360,46 +359,99 @@ function openKeyModal() {
 function closeKeyModal() { document.getElementById("keyModal").classList.remove("open"); }
 
 function updateKeyDot() {
-  const dot      = document.getElementById("keyDot");
-  const hasGroq  = !!getApiKey();
-  const hasRapid = !!getRapidApiKey();
-  dot.classList.toggle("set",  hasGroq && !hasRapid);
-  dot.classList.toggle("full", hasGroq &&  hasRapid);
+  const dot = document.getElementById("keyDot");
+  dot.classList.remove("set", "full");
+  if (getApiKey() && getRapidApiKey()) dot.classList.add("full");
+  else if (getApiKey())                dot.classList.add("set");
 }
 
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeKeyModal(); });
 
 // ── RapidAPI — Fetch Real Direct Trains ───────────────────────────────────────
+// The trainBetweenStations API is date-specific: a weekly train only appears on
+// its running day. We query all 7 days in parallel so no train is ever missed.
 async function fetchDirectTrains(fromCode, toCode, rapidKey) {
-  const today = new Date();
-  const dd    = String(today.getDate()).padStart(2, "0");
-  const mm    = String(today.getMonth() + 1).padStart(2, "0");
-  const yyyy  = today.getFullYear();
-  const date  = `${dd}-${mm}-${yyyy}`;
+  const requests = [];
 
-  const url = `https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations` +
-              `?fromStationCode=${encodeURIComponent(fromCode)}` +
-              `&toStationCode=${encodeURIComponent(toCode)}` +
-              `&dateOfJourney=${date}`;
+  for (let offset = 0; offset < 7; offset++) {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    const dd   = String(d.getDate()).padStart(2, "0");
+    const mm   = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const dateStr = `${dd}-${mm}-${yyyy}`;
 
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "X-RapidAPI-Key":  rapidKey,
-      "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
-    },
-  });
+    requests.push(
+      fetch(
+        `https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations` +
+        `?fromStationCode=${encodeURIComponent(fromCode)}` +
+        `&toStationCode=${encodeURIComponent(toCode)}` +
+        `&dateOfJourney=${dateStr}`,
+        {
+          method: "GET",
+          headers: {
+            "X-RapidAPI-Key":  rapidKey,
+            "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
+          },
+        }
+      ).then(async r => {
+        if (r.status === 401 || r.status === 403) throw new Error("auth");
+        if (r.status === 429) throw new Error("rate");
+        if (!r.ok) return null;
+        return r.json();
+      })
+    );
+  }
 
-  if (res.status === 403 || res.status === 401)
-    throw new Error("Invalid RapidAPI key. Please check your key in settings.");
-  if (res.status === 429)
-    throw new Error("RapidAPI rate limit hit. Please wait a moment.");
-  if (!res.ok)
-    throw new Error(`RapidAPI error ${res.status}`);
+  const results = await Promise.allSettled(requests);
 
-  const json = await res.json();
-  // irctc1 returns { status: true, data: [...] }
-  return Array.isArray(json.data) ? json.data : [];
+  // Bubble up hard errors
+  for (const r of results) {
+    if (r.status === "rejected") {
+      if (r.reason?.message === "auth")
+        throw new Error("Invalid RapidAPI key. Please check your key in settings.");
+      if (r.reason?.message === "rate")
+        throw new Error("RapidAPI rate limit hit. Please wait a moment.");
+    }
+  }
+
+  // Merge all days, deduplicate by train number
+  const seen = new Map();
+  for (const r of results) {
+    if (r.status === "fulfilled" && Array.isArray(r.value?.data)) {
+      for (const train of r.value.data) {
+        if (!seen.has(train.train_number)) {
+          seen.set(train.train_number, train);
+        }
+      }
+    }
+  }
+
+  return [...seen.values()];
+}
+
+function formatRealTrainsForPrompt(trains) {
+  return trains.slice(0, 12).map(t => {
+    const dur     = t.duration || t.travel_time || "?";
+    const runDays = t.run_days;
+    let daysStr;
+    if (Array.isArray(runDays)) {
+      daysStr = runDays.join(", ");
+    } else if (runDays && typeof runDays === "object") {
+      daysStr = Object.entries(runDays).filter(([, v]) => v).map(([k]) => k).join(", ");
+    } else {
+      daysStr = String(runDays || "daily");
+    }
+    return `  • ${t.train_name} (${t.train_number}) — runs: ${daysStr} — duration: ~${dur}`;
+  }).join("\n");
+}
+
+function realTrainsToDaysPerWeek(runDays) {
+  if (!runDays) return null;
+  if (Array.isArray(runDays)) return runDays.length;
+  if (typeof runDays === "object")
+    return Object.values(runDays).filter(v => v === 1 || v === "1" || v === true).length;
+  return null;
 }
 
 // ── Main Search ───────────────────────────────────────────────────────────────
@@ -420,25 +472,28 @@ async function findRoutes() {
 
   showLoader();
   hideAll();
+  verifiedByApi = false;
 
   try {
-    // Step 1: Fetch real direct train data from RapidAPI (if key is set)
     let realTrains = null;
     const rapidKey = getRapidApiKey();
 
     if (rapidKey && fromStation?.code && toStation?.code) {
-      setLoaderText("Fetching live train data from Indian Railways…", 10);
+      setLoaderText("Fetching live train data across all days…", 15);
       try {
         realTrains = await fetchDirectTrains(fromStation.code, toStation.code, rapidKey);
+        verifiedByApi = true;
       } catch (e) {
-        // Non-fatal — fall back to pure LLM if RapidAPI fails
-        console.warn("RapidAPI fetch failed, using LLM only:", e.message);
+        if (e.message.includes("Invalid RapidAPI") || e.message.includes("rate limit")) {
+          hideLoader();
+          showError(e.message);
+          return;
+        }
+        console.warn("RapidAPI failed, falling back to LLM:", e.message);
       }
     }
 
-    // Step 2: Call Groq with real data injected as context
-    setLoaderText("Planning hop routes with AI…", 40);
-    verifiedByApi = realTrains !== null;
+    setLoaderText("Planning routes with AI…", 55);
     const data = await callGroq(fromName, toName, groqKey, realTrains);
     hideLoader();
     renderResults(data, fromName, toName);
@@ -458,26 +513,23 @@ function shake(inputId) {
 
 // ── Groq API ──────────────────────────────────────────────────────────────────
 async function callGroq(from, to, apiKey, realTrains = null) {
-  // Build verified data block from RapidAPI results
   let verifiedBlock = "";
+
   if (realTrains !== null) {
     if (realTrains.length === 0) {
-      verifiedBlock = `\n⚠ VERIFIED BY IRCTC API: No direct trains found between these stations on today's date. Use frequency "none" and recommendation "hop".\n`;
+      verifiedBlock = `\n⚠ VERIFIED BY IRCTC API: Zero direct trains found between these exact stations across the next 7 days. Use frequency="none", count=0, recommendation="hop".\n`;
     } else {
-      const lines = realTrains.slice(0, 8).map(t => {
-        const days = Array.isArray(t.run_days) ? t.run_days.join(", ") : (t.run_days || "N/A");
-        const dur  = t.duration || t.travel_time || "?";
-        return `  • ${t.train_name} (${t.train_number}) — runs: ${days} — duration: ~${dur}`;
-      }).join("\n");
-      verifiedBlock = `\n✅ VERIFIED BY IRCTC API — use this data exactly for directTrains, do NOT contradict it:\n${lines}\n`;
+      verifiedBlock = `\n✅ VERIFIED BY IRCTC API — use this data exactly for directTrains, do NOT change or omit any train:\n${formatRealTrainsForPrompt(realTrains)}\n(Total verified direct trains: ${realTrains.length})\n`;
     }
   }
 
-  const systemPrompt = `You are HopRail, an Indian Railways expert. Respond with valid JSON only — no markdown, no prose.`;
+  const systemPrompt = `You are HopRail, an Indian Railways expert. Respond with valid JSON only — no markdown, no prose, no code fences.`;
 
   const userPrompt = `Journey: "${from}" → "${to}" on Indian Railways.
 ${verifiedBlock}
-Return JSON:
+${realTrains === null ? `No live API data available. Use your knowledge — if even one weekly train might exist on this route, use frequency="rare" rather than "none".` : ""}
+
+Return this exact JSON:
 {
   "sourceStation": "station name",
   "destinationStation": "station name",
@@ -485,7 +537,7 @@ Return JSON:
     "frequency": "none|rare|few_weekly|daily|multiple_daily",
     "count": 0,
     "trains": [{"name": "Train Name", "number": "12345", "daysPerWeek": 1, "approxDuration": "~18 hrs"}],
-    "note": "one line about direct connectivity"
+    "note": "one-line note about direct connectivity"
   },
   "recommendation": "direct|hop",
   "hopRoutes": [
@@ -515,15 +567,15 @@ Return JSON:
 }
 
 Rules:
-- If VERIFIED DATA is provided above, copy it exactly into directTrains — do not guess or override it.
-- If no verified data, use "rare" instead of "none" when uncertain (especially for Northeast India routes).
-- Give 2–3 hopRoutes when recommendation is hop. Use your knowledge of Indian Railways junctions for routing.
+- If VERIFIED DATA is provided above, copy it into directTrains exactly as given.
+- Always include 2–3 hopRoutes when recommendation is "hop".
+- recommendation="direct" if frequency is few_weekly/daily/multiple_daily; "hop" if none/rare.
 - waitRisk: low=multiple daily, medium=once daily, high=few per week.`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type":  "application/json",
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
@@ -547,26 +599,16 @@ Rules:
 
   const json = await res.json();
   const raw  = json.choices?.[0]?.message?.content || "";
-
   return parseGroqResponse(raw);
 }
 
 function parseGroqResponse(raw) {
   let text = raw.trim();
-
-  // Try direct parse first (response_format: json_object should give clean JSON)
   try { return JSON.parse(text); } catch {}
-
-  // Strip any markdown fences
   text = text.replace(/^```(?:json)?\s*/im, "").replace(/\s*```\s*$/im, "").trim();
   try { return JSON.parse(text); } catch {}
-
-  // Last resort: extract the outermost JSON object
   const match = text.match(/\{[\s\S]*\}/);
-  if (match) {
-    try { return JSON.parse(match[0]); } catch {}
-  }
-
+  if (match) { try { return JSON.parse(match[0]); } catch {} }
   throw new Error("Could not parse AI response. Please try again.");
 }
 
@@ -610,13 +652,9 @@ function renderResults(data, fromRaw, toRaw) {
   document.getElementById("resultTo").textContent   = to;
 
   const isDirect = data.recommendation === "direct";
-  const trains   = data.directTrains?.trains || [];
-  const freq     = data.directTrains?.frequency || "none";
 
-  // Direct trains section
   renderDirectSection(data.directTrains, isDirect);
 
-  // Hop routes
   const hopSection = document.getElementById("hopSection");
   if (!isDirect && data.hopRoutes?.length) {
     document.getElementById("hopSectionLabel").textContent =
@@ -633,7 +671,6 @@ function renderResults(data, fromRaw, toRaw) {
     hopSection.style.display = "none";
   }
 
-  // Insight
   if (data.insight) {
     document.getElementById("insightText").textContent = data.insight;
     document.getElementById("insightBox").style.display = "flex";
@@ -654,12 +691,12 @@ function renderDirectSection(directTrains, isDirect) {
 
   let cls, icon, title, sub;
 
-  if (isDirect) {
+  if (isDirect || freq === "few_weekly" || freq === "daily" || freq === "multiple_daily") {
     cls   = "good";
     icon  = "✦";
     title = "Direct trains available";
     sub   = note || `${trains.length} direct train${trains.length !== 1 ? "s" : ""} found`;
-  } else if (freq === "rare" || freq === "weekly" || freq === "few_weekly") {
+  } else if (freq === "rare" || freq === "weekly") {
     cls   = "sparse";
     icon  = "⚠";
     title = "Very limited direct trains";
@@ -667,10 +704,10 @@ function renderDirectSection(directTrains, isDirect) {
   } else {
     cls   = "none";
     icon  = "✕";
-    title = verifiedByApi ? "No direct trains found" : "No direct trains found by AI";
-    sub   = note || (verifiedByApi
-      ? "Confirmed by Indian Railways data — a hop route is your best option"
-      : "AI estimate — verify on IRCTC before assuming none exist");
+    title = verifiedByApi ? "No direct trains" : "No direct trains (AI estimate)";
+    sub   = verifiedByApi
+      ? (note || "Verified by IRCTC data — a hop route is your best option")
+      : (note || "AI estimate — always verify on IRCTC before assuming none exist");
   }
 
   const trainsHtml = trains.length ? `
@@ -684,15 +721,20 @@ function renderDirectSection(directTrains, isDirect) {
       `).join("")}
     </div>` : "";
 
+  const verifiedBadge = verifiedByApi
+    ? `<span style="font-size:0.68rem;color:var(--accent);opacity:0.8;margin-left:auto">✓ IRCTC verified</span>`
+    : `<span style="font-size:0.68rem;color:var(--muted-light);margin-left:auto">AI estimate</span>`;
+
   section.innerHTML = `
     <p class="hr-section-label">Direct Connectivity</p>
     <div class="hr-direct-card ${cls}">
       <div class="hr-direct-header">
         <span class="hr-direct-icon">${icon}</span>
-        <div>
+        <div style="flex:1">
           <div class="hr-direct-title">${title}</div>
           <div class="hr-direct-sub">${escHtml(sub)}</div>
         </div>
+        ${verifiedBadge}
       </div>
       ${trainsHtml}
     </div>
@@ -700,18 +742,17 @@ function renderDirectSection(directTrains, isDirect) {
 }
 
 function renderRouteCard(route, index) {
-  const legs = route.legs || [];
+  const legs     = route.legs || [];
   const stations = buildStationList(legs);
 
   const stripHtml = `
     <div class="hr-route-strip">
       <div class="hr-strip-inner">
         ${stations.map((s, i) => {
-          const isFirst = i === 0;
-          const isLast  = i === stations.length - 1;
-          const cls     = isFirst ? "origin" : isLast ? "dest" : "hop";
-          const lineHtml = i < stations.length - 1
-            ? `<div class="hr-strip-line"></div>` : "";
+          const isFirst  = i === 0;
+          const isLast   = i === stations.length - 1;
+          const cls      = isFirst ? "origin" : isLast ? "dest" : "hop";
+          const lineHtml = i < stations.length - 1 ? `<div class="hr-strip-line"></div>` : "";
           return `
             <div class="hr-strip-station">
               <div class="hr-strip-dot ${cls}"></div>
@@ -798,8 +839,8 @@ function waitLabel(risk) {
 }
 
 function reliabilityLabel(r) {
-  if (r === "high")   return "● High reliability";
-  if (r === "low")    return "● Low reliability";
+  if (r === "high") return "● High reliability";
+  if (r === "low")  return "● Low reliability";
   return "● Medium reliability";
 }
 
