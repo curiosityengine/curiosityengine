@@ -164,15 +164,11 @@
   <div class="hr-modal">
     <div class="hr-modal-title">API Keys</div>
 
-    <!-- Groq -->
-    <p class="hr-modal-section-label">
-      Groq API Key <span class="hr-modal-badge hr-modal-required">Required</span>
+    <p class="hr-modal-sub" style="margin-bottom:0.5rem">
+      <strong>Groq API Key</strong> (required) — powers AI route planning.
+      Get a free key at <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a>.
     </p>
-    <p class="hr-modal-sub">
-      Powers AI hop-route planning. Free key at
-      <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a>
-    </p>
-    <div class="hr-key-input-wrap">
+    <div class="hr-key-input-wrap" style="margin-bottom:1rem">
       <input
         type="password"
         id="keyInput"
@@ -183,16 +179,12 @@
       >
     </div>
 
-    <!-- RapidAPI -->
-    <p class="hr-modal-section-label" style="margin-top:1.25rem">
-      RapidAPI Key <span class="hr-modal-badge hr-modal-optional">Optional</span>
+    <p class="hr-modal-sub" style="margin-bottom:0.5rem">
+      <strong>RapidAPI Key</strong> (optional but recommended) — fetches real IRCTC train data
+      across all 7 days so weekly trains are never missed. Get a free key at
+      <a href="https://rapidapi.com/IRCTC/api/irctc1" target="_blank" rel="noopener">rapidapi.com → IRCTC API</a>.
     </p>
-    <p class="hr-modal-sub">
-      Fetches <strong>real verified train schedules</strong> from Indian Railways.
-      Get a free key at <a href="https://rapidapi.com/IRCTCAPI/api/irctc1" target="_blank" rel="noopener">rapidapi.com</a>
-      and subscribe to the IRCTC API (free tier). Without this, direct train data is AI-estimated.
-    </p>
-    <div class="hr-key-input-wrap">
+    <div class="hr-key-input-wrap" style="margin-bottom:1rem">
       <input
         type="password"
         id="rapidKeyInput"
@@ -203,10 +195,8 @@
       >
     </div>
 
-    <div class="hr-modal-footer">
-      <p class="hr-modal-note">Keys are stored in your browser's localStorage only — never shared.</p>
-      <button class="hr-key-save-btn" onclick="saveApiKey()">Save Keys</button>
-    </div>
+    <button class="hr-key-save-btn" style="width:100%;margin-bottom:0.75rem" onclick="saveApiKey()">Save Keys</button>
+    <p class="hr-modal-note">Keys are stored only in your browser's localStorage and never sent anywhere except their respective APIs.</p>
     <button class="hr-modal-close" onclick="closeKeyModal()">Dismiss</button>
   </div>
 </div>
