@@ -108,14 +108,74 @@
 
 <!-- LOADER -->
 <div class="hr-loader" id="loader" style="display:none">
-  <div class="hr-loader-dots">
-    <div class="hr-dot"></div>
-    <div class="hr-dot"></div>
-    <div class="hr-dot"></div>
-  </div>
-  <p class="hr-loader-step" id="loaderStepText">Checking direct train connections…</p>
-  <div class="hr-loader-progress">
-    <div class="hr-loader-bar" id="loaderBar"></div>
+  <div class="hr-loader-card">
+
+    <!-- Train scene -->
+    <div class="hr-train-scene">
+      <div class="hr-scene-rails">
+        <div class="hr-rail-top"></div>
+        <div class="hr-rail-bot"></div>
+        <div class="hr-ties-row">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="hr-rail-glow"></div>
+      </div>
+      <div class="hr-loco-wrap">
+        <div class="hr-loco-body">
+          <div class="hr-loco-nose"></div>
+          <div class="hr-loco-wins">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="hr-loco-stripe"></div>
+        </div>
+        <div class="hr-loco-wheels">
+          <div class="hr-loco-wheel"></div>
+          <div class="hr-loco-wheel"></div>
+          <div class="hr-loco-wheel sm"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route connector -->
+    <div class="hr-load-route">
+      <div class="hr-load-node">
+        <div class="hr-load-dot origin"></div>
+        <div class="hr-load-lbl" id="loaderFromLbl">—</div>
+      </div>
+      <div class="hr-load-rail">
+        <div class="hr-load-photon"></div>
+      </div>
+      <div class="hr-load-node">
+        <div class="hr-load-dot mid"></div>
+        <div class="hr-load-lbl" id="loaderMidLbl">scanning</div>
+      </div>
+      <div class="hr-load-rail">
+        <div class="hr-load-photon"></div>
+      </div>
+      <div class="hr-load-node">
+        <div class="hr-load-dot dest"></div>
+        <div class="hr-load-lbl" id="loaderToLbl">—</div>
+      </div>
+    </div>
+
+    <!-- Day-scan pips (shown during RapidAPI fetch) -->
+    <div class="hr-day-scan" id="dayScan" style="display:none">
+      <div class="hr-day-pips" id="dayPips">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="hr-day-text" id="dayScanText">Scanning 0 / 7 days…</div>
+    </div>
+
+    <!-- Step text -->
+    <p class="hr-loader-step" id="loaderStepText">Checking direct train connections…</p>
+
+    <!-- Progress bar -->
+    <div class="hr-loader-progress">
+      <div class="hr-loader-bar" id="loaderBar"></div>
+    </div>
+
   </div>
 </div>
 
