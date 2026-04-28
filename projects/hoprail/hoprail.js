@@ -529,7 +529,7 @@ Rules:
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
       temperature: 0,
-      max_tokens: 1500,
+      max_tokens: 3500,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
