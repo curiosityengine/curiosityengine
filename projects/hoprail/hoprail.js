@@ -368,63 +368,70 @@ function updateKeyDot() {
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeKeyModal(); });
 
 // ── RapidAPI — Fetch Real Direct Trains ───────────────────────────────────────
-// The trainBetweenStations API is date-specific: a weekly train only appears on
-// its running day. We query all 7 days in parallel so no train is ever missed.
+// trainBetweenStations is date-specific: a weekly train only appears on its
+// running day. We check all 7 days of the upcoming week in batches of 3 with a
+// 600ms gap between batches to stay within the free tier's rate limit (~5 req/s).
 async function fetchDirectTrains(fromCode, toCode, rapidKey) {
-  const requests = [];
-
+  const dates = [];
   for (let offset = 0; offset < 7; offset++) {
     const d = new Date();
     d.setDate(d.getDate() + offset);
-    const dd   = String(d.getDate()).padStart(2, "0");
-    const mm   = String(d.getMonth() + 1).padStart(2, "0");
-    const yyyy = d.getFullYear();
-    const dateStr = `${dd}-${mm}-${yyyy}`;
-
-    requests.push(
-      fetch(
-        `https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations` +
-        `?fromStationCode=${encodeURIComponent(fromCode)}` +
-        `&toStationCode=${encodeURIComponent(toCode)}` +
-        `&dateOfJourney=${dateStr}`,
-        {
-          method: "GET",
-          headers: {
-            "X-RapidAPI-Key":  rapidKey,
-            "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
-          },
-        }
-      ).then(async r => {
-        if (r.status === 401 || r.status === 403) throw new Error("auth");
-        if (r.status === 429) throw new Error("rate");
-        if (!r.ok) return null;
-        return r.json();
-      })
+    dates.push(
+      `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`
     );
   }
 
-  const results = await Promise.allSettled(requests);
-
-  // Bubble up hard errors
-  for (const r of results) {
-    if (r.status === "rejected") {
-      if (r.reason?.message === "auth")
-        throw new Error("Invalid RapidAPI key. Please check your key in settings.");
-      if (r.reason?.message === "rate")
-        throw new Error("RapidAPI rate limit hit. Please wait a moment.");
-    }
-  }
-
-  // Merge all days, deduplicate by train number
   const seen = new Map();
-  for (const r of results) {
-    if (r.status === "fulfilled" && Array.isArray(r.value?.data)) {
-      for (const train of r.value.data) {
-        if (!seen.has(train.train_number)) {
-          seen.set(train.train_number, train);
+  const BATCH = 3;
+
+  for (let i = 0; i < dates.length; i += BATCH) {
+    const batch = dates.slice(i, i + BATCH);
+
+    const results = await Promise.allSettled(
+      batch.map(dateStr =>
+        fetch(
+          `https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations` +
+          `?fromStationCode=${encodeURIComponent(fromCode)}` +
+          `&toStationCode=${encodeURIComponent(toCode)}` +
+          `&dateOfJourney=${dateStr}`,
+          {
+            method: "GET",
+            headers: {
+              "X-RapidAPI-Key":  rapidKey,
+              "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
+            },
+          }
+        ).then(async r => {
+          if (r.status === 401 || r.status === 403) throw new Error("auth");
+          if (r.status === 429) throw new Error("rate");
+          if (!r.ok) return null;
+          return r.json();
+        })
+      )
+    );
+
+    for (const r of results) {
+      if (r.status === "rejected") {
+        if (r.reason?.message === "auth")
+          throw new Error("Invalid RapidAPI key. Please check your key in settings.");
+        if (r.reason?.message === "rate")
+          throw new Error("RapidAPI rate limit hit. Please wait a moment and try again.");
+      }
+      if (r.status === "fulfilled" && Array.isArray(r.value?.data)) {
+        for (const train of r.value.data) {
+          if (!seen.has(train.train_number)) seen.set(train.train_number, train);
         }
       }
     }
+
+    // Update pip progress after each batch
+    const daysChecked = Math.min(i + BATCH, dates.length);
+    updateDayPips(daysChecked);
+    const pct = 10 + Math.round((daysChecked / dates.length) * 50);
+    setLoaderText(`Scanned ${daysChecked} of 7 days…`, pct);
+
+    // Pause between batches to stay within rate limits
+    if (i + BATCH < dates.length) await new Promise(res => setTimeout(res, 600));
   }
 
   return [...seen.values()];
@@ -470,7 +477,7 @@ async function findRoutes() {
   const groqKey = getApiKey();
   if (!groqKey) { openKeyModal(); return; }
 
-  showLoader();
+  showLoader(fromName, toName);
   hideAll();
   verifiedByApi = false;
 
@@ -479,10 +486,12 @@ async function findRoutes() {
     const rapidKey = getRapidApiKey();
 
     if (rapidKey && fromStation?.code && toStation?.code) {
-      setLoaderText("Fetching live train data across all days…", 15);
+      showDayScan();
+      setLoaderText("Fetching live train data from Indian Railways…", 10);
       try {
         realTrains = await fetchDirectTrains(fromStation.code, toStation.code, rapidKey);
         verifiedByApi = true;
+        updateDayPips(7);
       } catch (e) {
         if (e.message.includes("Invalid RapidAPI") || e.message.includes("rate limit")) {
           hideLoader();
@@ -493,7 +502,7 @@ async function findRoutes() {
       }
     }
 
-    setLoaderText("Planning routes with AI…", 55);
+    setLoaderText("Planning routes with AI…", 65);
     const data = await callGroq(fromName, toName, groqKey, realTrains);
     hideLoader();
     renderResults(data, fromName, toName);
@@ -613,34 +622,74 @@ function parseGroqResponse(raw) {
 }
 
 // ── Loader ────────────────────────────────────────────────────────────────────
-function showLoader() {
-  document.getElementById("loader").style.display = "flex";
+function showLoader(fromName, toName) {
+  const el = document.getElementById("loader");
+  el.style.display = "flex";
+
+  // Station labels in the route connector
+  const from = fromName ? shortName(fromName) : "—";
+  const to   = toName   ? shortName(toName)   : "—";
+  document.getElementById("loaderFromLbl").textContent = from;
+  document.getElementById("loaderToLbl").textContent   = to;
+  document.getElementById("loaderMidLbl").textContent  = "scanning";
+
+  // Hide day pips until API fetch starts
+  document.getElementById("dayScan").style.display = "none";
+  resetDayPips();
+
   loaderStep = 0;
-  updateLoaderStep();
+  setLoaderText(LOADER_STEPS[0], 5);
+
   loaderTimer = setInterval(() => {
     loaderStep = Math.min(loaderStep + 1, LOADER_STEPS.length - 1);
-    updateLoaderStep();
-  }, 1800);
-}
-
-function updateLoaderStep() {
-  document.getElementById("loaderStepText").textContent = LOADER_STEPS[loaderStep];
-  const pct = Math.round(((loaderStep + 1) / LOADER_STEPS.length) * 85);
-  document.getElementById("loaderBar").style.width = pct + "%";
+    setLoaderText(LOADER_STEPS[loaderStep]);
+  }, 2200);
 }
 
 function setLoaderText(text, pct) {
-  document.getElementById("loaderStepText").textContent = text;
+  const stepEl = document.getElementById("loaderStepText");
+  stepEl.style.opacity = "0";
+  setTimeout(() => {
+    stepEl.textContent  = text;
+    stepEl.style.opacity = "1";
+  }, 150);
   if (pct !== undefined) document.getElementById("loaderBar").style.width = pct + "%";
 }
 
 function hideLoader() {
   clearInterval(loaderTimer);
   document.getElementById("loaderBar").style.width = "100%";
+  document.getElementById("dayScan").style.display = "none";
   setTimeout(() => {
     document.getElementById("loader").style.display = "none";
     document.getElementById("loaderBar").style.width = "0%";
-  }, 300);
+  }, 350);
+}
+
+// ── Day pip helpers ───────────────────────────────────────────────────────────
+function resetDayPips() {
+  document.getElementById("dayPips").querySelectorAll("span").forEach(s => {
+    s.classList.remove("done", "active");
+  });
+  document.getElementById("dayScanText").textContent = "Scanning 0 / 7 days…";
+}
+
+function showDayScan() {
+  document.getElementById("dayScan").style.display = "flex";
+  // Kick off the first pip as "active"
+  const pips = document.getElementById("dayPips").querySelectorAll("span");
+  if (pips[0]) pips[0].classList.add("active");
+}
+
+function updateDayPips(daysChecked) {
+  const pips = document.getElementById("dayPips").querySelectorAll("span");
+  pips.forEach((p, i) => {
+    p.classList.remove("done", "active");
+    if (i < daysChecked)          p.classList.add("done");
+    else if (i === daysChecked)   p.classList.add("active");
+  });
+  document.getElementById("dayScanText").textContent =
+    `Scanning ${Math.min(daysChecked, 7)} / 7 days…`;
 }
 
 // ── Render Results ────────────────────────────────────────────────────────────
