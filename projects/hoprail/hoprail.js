@@ -819,6 +819,14 @@ const FALLBACK_DB = {
     "Howrah–Pune is a long cross-India journey via Nagpur. Azad Hind Express runs daily; a great overnight-plus option through central India."
   ),
 
+  // Raipur→Gaya: only 1 direct train — 22358 Mumbai LTT SF Express (few weekly)
+  "R-GAYA": _dr("few_weekly", 1,
+    [_t("22358","Mumbai LTT SF Express",3,"~18 hrs")],
+    "Only 1 direct train (22358, runs ~3 days/week); hop route recommended for flexibility",
+    [],
+    "Raipur–Gaya has just one direct train, the Mumbai LTT SF Express 22358, which runs a few days a week. Book early or consider hopping via Bilaspur for more frequent options."
+  ),
+
   "BPL-HWH": _dr("few_weekly", 2,
     [_t("12809","Howrah Mail",7,"~22 hrs"), _t("22912","Shipra Express",4,"~22 hrs")],
     "2 trains; ~22 hrs via Nagpur or Jabalpur",
@@ -1037,8 +1045,11 @@ function lookupFallback(fromCode, toCode, fromName, toName) {
   return result;
 }
 
-// ── Cache helpers (7-day TTL) ─────────────────────────────────────────────────
-const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+// ── Cache helpers ─────────────────────────────────────────────────────────────
+// Verified (IRCTC API) results: 7-day TTL — train schedules are stable.
+// AI-only estimates: 24-hour TTL — AI can be wrong; don't lock in bad data.
+const CACHE_TTL_VERIFIED = 7 * 24 * 60 * 60 * 1000;
+const CACHE_TTL_AI       = 24 * 60 * 60 * 1000;
 
 function _cacheKey(a, b) { return `hoprail_v1_${a}_${b}`; }
 
@@ -1046,14 +1057,24 @@ function readCache(fromCode, toCode) {
   try {
     const raw = localStorage.getItem(_cacheKey(fromCode, toCode));
     if (!raw) return null;
-    const { ts, data } = JSON.parse(raw);
-    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(_cacheKey(fromCode, toCode)); return null; }
+    const { ts, ttl, data } = JSON.parse(raw);
+    const maxAge = ttl || CACHE_TTL_VERIFIED;
+    if (Date.now() - ts > maxAge) { localStorage.removeItem(_cacheKey(fromCode, toCode)); return null; }
     return data;
   } catch { return null; }
 }
 
-function writeCache(fromCode, toCode, data) {
-  try { localStorage.setItem(_cacheKey(fromCode, toCode), JSON.stringify({ ts: Date.now(), data })); } catch {}
+function writeCache(fromCode, toCode, data, verified) {
+  const ttl = verified ? CACHE_TTL_VERIFIED : CACHE_TTL_AI;
+  try { localStorage.setItem(_cacheKey(fromCode, toCode), JSON.stringify({ ts: Date.now(), ttl, data })); } catch {}
+}
+
+function clearRouteCache() {
+  const fromCode = fromStation?.code;
+  const toCode   = toStation?.code;
+  if (fromCode && toCode) localStorage.removeItem(_cacheKey(fromCode, toCode));
+  fromCache = false;
+  findRoutes();
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -1409,8 +1430,8 @@ async function findRoutes() {
     setLoaderText("Planning routes with AI…", 65);
     const data = await callGroq(fromName, toName, groqKey, realTrains);
 
-    // Cache result for 7 days
-    if (fromCode && toCode) writeCache(fromCode, toCode, data);
+    // Cache: 7 days if IRCTC-verified, 24 hrs if AI-only estimate
+    if (fromCode && toCode) writeCache(fromCode, toCode, data, verifiedByApi);
 
     hideLoader();
     renderResults(data, fromName, toName);
@@ -1688,20 +1709,16 @@ function renderDirectSection(directTrains, isDirect) {
     </div>` : "";
 
   let badgeText, badgeStyle;
+  let verifiedBadge;
   if (verifiedByApi) {
-    badgeText  = "✓ IRCTC verified";
-    badgeStyle = "color:var(--accent);opacity:0.8";
+    verifiedBadge = `<span style="font-size:0.68rem;margin-left:auto;color:var(--accent);opacity:0.8">✓ IRCTC verified</span>`;
   } else if (fromCache) {
-    badgeText  = "↺ Cached (7d)";
-    badgeStyle = "color:var(--accent);opacity:0.7";
+    verifiedBadge = `<span style="font-size:0.68rem;margin-left:auto;color:var(--accent);opacity:0.7;cursor:pointer;text-decoration:underline;text-underline-offset:2px" onclick="clearRouteCache()" title="Results look wrong? Click to refresh">↺ Cached · Refresh</span>`;
   } else if (fromFallback) {
-    badgeText  = "◎ Route DB";
-    badgeStyle = "color:var(--muted-light);opacity:0.9";
+    verifiedBadge = `<span style="font-size:0.68rem;margin-left:auto;color:var(--muted-light);opacity:0.9">◎ Route DB</span>`;
   } else {
-    badgeText  = "AI estimate";
-    badgeStyle = "color:var(--muted-light)";
+    verifiedBadge = `<span style="font-size:0.68rem;margin-left:auto;color:var(--muted-light)">AI estimate</span>`;
   }
-  const verifiedBadge = `<span style="font-size:0.68rem;margin-left:auto;${badgeStyle}">${badgeText}</span>`;
 
   section.innerHTML = `
     <p class="hr-section-label">Direct Connectivity</p>
