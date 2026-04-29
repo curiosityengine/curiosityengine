@@ -1411,6 +1411,7 @@ async function findRoutes() {
     let realTrains = null;
 
     if (rapidKey && fromCode && toCode) {
+      // RapidAPI available — fetch live data, then let Groq reason over it
       showDayScan();
       setLoaderText("Fetching live train data from Indian Railways…", 10);
       try {
@@ -1424,6 +1425,16 @@ async function findRoutes() {
           return;
         }
         console.warn("RapidAPI failed, falling back to LLM:", e.message);
+      }
+    } else if (fromCode && toCode) {
+      // No live API — prefer curated fallback DB over Groq's unreliable memory
+      const fallback = lookupFallback(fromCode, toCode, fromName, toName);
+      if (fallback) {
+        fromFallback = true;
+        if (fromCode && toCode) writeCache(fromCode, toCode, fallback, false);
+        hideLoader();
+        renderResults(fallback, fromName, toName);
+        return;
       }
     }
 
