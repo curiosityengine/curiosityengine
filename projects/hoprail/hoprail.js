@@ -1295,14 +1295,24 @@ function getNtesWorkerUrl() {
   return localStorage.getItem("hoprail_ntes_worker") || "";
 }
 
-async function fetchDirectTrains(fromCode, toCode) {
+async function fetchDirectTrains(fromCode, toCode, fromName, toName) {
   const workerUrl = getNtesWorkerUrl();
   if (!workerUrl) throw new Error("ntes_not_configured");
 
   setLoaderText("Fetching live train data from NTES…", 15);
   updateDayPips(5); // show progress early
 
-  const url = `${workerUrl.replace(/\/$/, "")}/api/hoprail/trains?from=${encodeURIComponent(fromCode)}&to=${encodeURIComponent(toCode)}`;
+  // NTES expects "STATION NAME - CODE" format (e.g. "SILCHAR - SCL")
+  function toNtesStation(name, code) {
+    const short = name.replace(/\s+junction$/i,"").replace(/\s+jn\.?$/i,"").replace(/\s+railway\s+station$/i,"").trim().toUpperCase();
+    return `${short} - ${code}`;
+  }
+
+  const base = workerUrl.replace(/\/+$/, "").replace(/\/api\/hoprail\/trains$/, "");
+  const url = `${base}/api/hoprail/trains`
+    + `?from=${encodeURIComponent(fromCode)}&to=${encodeURIComponent(toCode)}`
+    + `&fromLabel=${encodeURIComponent(toNtesStation(fromName||fromCode, fromCode))}`
+    + `&toLabel=${encodeURIComponent(toNtesStation(toName||toCode, toCode))}`;
 
   const res = await fetch(url);
 
@@ -1401,7 +1411,7 @@ async function findRoutes() {
       // NTES Worker available — single call returns all trains with running days
       showDayScan();
       try {
-        realTrains = await fetchDirectTrains(fromCode, toCode);
+        realTrains = await fetchDirectTrains(fromCode, toCode, fromName, toName);
         verifiedByApi = true;
         updateDayPips(10);
       } catch (e) {
