@@ -1076,16 +1076,16 @@ function readCache(fromCode, toCode) {
   try {
     const raw = localStorage.getItem(_cacheKey(fromCode, toCode));
     if (!raw) return null;
-    const { ts, ttl, data } = JSON.parse(raw);
+    const { ts, ttl, data, verified } = JSON.parse(raw);
     const maxAge = ttl || CACHE_TTL_VERIFIED;
     if (Date.now() - ts > maxAge) { localStorage.removeItem(_cacheKey(fromCode, toCode)); return null; }
-    return data;
+    return { data, verified: !!verified };
   } catch { return null; }
 }
 
 function writeCache(fromCode, toCode, data, verified) {
   const ttl = verified ? CACHE_TTL_VERIFIED : CACHE_TTL_AI;
-  try { localStorage.setItem(_cacheKey(fromCode, toCode), JSON.stringify({ ts: Date.now(), ttl, data })); } catch {}
+  try { localStorage.setItem(_cacheKey(fromCode, toCode), JSON.stringify({ ts: Date.now(), ttl, data, verified: !!verified })); } catch {}
 }
 
 function clearRouteCache() {
@@ -1376,10 +1376,10 @@ async function findRoutes() {
   if (fromCode && toCode) {
     const cached = readCache(fromCode, toCode);
     if (cached) {
-      fromCache = true; fromFallback = false; verifiedByApi = false;
+      fromCache = true; fromFallback = false; verifiedByApi = cached.verified;
       showLoader(fromName, toName);
       hideAll();
-      setTimeout(() => { hideLoader(); renderResults(cached, fromName, toName); }, 350);
+      setTimeout(() => { hideLoader(); renderResults(cached.data, fromName, toName); }, 350);
       return;
     }
   }
@@ -1688,7 +1688,7 @@ function renderDirectSection(directTrains, isDirect) {
 
   let cls, icon, title, sub;
 
-  if (isDirect || freq === "few_weekly" || freq === "daily" || freq === "multiple_daily") {
+  if (isDirect || freq === "few_weekly" || freq === "daily" || freq === "multiple_daily" || trains.length > 2) {
     cls   = "good";
     icon  = "✦";
     title = "Direct trains available";
