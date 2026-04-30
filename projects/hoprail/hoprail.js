@@ -1255,23 +1255,23 @@ function setExample(fromName, toName) {
 }
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
-function getApiKey()      { return localStorage.getItem("hoprail_groq_key")  || ""; }
-function getRapidApiKey() { return localStorage.getItem("hoprail_rapid_key") || ""; }
+function getApiKey()       { return localStorage.getItem("hoprail_groq_key")    || ""; }
+function getNtesWorkerUrl(){ return localStorage.getItem("hoprail_ntes_worker") || ""; }
 
 function saveApiKey() {
-  const groq  = document.getElementById("keyInput").value.trim();
-  const rapid = document.getElementById("rapidKeyInput").value.trim();
-  if (groq)  localStorage.setItem("hoprail_groq_key",  groq);
-  if (rapid) localStorage.setItem("hoprail_rapid_key", rapid);
-  if (!groq && !rapid) return;
+  const groq   = document.getElementById("keyInput").value.trim();
+  const worker = document.getElementById("ntesWorkerInput").value.trim();
+  if (groq)   localStorage.setItem("hoprail_groq_key",    groq);
+  if (worker) localStorage.setItem("hoprail_ntes_worker", worker);
+  if (!groq && !worker) return;
   closeKeyModal();
   updateKeyDot();
 }
 
 function openKeyModal() {
   document.getElementById("keyModal").classList.add("open");
-  document.getElementById("keyInput").value      = getApiKey();
-  document.getElementById("rapidKeyInput").value = getRapidApiKey();
+  document.getElementById("keyInput").value        = getApiKey();
+  document.getElementById("ntesWorkerInput").value = getNtesWorkerUrl();
   document.getElementById("keyInput").focus();
 }
 function closeKeyModal() { document.getElementById("keyModal").classList.remove("open"); }
@@ -1279,77 +1279,45 @@ function closeKeyModal() { document.getElementById("keyModal").classList.remove(
 function updateKeyDot() {
   const dot = document.getElementById("keyDot");
   dot.classList.remove("set", "full");
-  if (getApiKey() && getRapidApiKey()) dot.classList.add("full");
-  else if (getApiKey())                dot.classList.add("set");
+  if (getApiKey() && getNtesWorkerUrl()) dot.classList.add("full");
+  else if (getApiKey())                  dot.classList.add("set");
 }
 
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeKeyModal(); });
 
-// ── RapidAPI — Fetch Real Direct Trains ───────────────────────────────────────
-// Checks all 30 days to catch special trains that run once every 2–4 weeks.
-// Batches of 3 requests with a 600ms gap to stay within the free-tier rate limit.
-async function fetchDirectTrains(fromCode, toCode, rapidKey) {
-  const dates = [];
-  for (let offset = 0; offset < 30; offset++) {
-    const d = new Date();
-    d.setDate(d.getDate() + offset);
-    dates.push(
-      `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`
-    );
+// ── NTES Worker — Fetch Real Direct Trains ────────────────────────────────────
+// Single call to a Cloudflare Worker that proxies NTES.
+// NTES returns ALL trains on the route with running-day info in one shot —
+// no date-looping needed (unlike the old RapidAPI approach that needed 30 calls).
+//
+// Set your Worker URL in Settings or hardcode it below.
+function getNtesWorkerUrl() {
+  return localStorage.getItem("hoprail_ntes_worker") || "";
+}
+
+async function fetchDirectTrains(fromCode, toCode) {
+  const workerUrl = getNtesWorkerUrl();
+  if (!workerUrl) throw new Error("ntes_not_configured");
+
+  setLoaderText("Fetching live train data from NTES…", 15);
+  updateDayPips(5); // show progress early
+
+  const url = `${workerUrl.replace(/\/$/, "")}?from=${encodeURIComponent(fromCode)}&to=${encodeURIComponent(toCode)}`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error || `NTES Worker returned ${res.status}`);
   }
 
-  const seen = new Map();
-  const BATCH = 3;
+  const json = await res.json();
+  if (!Array.isArray(json?.data)) throw new Error("Unexpected response from NTES Worker.");
 
-  for (let i = 0; i < dates.length; i += BATCH) {
-    const batch = dates.slice(i, i + BATCH);
+  updateDayPips(10); // done — all trains returned in one call
+  setLoaderText(`Found ${json.data.length} train(s) on this route…`, 60);
 
-    const results = await Promise.allSettled(
-      batch.map(dateStr =>
-        fetch(
-          `https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations` +
-          `?fromStationCode=${encodeURIComponent(fromCode)}` +
-          `&toStationCode=${encodeURIComponent(toCode)}` +
-          `&dateOfJourney=${dateStr}`,
-          {
-            method: "GET",
-            headers: {
-              "X-RapidAPI-Key":  rapidKey,
-              "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
-            },
-          }
-        ).then(async r => {
-          if (r.status === 401 || r.status === 403) throw new Error("auth");
-          if (r.status === 429) throw new Error("rate");
-          if (!r.ok) return null;
-          return r.json();
-        })
-      )
-    );
-
-    for (const r of results) {
-      if (r.status === "rejected") {
-        if (r.reason?.message === "auth")
-          throw new Error("Invalid RapidAPI key. Please check your key in settings.");
-        if (r.reason?.message === "rate")
-          throw new Error("RapidAPI rate limit hit. Please wait a moment and try again.");
-      }
-      if (r.status === "fulfilled" && Array.isArray(r.value?.data)) {
-        for (const train of r.value.data) {
-          if (!seen.has(train.train_number)) seen.set(train.train_number, train);
-        }
-      }
-    }
-
-    const daysChecked = Math.min(i + BATCH, dates.length);
-    updateDayPips(daysChecked);
-    const pct = 10 + Math.round((daysChecked / dates.length) * 50);
-    setLoaderText(`Scanned ${daysChecked} of 30 days…`, pct);
-
-    if (i + BATCH < dates.length) await new Promise(res => setTimeout(res, 600));
-  }
-
-  return [...seen.values()];
+  return json.data;
 }
 
 function formatRealTrainsForPrompt(trains) {
@@ -1389,10 +1357,10 @@ async function findRoutes() {
 
   if (fromName.toLowerCase() === toName.toLowerCase()) { shake("toInput"); return; }
 
-  const fromCode = fromStation?.code || "";
-  const toCode   = toStation?.code   || "";
-  const groqKey  = getApiKey();
-  const rapidKey = getRapidApiKey();
+  const fromCode  = fromStation?.code || "";
+  const toCode    = toStation?.code   || "";
+  const groqKey   = getApiKey();
+  const ntesWorker = getNtesWorkerUrl();
 
   // 1. Check 7-day cache first — skip all API calls if fresh result exists
   if (fromCode && toCode) {
@@ -1429,23 +1397,23 @@ async function findRoutes() {
   try {
     let realTrains = null;
 
-    if (rapidKey && fromCode && toCode) {
-      // RapidAPI available — fetch live data, then let Groq reason over it
+    if (ntesWorker && fromCode && toCode) {
+      // NTES Worker available — single call returns all trains with running days
       showDayScan();
-      setLoaderText("Fetching live train data from Indian Railways…", 10);
       try {
-        realTrains = await fetchDirectTrains(fromCode, toCode, rapidKey);
+        realTrains = await fetchDirectTrains(fromCode, toCode);
         verifiedByApi = true;
-        updateDayPips(30);
+        updateDayPips(10);
       } catch (e) {
-        if (e.message.includes("Invalid RapidAPI") || e.message.includes("rate limit")) {
-          hideLoader();
-          showError(e.message);
-          return;
+        if (e.message === "ntes_not_configured") {
+          // Worker URL disappeared somehow; fall through to fallback/Groq
+        } else {
+          console.warn("NTES Worker failed, falling back:", e.message);
         }
-        console.warn("RapidAPI failed, falling back to LLM:", e.message);
       }
-    } else if (fromCode && toCode) {
+    }
+
+    if (!realTrains && fromCode && toCode) {
       // No live API — prefer curated fallback DB over Groq's unreliable memory
       const fallback = lookupFallback(fromCode, toCode, fromName, toName);
       if (fallback) {
